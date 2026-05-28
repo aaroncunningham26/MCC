@@ -96,6 +96,11 @@
 
   const LAST_UPDATED = 'April 2026';
   const DATA_NOTE    = '2022–2023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024–2026: General Fund only. Source: PowerChurch (2022–2025), QuickBooks Online (2026).';
+
+  // ── Months of Cash on Hand ──────────────────────────────────────
+  // Update CASH_ON_HAND each time the dashboard is refreshed.
+  // Pull the unrestricted checking/savings balance from QBO Balance Sheet.
+  const CASH_ON_HAND = 383202; // ← update this value each month (unrestricted bank balance — total bank accounts minus all designated/restricted fund balances). As of Apr 30, 2026.
   </script>
 
   <div class="header">
@@ -183,6 +188,10 @@ document.querySelectorAll('.hdr-month').forEach(el => el.textContent = lastMonth
 const ytdInc = ytd2026Income.reduce((a,b)=>a+b,0);
 const ytdExp = ytd2026Expense.reduce((a,b)=>a+b,0);
 const ytdNet = ytdInc - ytdExp;
+const avgMonthlyExp = ytdExp / ytd2026Months.length;
+const monthsCash = (CASH_ON_HAND / avgMonthlyExp).toFixed(1);
+const cashCls = monthsCash >= 3 ? 'up' : monthsCash >= 1.5 ? 'neutral' : 'down';
+const cashAccent = monthsCash >= 3 ? 'accent-green' : monthsCash >= 1.5 ? 'accent-amber' : 'accent-red';
 const incChg = ((ytdInc-janAprIncome[2025])/janAprIncome[2025]*100).toFixed(1);
 const expChg = ((ytdExp-janAprExpense[2025])/janAprExpense[2025]*100).toFixed(1);
 
@@ -190,7 +199,8 @@ document.getElementById('snapshot-cards').innerHTML = [
   { label:'Giving received (Jan–'+lastMonth+')', value:fmt(ytdInc), sub:(incChg>=0?'▲ ':'▼ ')+Math.abs(incChg)+'% vs same period last year', cls:incChg>=0?'up':'down', accent:'accent-blue' },
   { label:'Operating costs (Jan–'+lastMonth+')', value:fmt(ytdExp), sub:(expChg>=0?'▲ ':'▼ ')+Math.abs(expChg)+'% vs same period last year', cls:Number(expChg)<=3?'up':'down', accent:'accent-amber' },
   { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — giving is covering costs':'Deficit — costs exceeding giving', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' },
-  { label:'2026 annual budget', value:fmt(annualBudgetIncome[2026]), sub:'Received '+Math.round(ytdInc/annualBudgetIncome[2026]*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' }
+  { label:'2026 annual budget', value:fmt(annualBudgetIncome[2026]), sub:'Received '+Math.round(ytdInc/annualBudgetIncome[2026]*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' },
+  { label:'Months of cash on hand', value:monthsCash + ' mo.', sub: monthsCash >= 3 ? 'Healthy — target is 3–6 months' : monthsCash >= 1.5 ? 'Caution — below the 3-month target' : 'Low — under 1.5 months of runway', cls:cashCls, accent:cashAccent }
 ].map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub ${c.cls}">${c.sub}</div></div>`).join('');
 
 const netVsLastYear = fmt(janAprIncome[2025]-janAprExpense[2025]);
@@ -199,7 +209,8 @@ document.getElementById('insights-list').innerHTML = [
   { dot:'dot-red',   text:`Operating costs are growing faster than giving — up <strong>${expChg}%</strong> year-over-year vs ${incChg}% giving growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>. This gap is the key financial challenge right now.` },
   { dot:'dot-amber', text:`The January–${lastMonth} deficit of <strong>${fmt(ytdNet)}</strong> is the largest in five years, more than double the deficit in the same period of 2025 (${netVsLastYear}). This warrants close monitoring through the spring and summer months.` },
   { dot:'dot-blue',  text:`April's higher cost total was driven by a <strong>third payroll in the month</strong> — a calendar artifact that occurs 2–3 times per year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is approximately <strong>$87,000–$89,000 per month</strong>.` },
-  { dot:'dot-blue',  text:`We have received <strong>${Math.round(ytdInc/annualBudgetIncome[2026]*100)}%</strong> of our full-year budget of ${fmt(annualBudgetIncome[2026])} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` }
+  { dot:'dot-blue',  text:`We have received <strong>${Math.round(ytdInc/annualBudgetIncome[2026]*100)}%</strong> of our full-year budget of ${fmt(annualBudgetIncome[2026])} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` },
+  { dot: monthsCash >= 3 ? 'dot-green' : monthsCash >= 1.5 ? 'dot-amber' : 'dot-red', text:`We currently have <strong>${monthsCash} months of cash on hand</strong> (${fmt(CASH_ON_HAND)} in reserves ÷ ${fmt(Math.round(avgMonthlyExp))} avg monthly costs). The healthy target for a church is <strong>3–6 months</strong>. ${monthsCash >= 3 ? 'We are within that range.' : 'Building reserves toward the 3-month floor should be a priority.'}` }
 ].map(i=>`<li><span class="dot ${i.dot}"></span><span>${i.text}</span></li>`).join('');
 
 Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";

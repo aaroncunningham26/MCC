@@ -48,6 +48,23 @@
   .dot-amber  { background: #D97706; }
   .dot-blue   { background: #1B3A6B; }
 
+  /* Next steps funnel */
+  .funnel-wrap { display: flex; align-items: stretch; gap: 0; }
+  .funnel-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+  .funnel-step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #D1D5DB; z-index: 1; }
+  .funnel-box { width: 100%; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 16px 10px; }
+  .funnel-step:nth-child(2) .funnel-box { background: #F0FDF4; border-color: #BBF7D0; }
+  .funnel-step:nth-child(3) .funnel-box { background: #FFF7ED; border-color: #FED7AA; }
+  .funnel-step:nth-child(4) .funnel-box { background: #F5F3FF; border-color: #DDD6FE; }
+  .funnel-num  { font-size: 26px; font-weight: 700; color: #1A1A2E; letter-spacing: -0.5px; }
+  .funnel-label { font-size: 12px; font-weight: 600; color: #374151; margin-top: 4px; }
+  .funnel-conv { font-size: 11px; color: #6B7280; margin-top: 6px; line-height: 1.4; }
+  .funnel-conv strong { color: #1A1A2E; }
+  @media (max-width: 600px) {
+    .funnel-wrap { flex-direction: column; gap: 8px; }
+    .funnel-step:not(:last-child)::after { content: '↓'; right: auto; top: auto; bottom: -16px; left: 50%; transform: translateX(-50%); }
+  }
+
   /* Chart cards */
   .chart-card { background: #fff; border-radius: 10px; padding: 22px 22px 18px; border: 1px solid #E5E7EB; margin-bottom: 14px; }
   .chart-card h2 { font-size: 15px; font-weight: 600; color: #1A1A2E; margin-bottom: 4px; }
@@ -217,6 +234,15 @@
     <div class="chart-wrap" style="height:220px;"><canvas id="discipleshipChart" role="img" aria-label="Adults in circles and regular serving percentage trend"></canvas></div>
   </div>
 
+  <!-- NEXT STEPS FUNNEL -->
+  <div class="section-label" style="margin-top: 28px;">Next steps funnel — 2026 YTD</div>
+  <div class="chart-card">
+    <h2>How people move from visitor to engaged disciple</h2>
+    <p class="chart-sub">Each stage shows the YTD count for 2026 and the conversion rate from the previous step. Count metrics are through Week 17.</p>
+    <div class="funnel-wrap" id="funnel-wrap"></div>
+    <p style="font-size:11px; color:#9CA3AF; margin-top:16px;">† YTD counts through Week 17. Adults in circles is a point-in-time average, not a cumulative count — conversion rate shown vs. Starting Point completers is directional only.</p>
+  </div>
+
   <div class="footer">
     <p>MCC &nbsp;·&nbsp; MCC Vitals Dashboard &nbsp;·&nbsp; Data through Week 17, April 2026</p>
     <p style="margin-top:2px;">Source: Planning Center / internal tracking. Updated by the Operations team.</p>
@@ -329,6 +355,54 @@ function buildTable(metrics, tableId) {
 
 buildTable(evangelism, 'evangelismTable');
 buildTable(discipleship, 'discipleshipTable');
+
+// ── Next Steps Funnel ───────────────────────────────────────────────
+(function() {
+  // 2026 YTD values (Week 17)
+  const visitors      = evangelism.find(m => m.name === 'Sunday visitors').values[4];       // 186
+  const connectBreak  = evangelism.find(m => m.name === 'Connect breakfast').values[4];     // 45
+  const startingPt    = discipleship.find(m => m.name === 'Starting Point').values[4];      // 15
+  const inCircles     = discipleship.find(m => m.name === 'Adults in circles').values[4];   // 593
+
+  const conv1 = Math.round(connectBreak / visitors * 100);
+  const conv2 = Math.round(startingPt / connectBreak * 100);
+
+  const steps = [
+    {
+      num: visitors,
+      label: 'Sunday Visitors',
+      conv: 'Starting point — guests who attended a service',
+      color: '#1B3A6B'
+    },
+    {
+      num: connectBreak,
+      label: 'Connect Breakfast',
+      conv: `<strong>${conv1}%</strong> of visitors attended Connect Breakfast`,
+      color: '#16A34A'
+    },
+    {
+      num: startingPt,
+      label: 'Starting Point',
+      conv: `<strong>${conv2}%</strong> of Connect Breakfast attendees completed Starting Point`,
+      color: '#D97706'
+    },
+    {
+      num: inCircles,
+      label: 'Adults in Circles',
+      conv: `<strong>${inCircles}</strong> adults currently in a circle (avg) — the ultimate discipleship goal`,
+      color: '#7C3AED'
+    }
+  ];
+
+  document.getElementById('funnel-wrap').innerHTML = steps.map(s => `
+    <div class="funnel-step">
+      <div class="funnel-box">
+        <div class="funnel-num" style="color:${s.color}">${s.num}</div>
+        <div class="funnel-label">${s.label}</div>
+        <div class="funnel-conv">${s.conv}</div>
+      </div>
+    </div>`).join('');
+})();
 
 // ── Charts ─────────────────────────────────────────────────────────
 Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
