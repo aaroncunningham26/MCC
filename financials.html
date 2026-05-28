@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCC General Fund Dashboard</title>
+<style>
+  :root { color-scheme: light; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #F0F2F5; color: #1A1A2E; font-size: 15px; line-height: 1.6; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #6B7280; text-decoration: none; margin-bottom: 20px; padding: 6px 0; }
+  .back-link:hover { color: #1B3A6B; }
+
+  .header { background: #1B3A6B; color: #fff; border-radius: 12px; padding: 24px 32px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header-left h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
+  .header-left p  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+  .header-badge   { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; color: rgba(255,255,255,0.9); text-align: right; }
+  .header-badge strong { display: block; font-size: 16px; font-weight: 600; color: #fff; }
+
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6B7280; margin-bottom: 12px; margin-top: 32px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 4px; }
+  .card  { background: #fff; border-radius: 10px; padding: 18px 20px; border: 1px solid #E5E7EB; }
+  .card .label { font-size: 12px; color: #6B7280; font-weight: 500; margin-bottom: 6px; }
+  .card .value { font-size: 24px; font-weight: 600; color: #1A1A2E; letter-spacing: -0.5px; }
+  .card .sub   { font-size: 12px; color: #6B7280; margin-top: 4px; }
+  .card .sub.up      { color: #15803D; }
+  .card .sub.down    { color: #B91C1C; }
+  .card .sub.neutral { color: #6B7280; }
+  .card.accent-green { border-top: 4px solid #16A34A; }
+  .card.accent-red   { border-top: 4px solid #DC2626; }
+  .card.accent-blue  { border-top: 4px solid #1B3A6B; }
+  .card.accent-amber { border-top: 4px solid #D97706; }
+
+  .chart-card { background: #fff; border-radius: 10px; padding: 22px 22px 18px; border: 1px solid #E5E7EB; margin-bottom: 14px; }
+  .chart-card h2 { font-size: 15px; font-weight: 600; color: #1A1A2E; margin-bottom: 4px; }
+  .chart-card .chart-sub { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+  .chart-wrap { position: relative; width: 100%; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 680px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4B5563; }
+  .legend-dot  { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .insights { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 20px 24px; margin-top: 6px; }
+  .insights h2 { font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 12px; }
+  .insights ul { list-style: none; }
+  .insights ul li { padding: 8px 0; border-bottom: 1px solid #DBEAFE; font-size: 13px; color: #1E3A5F; display: flex; align-items: flex-start; gap: 10px; line-height: 1.55; }
+  .insights ul li:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .dot-green  { background: #16A34A; }
+  .dot-red    { background: #DC2626; }
+  .dot-amber  { background: #D97706; }
+  .dot-blue   { background: #1B3A6B; }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th { background: #F9FAFB; font-weight: 600; color: #374151; padding: 9px 12px; text-align: right; border-bottom: 1px solid #E5E7EB; }
+  .data-table th:first-child { text-align: left; }
+  .data-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: #374151; }
+  .data-table td:first-child { text-align: left; font-weight: 500; color: #1A1A2E; }
+  .data-table tr:last-child td { border-bottom: none; font-weight: 600; background: #F9FAFB; }
+  .pos { color: #15803D; font-weight: 600; }
+  .neg { color: #B91C1C; font-weight: 600; }
+  .ytd-col { color: #1B3A6B; font-weight: 600; }
+
+  .footer { text-align: center; font-size: 11px; color: #9CA3AF; margin-top: 44px; line-height: 1.8; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a href="index.html" class="back-link">← Back to Metrics Portal</a>
+
+  <script>
+  // ══════════════════════════════════════════════════════════════
+  //  DATA — Sam updates these values when new reports come in
+  // ══════════════════════════════════════════════════════════════
+
+  const annualIncome  = { 2022:1406184, 2023:1515712, 2024:1418690, 2025:1553525 };
+  const annualExpense = { 2022:1374577, 2023:1349295, 2024:1389166, 2025:1574578 };
+
+  const annualBudgetIncome  = { 2022:1203775, 2023:1220300, 2024:1482025, 2025:1604875, 2026:1839800 };
+  const annualBudgetExpense = { 2022:1228900, 2023:1220800, 2024:1471869, 2025:1603860 };
+
+  const ytd2026Income  = [107451, 112486, 129496, 178530];
+  const ytd2026Expense = [147212, 152828, 153450, 189918];
+  const ytd2026Months  = ['Jan','Feb','Mar','Apr'];
+
+  const janAprIncome  = { 2022:443055, 2023:403961, 2024:416717, 2025:454888, 2026:527963 };
+  const janAprExpense = { 2022:433744, 2023:437010, 2024:408953, 2025:504171, 2026:643408 };
+
+  const LAST_UPDATED = 'April 2026';
+  const DATA_NOTE    = '2022–2023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024–2026: General Fund only. Source: PowerChurch (2022–2025), QuickBooks Online (2026).';
+  </script>
+
+  <div class="header">
+    <div class="header-left">
+      <h1>Maple City Chapel — General Fund</h1>
+      <p>Financial Health Dashboard &nbsp;·&nbsp; General Fund</p>
+    </div>
+    <div class="header-badge">Data through<strong id="hdr-date"></strong></div>
+  </div>
+
+  <div class="section-label">2026 Year-to-Date Snapshot (January – <span class="hdr-month"></span>)</div>
+  <div class="cards" id="snapshot-cards"></div>
+
+  <div class="section-label">Key takeaways</div>
+  <div class="insights"><h2>What this data is telling us</h2><ul id="insights-list"></ul></div>
+
+  <div class="section-label">Annual giving — are we growing?</div>
+  <div class="chart-card">
+    <h2>Total giving received each year</h2>
+    <p class="chart-sub">Full-year totals for 2022–2025. The 2026 bar shows giving received so far (January through <span class="hdr-month"></span>).</p>
+    <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#60A5FA;"></span>2026 year-to-date</span></div>
+    <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
+  </div>
+
+  <div class="section-label">Is giving covering our costs?</div>
+  <div class="chart-card">
+    <h2>Annual giving vs operating costs</h2>
+    <p class="chart-sub">When the blue bar is taller, we finished the year with a surplus. When orange is taller, we ran a deficit.</p>
+    <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Giving received</span><span class="legend-item"><span class="legend-dot" style="background:#F97316;"></span>Operating costs</span></div>
+    <div class="chart-wrap" style="height:230px;"><canvas id="incExpChart" role="img" aria-label="Giving vs operating costs 2022 through 2026 YTD"></canvas></div>
+  </div>
+
+  <div class="section-label">2026 monthly detail</div>
+  <div class="grid-2">
+    <div class="chart-card">
+      <h2>2026 month-by-month</h2>
+      <p class="chart-sub">Giving vs costs for each month so far in 2026.</p>
+      <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Giving</span><span class="legend-item"><span class="legend-dot" style="background:#F97316;"></span>Costs</span></div>
+      <div class="chart-wrap" style="height:190px;"><canvas id="monthlyChart" role="img" aria-label="2026 monthly giving vs costs"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h2>Jan–<span class="hdr-month"></span> net: 5-year view</h2>
+      <p class="chart-sub">Surplus or deficit in the same window across all five years.</p>
+      <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#16A34A;"></span>Surplus</span><span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>Deficit</span></div>
+      <div class="chart-wrap" style="height:190px;"><canvas id="netChart" role="img" aria-label="Jan through Apr net by year 2022 to 2026"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-label">How are we tracking against our giving goals?</div>
+  <div class="chart-card">
+    <h2>Giving budget vs actual — year by year</h2>
+    <p class="chart-sub">Budget is the target set at the start of each year. Variance shows whether we came in above or below the goal.</p>
+    <table class="data-table" id="budgetTable"></table>
+  </div>
+
+  <div class="section-label">Full summary</div>
+  <div class="chart-card">
+    <h2>General Fund — year-by-year totals</h2>
+    <p class="chart-sub">All figures are full-year actuals except 2026, which reflects January through <span class="hdr-month"></span> only.</p>
+    <table class="data-table" id="summaryTable"></table>
+  </div>
+
+  <div class="footer">
+    <p>Maple City Chapel &nbsp;·&nbsp; General Fund Financial Dashboard &nbsp;·&nbsp; Updated through <span id="ftr-date"></span></p>
+    <p id="ftr-note" style="margin-top:2px;"></p>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function fmt(v) {
+  if (v === null || v === undefined) return '—';
+  const abs = Math.abs(v);
+  const s = abs >= 1000000 ? '$' + (abs/1000000).toFixed(2) + 'M' : '$' + abs.toLocaleString('en-US');
+  return v < 0 ? '(' + s + ')' : s;
+}
+
+const lastMonth = ytd2026Months[ytd2026Months.length - 1];
+document.getElementById('hdr-date').textContent = lastMonth + ' ' + LAST_UPDATED.split(' ')[1];
+document.getElementById('ftr-date').textContent = LAST_UPDATED;
+document.getElementById('ftr-note').textContent = DATA_NOTE;
+document.querySelectorAll('.hdr-month').forEach(el => el.textContent = lastMonth);
+
+const ytdInc = ytd2026Income.reduce((a,b)=>a+b,0);
+const ytdExp = ytd2026Expense.reduce((a,b)=>a+b,0);
+const ytdNet = ytdInc - ytdExp;
+const incChg = ((ytdInc-janAprIncome[2025])/janAprIncome[2025]*100).toFixed(1);
+const expChg = ((ytdExp-janAprExpense[2025])/janAprExpense[2025]*100).toFixed(1);
+
+document.getElementById('snapshot-cards').innerHTML = [
+  { label:'Giving received (Jan–'+lastMonth+')', value:fmt(ytdInc), sub:(incChg>=0?'▲ ':'▼ ')+Math.abs(incChg)+'% vs same period last year', cls:incChg>=0?'up':'down', accent:'accent-blue' },
+  { label:'Operating costs (Jan–'+lastMonth+')', value:fmt(ytdExp), sub:(expChg>=0?'▲ ':'▼ ')+Math.abs(expChg)+'% vs same period last year', cls:Number(expChg)<=3?'up':'down', accent:'accent-amber' },
+  { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — giving is covering costs':'Deficit — costs exceeding giving', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' },
+  { label:'2026 annual giving goal', value:fmt(annualBudgetIncome[2026]), sub:'Received '+Math.round(ytdInc/annualBudgetIncome[2026]*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' }
+].map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub ${c.cls}">${c.sub}</div></div>`).join('');
+
+const netVsLastYear = fmt(janAprIncome[2025]-janAprExpense[2025]);
+document.getElementById('insights-list').innerHTML = [
+  { dot:'dot-green', text:`Giving is the strongest it has been in the January–${lastMonth} window across all five years — <strong>${fmt(ytdInc)}</strong> received, up ${incChg}% from the same period in 2025. This is encouraging momentum.` },
+  { dot:'dot-red',   text:`Operating costs are growing faster than giving — up <strong>${expChg}%</strong> year-over-year vs ${incChg}% giving growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>. This gap is the key financial challenge right now.` },
+  { dot:'dot-amber', text:`The January–${lastMonth} deficit of <strong>${fmt(ytdNet)}</strong> is the largest in five years, more than double the deficit in the same period of 2025 (${netVsLastYear}). This warrants close monitoring through the spring and summer months.` },
+  { dot:'dot-blue',  text:`April's higher cost total was driven by a <strong>third payroll in the month</strong> — a calendar artifact that occurs 2–3 times per year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is approximately <strong>$87,000–$89,000 per month</strong>.` },
+  { dot:'dot-blue',  text:`We have received <strong>${Math.round(ytdInc/annualBudgetIncome[2026]*100)}%</strong> of our full-year giving goal of ${fmt(annualBudgetIncome[2026])} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` }
+].map(i=>`<li><span class="dot ${i.dot}"></span><span>${i.text}</span></li>`).join('');
+
+Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
+Chart.defaults.font.size=12; Chart.defaults.color='#6B7280';
+const gc='rgba(0,0,0,0.06)';
+const yT={callback:v=>'$'+Math.round(Math.abs(v)/1000)+'K',color:'#9CA3AF'};
+const yN={callback:v=>(v<0?'-$':'$')+Math.round(Math.abs(v)/1000)+'K',color:'#9CA3AF'};
+const priorYears=[2022,2023,2024,2025];
+
+new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:[...priorYears.map(()=>'#1B3A6B'),'#60A5FA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+
+new Chart(document.getElementById('incExpChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{label:'Giving received',data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:'#1B3A6B',borderRadius:4},{label:'Operating costs',data:[...priorYears.map(y=>annualExpense[y]),ytdExp],backgroundColor:'#F97316',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+
+new Chart(document.getElementById('monthlyChart'),{type:'bar',data:{labels:ytd2026Months,datasets:[{label:'Giving',data:ytd2026Income,backgroundColor:'#1B3A6B',borderRadius:4},{label:'Costs',data:ytd2026Expense,backgroundColor:'#F97316',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+
+const nv=[2022,2023,2024,2025,2026].map(y=>janAprIncome[y]-janAprExpense[y]);
+new Chart(document.getElementById('netChart'),{type:'bar',data:{labels:['2022','2023','2024','2025','2026'],datasets:[{data:nv,backgroundColor:nv.map(v=>v>=0?'#16A34A':'#DC2626'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' Net: '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yN}}}});
+
+let bh=`<thead><tr><th>Year</th><th>Giving goal</th><th>Giving received</th><th>Variance</th><th>vs goal</th></tr></thead><tbody>`;
+priorYears.forEach(y=>{const b=annualBudgetIncome[y],a=annualIncome[y],d=a-b,c=d>=0?'pos':'neg';bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td class="${c}">${d>=0?'+':''}${fmt(d)}</td><td class="${c}">${d>=0?'+':''}${(d/b*100).toFixed(1)}%</td></tr>`;});
+bh+=`<tr><td>2026 (Jan–${lastMonth})</td><td>${fmt(annualBudgetIncome[2026])} annual goal</td><td>${fmt(ytdInc)} received</td><td class="ytd-col">${Math.round(ytdInc/annualBudgetIncome[2026]*100)}% of goal reached</td><td class="ytd-col">YTD only</td></tr></tbody>`;
+document.getElementById('budgetTable').innerHTML=bh;
+
+let sh=`<thead><tr><th>Year</th><th>Giving received</th><th>Operating costs</th><th>Net</th><th>Giving YoY</th></tr></thead><tbody>`;
+priorYears.forEach((y,i)=>{const inc=annualIncome[y],exp=annualExpense[y],net=inc-exp,prev=i>0?annualIncome[priorYears[i-1]]:null,cs=prev?((inc-prev)/prev*100).toFixed(1)+'%':'—',cc=prev?(inc>=prev?'pos':'neg'):'';sh+=`<tr><td>${y}</td><td>${fmt(inc)}</td><td>${fmt(exp)}</td><td class="${net>=0?'pos':'neg'}">${net>=0?'+':''}${fmt(net)}</td><td class="${cc}">${prev?(inc>=prev?'+':'')+cs:cs}</td></tr>`;});
+sh+=`<tr><td>2026 (Jan–${lastMonth})</td><td class="ytd-col">${fmt(ytdInc)}</td><td class="ytd-col">${fmt(ytdExp)}</td><td class="neg">${fmt(ytdNet)}</td><td class="ytd-col">+${((ytdInc-janAprIncome[2025])/janAprIncome[2025]*100).toFixed(1)}% vs 2025 same period</td></tr></tbody>`;
+document.getElementById('summaryTable').innerHTML=sh;
+</script>
+</body>
+</html>
