@@ -144,7 +144,7 @@
     </div>
   </div>
 
-  <div class="section-label">How are we tracking against our giving goals?</div>
+  <div class="section-label">How are we tracking against our budgets?</div>
   <div class="chart-card">
     <h2>Giving budget vs actual — year by year</h2>
     <p class="chart-sub">Budget is the target set at the start of each year. Variance shows whether we came in above or below the goal.</p>
@@ -190,7 +190,7 @@ document.getElementById('snapshot-cards').innerHTML = [
   { label:'Giving received (Jan–'+lastMonth+')', value:fmt(ytdInc), sub:(incChg>=0?'▲ ':'▼ ')+Math.abs(incChg)+'% vs same period last year', cls:incChg>=0?'up':'down', accent:'accent-blue' },
   { label:'Operating costs (Jan–'+lastMonth+')', value:fmt(ytdExp), sub:(expChg>=0?'▲ ':'▼ ')+Math.abs(expChg)+'% vs same period last year', cls:Number(expChg)<=3?'up':'down', accent:'accent-amber' },
   { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — giving is covering costs':'Deficit — costs exceeding giving', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' },
-  { label:'2026 annual giving goal', value:fmt(annualBudgetIncome[2026]), sub:'Received '+Math.round(ytdInc/annualBudgetIncome[2026]*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' }
+  { label:'2026 annual budget', value:fmt(annualBudgetIncome[2026]), sub:'Received '+Math.round(ytdInc/annualBudgetIncome[2026]*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' }
 ].map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub ${c.cls}">${c.sub}</div></div>`).join('');
 
 const netVsLastYear = fmt(janAprIncome[2025]-janAprExpense[2025]);
@@ -199,7 +199,7 @@ document.getElementById('insights-list').innerHTML = [
   { dot:'dot-red',   text:`Operating costs are growing faster than giving — up <strong>${expChg}%</strong> year-over-year vs ${incChg}% giving growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>. This gap is the key financial challenge right now.` },
   { dot:'dot-amber', text:`The January–${lastMonth} deficit of <strong>${fmt(ytdNet)}</strong> is the largest in five years, more than double the deficit in the same period of 2025 (${netVsLastYear}). This warrants close monitoring through the spring and summer months.` },
   { dot:'dot-blue',  text:`April's higher cost total was driven by a <strong>third payroll in the month</strong> — a calendar artifact that occurs 2–3 times per year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is approximately <strong>$87,000–$89,000 per month</strong>.` },
-  { dot:'dot-blue',  text:`We have received <strong>${Math.round(ytdInc/annualBudgetIncome[2026]*100)}%</strong> of our full-year giving goal of ${fmt(annualBudgetIncome[2026])} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` }
+  { dot:'dot-blue',  text:`We have received <strong>${Math.round(ytdInc/annualBudgetIncome[2026]*100)}%</strong> of our full-year budget of ${fmt(annualBudgetIncome[2026])} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` }
 ].map(i=>`<li><span class="dot ${i.dot}"></span><span>${i.text}</span></li>`).join('');
 
 Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
