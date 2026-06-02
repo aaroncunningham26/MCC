@@ -44,10 +44,15 @@ tr.hl td{font-weight:700;}
 .detail .lbl{font-size:12px;color:#6b7280;text-transform:uppercase;font-weight:600;}
 .detail .big{font-size:32px;font-weight:800;color:var(--navy);margin:6px 0;}
 .detail .meta{font-size:12.5px;color:#6b7280;}
+.yoy{font-size:13px;color:#4b5563;margin:-6px 0 14px;padding-bottom:12px;border-bottom:1px solid #f1f1f4;}
+.ghgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.ghstat{background:#f8fafc;border:1px solid #eef0f3;border-radius:10px;padding:14px 12px;text-align:center;}
+.ghv{font-size:26px;font-weight:800;color:var(--navy);}
+.ghl{font-size:11px;color:#6b7280;margin-top:4px;line-height:1.3;}
 .chartbox{position:relative;height:300px;}
 footer{text-align:center;font-size:12px;color:#6b7280;margin-top:24px;line-height:1.7;}
 .caveat{font-size:11.5px;color:#9ca3af;margin-top:10px;font-style:italic;}
-@media(max-width:760px){.cards,.budgetgrid{grid-template-columns:repeat(2,1fr);}.detailgrid{grid-template-columns:1fr;}header{flex-direction:column;}header .right{text-align:left;}}
+@media(max-width:760px){.cards,.budgetgrid,.ghgrid{grid-template-columns:repeat(2,1fr);}.detailgrid{grid-template-columns:1fr;}header{flex-direction:column;}header .right{text-align:left;}}
 </style></head>
 <body><div class="wrap">
 
@@ -94,6 +99,7 @@ footer{text-align:center;font-size:12px;color:#6b7280;margin-top:24px;line-heigh
 
 <div class="section">
   <h2>Monthly Giving &mdash; 2026 vs Prior-Year Income</h2>
+  <div class="yoy">May giving $106,494 vs May 2025 $132,355 (<span style="color:var(--red);font-weight:600">-19.5%</span>, partly a large one-off gift in May 2025) &nbsp;·&nbsp; YTD operating income <span style="color:var(--green);font-weight:600">+10.8%</span> vs 2025 ($587,243)</div>
   <div class="chartbox"><canvas id="givingChart"></canvas></div>
 </div>
 
@@ -110,12 +116,16 @@ footer{text-align:center;font-size:12px;color:#6b7280;margin-top:24px;line-heigh
 </div>
 
 <div class="section">
-  <h2>Giving Detail</h2>
-  <div class="detailgrid">
-    <div class="detail"><div class="lbl">Last Week</div><div class="big">$17,605</div><div class="meta">Week of May 25–31 &middot; QBO 4100</div></div>
-    <div class="detail"><div class="lbl">May (Full Month)</div><div class="big">$106,494</div><div class="meta">vs May 2025 giving $132,355 &rarr; <span style="color:var(--red);font-weight:600">-19.5%</span> &middot; QBO 4100</div></div>
+  <h2>Giving Health</h2>
+  <div class="ghgrid">
+    <div class="ghstat"><div class="ghv">410</div><div class="ghl">Gave &middot; last 6 weeks</div></div>
+    <div class="ghstat"><div class="ghv">527</div><div class="ghl">Gave &middot; last 6 months</div></div>
+    <div class="ghstat"><div class="ghv">584</div><div class="ghl">Gave &middot; last 12 months</div></div>
+    <div class="ghstat"><div class="ghv">39%</div><div class="ghl">Participation (of 1,483 active)</div></div>
+    <div class="ghstat"><div class="ghv">11</div><div class="ghl">Active recurring donors</div></div>
+    <div class="ghstat"><div class="ghv">1</div><div class="ghl">New donors this week</div></div>
   </div>
-  <div class="caveat">May 2025 figure is total Fund-11 giving; the year-over-year dip partly reflects an unusually large gift in May 2025. June giving begins with the 6/7 weekend.</div>
+  <div class="caveat">Live counts from Planning Center People Lists (donors, incl. joint givers). Participation = gave in last 12 months &divide; active members &amp; regular attenders.</div>
 </div>
 
 <footer>
