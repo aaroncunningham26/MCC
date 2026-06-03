@@ -295,8 +295,8 @@ new Chart(document.getElementById('givingChart'), {
     responsive:true, maintainAspectRatio:true,
     interaction:{mode:'index',intersect:false},
     plugins:{
-      legend:{position:'top',labels:{boxWidth:14,font:{size:12}}},
-      tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'—':'$'+Number(c.raw).toLocaleString())}}
+      legend:{position:'top',reverse:true,labels:{boxWidth:14,font:{size:12}}},
+      tooltip:{itemSort:(a,b)=>a.datasetIndex-b.datasetIndex,callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'—':'$'+Number(c.raw).toLocaleString())}}
     },
     scales:{ y:{ ticks:{callback:fmtK}, grid:{color:'#eef1f5'} }, x:{grid:{display:false}} }
   }
