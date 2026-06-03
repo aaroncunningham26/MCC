@@ -1,180 +1,275 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MCC Finance Team Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root{--navy:#1B3A6B;--green:#16A34A;--amber:#D97706;--red:#DC2626;--bg:#F0F2F5;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:#1f2937;line-height:1.45;}
-.wrap{max-width:1080px;margin:0 auto;padding:20px 16px 48px;}
-header{background:var(--navy);color:#fff;border-radius:12px;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;}
-header h1{font-size:24px;font-weight:700;}
-header .sub{font-size:13px;opacity:.85;margin-top:4px;}
-header .right{text-align:right;font-size:13px;opacity:.9;}
-header .right .big{font-size:15px;font-weight:600;opacity:1;}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:18px;}
-.card{background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
-.card .lbl{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#6b7280;font-weight:600;}
-.card .val{font-size:26px;font-weight:700;margin:6px 0 4px;color:var(--navy);}
-.card .note{font-size:11.5px;color:#6b7280;}
-.section{background:#fff;border-radius:12px;padding:20px 24px;margin-top:18px;box-shadow:0 1px 3px rgba(0,0,0,.07);}
-.section h2{font-size:16px;color:var(--navy);margin-bottom:14px;}
-.budgetgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
-.bstat .k{font-size:11.5px;color:#6b7280;text-transform:uppercase;font-weight:600;}
-.bstat .v{font-size:20px;font-weight:700;margin-top:3px;}
-.bar{height:18px;border-radius:9px;background:#e5e7eb;position:relative;margin:6px 0 2px;overflow:hidden;}
-.bar > span{position:absolute;left:0;top:0;bottom:0;border-radius:9px;}
-.barlbl{font-size:11.5px;color:#6b7280;display:flex;justify-content:space-between;}
-.pace{position:absolute;top:-3px;bottom:-3px;width:2px;background:#111827;}
-ul.insights{list-style:none;margin-top:6px;}
-ul.insights li{font-size:13.5px;padding:7px 0 7px 22px;position:relative;border-top:1px solid #f1f1f4;}
-ul.insights li:first-child{border-top:none;}
-ul.insights li::before{content:'';position:absolute;left:4px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--navy);}
-table{width:100%;border-collapse:collapse;font-size:13px;}
-th,td{padding:7px 8px;text-align:right;border-bottom:1px solid #eef0f3;}
-th:first-child,td:first-child{text-align:left;}
-thead th{color:#6b7280;font-size:11.5px;text-transform:uppercase;border-bottom:2px solid #e5e7eb;}
-td.yr{font-weight:600;color:#374151;}
-td.tot{font-weight:700;color:var(--navy);}
-tr.hl{background:#eef4ff;}
-tr.hl td{font-weight:700;}
-.detailgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
-.detail{background:#f8fafc;border-radius:10px;padding:18px 20px;border:1px solid #eef0f3;}
-.detail .lbl{font-size:12px;color:#6b7280;text-transform:uppercase;font-weight:600;}
-.detail .big{font-size:32px;font-weight:800;color:var(--navy);margin:6px 0;}
-.detail .meta{font-size:12.5px;color:#6b7280;}
-.yoy{font-size:13px;color:#4b5563;margin:-6px 0 14px;padding-bottom:12px;border-bottom:1px solid #f1f1f4;}
-.ghgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
-.ghstat{background:#f8fafc;border:1px solid #eef0f3;border-radius:10px;padding:14px 12px;text-align:center;}
-.ghv{font-size:26px;font-weight:800;color:var(--navy);}
-.ghl{font-size:11px;color:#6b7280;margin-top:4px;line-height:1.3;}
-.subh{font-size:13px;font-weight:600;color:#374151;margin:18px 0 8px;}
-.ramptbl{width:100%;border-collapse:collapse;font-size:13px;}
-.ramptbl th,.ramptbl td{padding:7px 8px;border-bottom:1px solid #eef0f3;text-align:left;}
-.ramptbl th{color:#6b7280;font-size:11.5px;text-transform:uppercase;border-bottom:2px solid #e5e7eb;}
-.ramptbl td.amt,.ramptbl th.amt{text-align:right;font-weight:700;color:var(--navy);}
-.chartbox{position:relative;height:300px;}
-footer{text-align:center;font-size:12px;color:#6b7280;margin-top:24px;line-height:1.7;}
-.caveat{font-size:11.5px;color:#9ca3af;margin-top:10px;font-style:italic;}
-@media(max-width:760px){.cards,.budgetgrid,.ghgrid{grid-template-columns:repeat(2,1fr);}.detailgrid{grid-template-columns:1fr;}header{flex-direction:column;}header .right{text-align:left;}}
-</style></head>
-<body><div class="wrap">
+  :root{
+    --navy:#1B3A6B; --green:#16A34A; --amber:#D97706; --red:#DC2626;
+    --bg:#F0F2F5; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 48px;}
+  header.top{background:var(--navy);color:#fff;border-radius:12px;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;}
+  header.top h1{margin:0;font-size:24px;font-weight:700;letter-spacing:.2px;}
+  header.top .sub{margin-top:6px;font-size:13px;color:#cbd5e1;}
+  header.top .right{text-align:right;font-size:13px;color:#e2e8f0;line-height:1.5;}
+  header.top .right .wk{font-weight:600;color:#fff;font-size:15px;}
+  section{margin-top:22px;}
+  .sec-title{font-size:15px;font-weight:700;color:var(--navy);margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .card{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .card .label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+  .card .value{font-size:26px;font-weight:700;margin-top:8px;color:var(--ink);}
+  .card .sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45;}
+  .chart-card{background:var(--card);border-radius:12px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .chart-card h3{margin:0 0 4px;font-size:16px;color:var(--navy);}
+  .chart-card .callout{font-size:13px;color:var(--muted);margin:0 0 14px;}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .tile{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .tile .v{font-size:24px;font-weight:700;color:var(--navy);}
+  .tile .l{font-size:12px;color:var(--muted);margin-top:6px;font-weight:600;}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px;}
+  .stat{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+  .stat .v{font-size:21px;font-weight:700;}
+  .stat .l{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+  .bar-wrap{margin:14px 0;}
+  .bar-wrap .bl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;font-weight:600;}
+  .track{position:relative;height:22px;background:#eef1f5;border-radius:6px;overflow:hidden;}
+  .fill{position:absolute;left:0;top:0;height:100%;border-radius:6px;}
+  .pace{position:absolute;top:-3px;height:28px;width:2px;background:#111;opacity:.65;}
+  .pace span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:#111;white-space:nowrap;}
+  ul.insights{margin:14px 0 0;padding-left:20px;font-size:13.5px;line-height:1.7;color:#374151;}
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);font-size:13.5px;}
+  th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);}
+  th:first-child,td:first-child{text-align:left;}
+  thead th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;}
+  tr.cur td{background:#eff6ff;font-weight:700;color:var(--navy);}
+  td.tot,th.tot{font-weight:700;border-left:1px solid var(--line);}
+  .small-tables{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
+  .cap{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5;}
+  footer{margin-top:30px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7;}
+  @media(max-width:860px){.cards,.tiles,.statgrid{grid-template-columns:repeat(2,1fr)}.small-tables{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
 
-<header>
-  <div>
-    <h1>MCC Finance Team Dashboard</h1>
-    <div class="sub">General Fund &middot; Operating figures only (excl. designated)</div>
-  </div>
-  <div class="right">
-    <div class="big">Week of June 2, 2026</div>
-    <div>Data through May 31</div>
-  </div>
-</header>
+  <header class="top">
+    <div>
+      <h1>MCC Finance Team Dashboard</h1>
+      <div class="sub">General Fund · Operating figures only (excl. designated)</div>
+    </div>
+    <div class="right">
+      <div class="wk">Week of Jun 3, 2026</div>
+      <div>Data through May 31, 2026</div>
+    </div>
+  </header>
 
-<div class="cards">
-  <div class="card"><div class="lbl">Last Week's Giving</div><div class="val">$17,605</div><div class="note">Week of May 25–31 &middot; QBO 4100</div></div>
-  <div class="card"><div class="lbl">May Giving</div><div class="val">$106,494</div><div class="note">May 1&ndash;31 &middot; QBO 4100</div></div>
-  <div class="card"><div class="lbl">2026 YTD Giving</div><div class="val">$598,555</div><div class="note">Jan&ndash;May &middot; QBO 4100</div></div>
-  <div class="card"><div class="lbl">Bank Balance</div><div class="val">$788,659</div><div class="note">Unrestricted: $346,298 &middot; 2.2 mo. cash</div></div>
+  <!-- Snapshot -->
+  <section>
+    <div class="cards">
+      <div class="card">
+        <div class="label">Last Week's Giving</div>
+        <div class="value">$17,605</div>
+        <div class="sub">Week of May 25–31</div>
+      </div>
+      <div class="card">
+        <div class="label">May Giving</div>
+        <div class="value">$106,494</div>
+        <div class="sub">General Tithes &amp; Offerings</div>
+      </div>
+      <div class="card">
+        <div class="label">YTD Giving</div>
+        <div class="value">$598,555</div>
+        <div class="sub">Jan 1 – May 31, 2026</div>
+      </div>
+      <div class="card">
+        <div class="label">Bank Balance</div>
+        <div class="value">$788,659</div>
+        <div class="sub">Unrestricted: $346,298 · 2.2 mo. cash</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Monthly Giving chart -->
+  <section>
+    <div class="chart-card">
+      <h3>Monthly Giving — 2026 vs Prior-Year Income</h3>
+      <p class="callout">2026 giving of $598,555 through May is pacing slightly ahead of 2025 income ($587,243) for the same months and well above 2024.</p>
+      <canvas id="givingChart" height="110"></canvas>
+    </div>
+  </section>
+
+  <!-- Giving Health -->
+  <section>
+    <h2 class="sec-title">Giving Health</h2>
+    <div class="tiles">
+      <div class="tile"><div class="v">287</div><div class="l">Giving units · 2026 YTD</div></div>
+      <div class="tile"><div class="v">62.8%</div><div class="l">Participation (of 457 households)</div></div>
+      <div class="tile"><div class="v">37</div><div class="l">New donors to 4100 · this year</div></div>
+      <div class="tile"><div class="v">1</div><div class="l">New donors this week</div></div>
+    </div>
+  </section>
+
+  <!-- YTD Operating Income vs Budget -->
+  <section>
+    <div class="chart-card">
+      <h3>YTD Operating Income vs Budget</h3>
+      <div class="statgrid" style="margin-top:14px;">
+        <div class="stat"><div class="v">$650,742</div><div class="l">YTD Operating Income</div></div>
+        <div class="stat"><div class="v">$767,800</div><div class="l">YTD Budget (22 wks)</div></div>
+        <div class="stat"><div class="v" style="color:var(--red)">-$117,058</div><div class="l">Variance vs Budget</div></div>
+        <div class="stat"><div class="v">84.8%</div><div class="l">% of YTD Budget</div></div>
+      </div>
+
+      <div class="bar-wrap">
+        <div class="bl"><span>Operating Income vs Annual Budget</span><span>$650,742 / $1,839,800 · 35.4%</span></div>
+        <div class="track">
+          <div class="fill" style="width:35.4%;background:var(--green)"></div>
+          <div class="pace" style="left:42.3%"><span>Pace 42.3%</span></div>
+        </div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bl"><span>Operating Expenses vs Annual Budget</span><span>$783,650 / $1,839,800 · 42.6%</span></div>
+        <div class="track">
+          <div class="fill" style="width:42.6%;background:var(--amber)"></div>
+          <div class="pace" style="left:42.3%"><span>Pace 42.3%</span></div>
+        </div>
+      </div>
+
+      <ul class="insights">
+        <li><strong>vs budget:</strong> 22 weeks × $34,900/wk = $767,800 budgeted; actual operating income is $650,742 — behind by -$117,058 (84.8% of pace).</li>
+        <li><strong>vs prior year:</strong> 2025 Jan–May income was $587,243; 2026 is $650,742, up $63,499 (+10.8%).</li>
+        <li><strong>income vs expenses:</strong> operating expenses of $783,650 exceed operating income of $650,742 — a YTD operating shortfall of -$132,908.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Operating Income Comparison -->
+  <section>
+    <h2 class="sec-title">Operating Income Comparison</h2>
+    <table>
+      <thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th class="tot">Total</th></tr></thead>
+      <tbody>
+        <tr><td>2022</td><td>$87,163</td><td>$95,988</td><td>$109,900</td><td>$150,004</td><td>$113,555</td><td class="tot">$556,610</td></tr>
+        <tr><td>2023</td><td>$64,824</td><td>$89,895</td><td>$119,128</td><td>$130,114</td><td>$90,236</td><td class="tot">$494,197</td></tr>
+        <tr><td>2024</td><td>$76,299</td><td>$86,725</td><td>$138,867</td><td>$114,826</td><td>$97,422</td><td class="tot">$514,139</td></tr>
+        <tr><td>2025</td><td>$65,693</td><td>$97,362</td><td>$161,385</td><td>$130,448</td><td>$132,355</td><td class="tot">$587,243</td></tr>
+        <tr class="cur"><td>2026</td><td>$107,451</td><td>$112,486</td><td>$129,496</td><td>$178,530</td><td>$122,779</td><td class="tot">$650,742</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Operating Expense Comparison -->
+  <section>
+    <h2 class="sec-title">Operating Expense Comparison</h2>
+    <table>
+      <thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th class="tot">Total</th></tr></thead>
+      <tbody>
+        <tr><td>2022</td><td>$94,382</td><td>$100,727</td><td>$141,604</td><td>$97,031</td><td>$111,113</td><td class="tot">$544,857</td></tr>
+        <tr><td>2023</td><td>$100,898</td><td>$112,560</td><td>$110,885</td><td>$112,667</td><td>$145,223</td><td class="tot">$582,233</td></tr>
+        <tr><td>2024</td><td>$102,264</td><td>$118,014</td><td>$91,828</td><td>$96,847</td><td>$134,588</td><td class="tot">$543,541</td></tr>
+        <tr><td>2025</td><td>$121,234</td><td>$119,485</td><td>$120,650</td><td>$142,802</td><td>$124,219</td><td class="tot">$628,390</td></tr>
+        <tr class="cur"><td>2026</td><td>$147,212</td><td>$152,828</td><td>$153,450</td><td>$189,918</td><td>$140,243</td><td class="tot">$783,650</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Ramp Activity -->
+  <section>
+    <h2 class="sec-title">Ramp Activity</h2>
+    <div class="tiles">
+      <div class="tile"><div class="v">$6,429</div><div class="l">Card spend · June MTD (25 txns)</div></div>
+      <div class="tile"><div class="v">$8,978</div><div class="l">Card spend · past 7 days (55 txns)</div></div>
+      <div class="tile"><div class="v">$3,304</div><div class="l">Bill Pay paid · June MTD</div></div>
+      <div class="tile"><div class="v">$6,527</div><div class="l">Bill Pay outstanding (12 open)</div></div>
+    </div>
+
+    <div class="small-tables">
+      <div>
+        <table>
+          <thead>
+            <tr><th colspan="3" style="text-align:left">Card transactions over $500 · past 7 days</th></tr>
+            <tr><th>Date</th><th style="text-align:left">Merchant / Cardholder</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Jun 1</td><td style="text-align:left">Church Finance · Aaron Cunningham</td><td>$1,780.00</td></tr>
+            <tr><td>Jun 1</td><td style="text-align:left">Grass Guru · Aaron Cunningham</td><td>$1,400.00</td></tr>
+            <tr><td>Jun 1</td><td style="text-align:left">Waste Connections · Wrennie Howard</td><td>$537.68</td></tr>
+            <tr><td>May 28</td><td style="text-align:left">TCS Fundraising · Jessica Graber</td><td>$518.62</td></tr>
+            <tr><td>May 29</td><td style="text-align:left">Subsplash · Aaron Cunningham</td><td>$505.39</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <table>
+          <thead>
+            <tr><th colspan="3" style="text-align:left">Bills paid · past 7 days</th></tr>
+            <tr><th>Paid</th><th style="text-align:left">Vendor</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Jun 1</td><td style="text-align:left">Missionary Ventures</td><td>$1,100.00</td></tr>
+            <tr><td>Jun 2</td><td style="text-align:left">Mission Aviation Fellowship</td><td>$800.00</td></tr>
+            <tr><td>Jun 1</td><td style="text-align:left">Wycliffe Bible Translators</td><td>$800.00</td></tr>
+            <tr><td>May 29</td><td style="text-align:left">Clayton Nisly</td><td>$800.00</td></tr>
+            <tr><td>May 28</td><td style="text-align:left">Global Gates</td><td>$750.00</td></tr>
+            <tr><td>Jun 1</td><td style="text-align:left">GET PRINTING INC.</td><td>$267.25</td></tr>
+            <tr><td>May 28</td><td style="text-align:left">Economy Offset Print &amp; Digital</td><td>$195.73</td></tr>
+            <tr><td>Jun 1</td><td style="text-align:left">KSS Enterprises</td><td>$189.62</td></tr>
+            <tr><td>Jun 1</td><td style="text-align:left">Cintas</td><td>$146.71</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="cap">Live from Ramp · card spend (all cardholders, incl. pending) and Bill Pay / accounts payable. Card spend posts to QBO Ramp Card &amp; expense accounts.</p>
+  </section>
+
+  <footer>
+    <div>MCC Finance Team · Prepared Wednesday, Jun 3, 2026</div>
+    <div>2022–2025: PowerChurch · 2026: QuickBooks Online · Giving: QBO 4100 · Donors: Planning Center · Card spend &amp; bills: Ramp</div>
+  </footer>
+
 </div>
 
-<div class="section">
-  <h2>Monthly Giving &mdash; 2026 vs Prior-Year Income</h2>
-  <div class="yoy">May giving $106,494 vs May 2025 $132,355 (<span style="color:var(--red);font-weight:600">-19.5%</span>, partly a large one-off gift in May 2025) &nbsp;·&nbsp; YTD operating income <span style="color:var(--green);font-weight:600">+10.8%</span> vs 2025 ($587,243)</div>
-  <div class="chartbox"><canvas id="givingChart"></canvas></div>
-</div>
-
-<div class="section">
-  <h2>Giving Health</h2>
-  <div class="ghgrid" style="grid-template-columns:repeat(4,1fr);">
-    <div class="ghstat"><div class="ghv">287</div><div class="ghl">Giving units &middot; 2026 YTD</div></div>
-    <div class="ghstat"><div class="ghv">63%</div><div class="ghl">Participation (of 457 households)</div></div>
-    <div class="ghstat"><div class="ghv">37</div><div class="ghl">New donors to 4100 &middot; this year</div></div>
-    <div class="ghstat"><div class="ghv">1</div><div class="ghl">New donors this week</div></div>
-  </div>
-  <div class="caveat">Live counts from Planning Center People Lists. Giving units = households that gave to 4100 in 2026; participation = 287 of 457 giving-capable households.</div>
-</div>
-
-<div class="section">
-  <h2>YTD Operating Income vs Budget</h2>
-  <div class="budgetgrid">
-    <div class="bstat"><div class="k">YTD Actual Income</div><div class="v" style="color:var(--navy)">$650,742</div></div>
-    <div class="bstat"><div class="k">YTD Budget (22 wks)</div><div class="v">$767,800</div></div>
-    <div class="bstat"><div class="k">Variance</div><div class="v" style="color:var(--red)">-$117,058</div></div>
-    <div class="bstat"><div class="k">% of YTD Budget</div><div class="v" style="color:var(--amber)">85%</div></div>
-  </div>
-
-  <div class="barlbl"><span>Income &mdash; $650,742 of $1,839,800 annual</span><span>35.4%</span></div>
-  <div class="bar"><span style="width:35.4%;background:var(--green)"></span><span class="pace" style="left:42.3%"></span></div>
-
-  <div class="barlbl" style="margin-top:10px"><span>Expenses &mdash; $783,650 of $1,839,800 annual</span><span>42.6%</span></div>
-  <div class="bar"><span style="width:42.6%;background:var(--amber)"></span><span class="pace" style="left:42.3%"></span></div>
-  <div class="caveat">Vertical marker = 42% of year elapsed (week 22 of 52). Income behind pace; expenses slightly ahead.</div>
-
-  <ul class="insights">
-    <li><strong>vs Budget:</strong> YTD operating income of $650,742 is $117,058 (15%) behind the YTD giving budget of $767,800 (22 weeks &times; $34,900/wk).</li>
-    <li><strong>vs Prior Year:</strong> Giving is up $63,499 (+10.8%) versus the same Jan&ndash;May period in 2025 ($587,243) &mdash; consistent with the ~9% year-over-year trend.</li>
-    <li><strong>Income vs Expenses:</strong> Operating expenses exceed income by $132,908 YTD &mdash; a normal seasonal pattern; giving historically catches up in Q4 (December alone averaged ~$234K across 2022&ndash;2025).</li>
-  </ul>
-</div>
-
-<div class="section">
-  <h2>Operating Income Comparison (Jan&ndash;May)</h2>
-  <table><thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Total</th></tr></thead>
-  <tbody><tr><td class='yr'>2022</td><td>$87,163</td><td>$95,988</td><td>$109,900</td><td>$150,004</td><td>$113,555</td><td class='tot'>$556,610</td></tr><tr><td class='yr'>2023</td><td>$64,824</td><td>$89,895</td><td>$119,128</td><td>$130,114</td><td>$90,236</td><td class='tot'>$494,197</td></tr><tr><td class='yr'>2024</td><td>$76,299</td><td>$86,725</td><td>$138,867</td><td>$114,826</td><td>$97,422</td><td class='tot'>$514,139</td></tr><tr><td class='yr'>2025</td><td>$65,693</td><td>$97,362</td><td>$161,385</td><td>$130,448</td><td>$132,355</td><td class='tot'>$587,243</td></tr><tr class="hl"><td class='yr'>2026</td><td>$107,451</td><td>$112,486</td><td>$129,496</td><td>$178,530</td><td>$122,779</td><td class='tot'>$650,742</td></tr></tbody></table>
-</div>
-
-<div class="section">
-  <h2>Operating Expense Comparison (Jan&ndash;May)</h2>
-  <table><thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Total</th></tr></thead>
-  <tbody><tr><td class='yr'>2022</td><td>$94,382</td><td>$100,727</td><td>$141,604</td><td>$97,031</td><td>$111,113</td><td class='tot'>$544,857</td></tr><tr><td class='yr'>2023</td><td>$100,898</td><td>$112,560</td><td>$110,885</td><td>$112,667</td><td>$145,223</td><td class='tot'>$582,233</td></tr><tr><td class='yr'>2024</td><td>$102,264</td><td>$118,014</td><td>$91,828</td><td>$96,847</td><td>$134,588</td><td class='tot'>$543,541</td></tr><tr><td class='yr'>2025</td><td>$121,234</td><td>$119,485</td><td>$120,650</td><td>$142,802</td><td>$124,219</td><td class='tot'>$628,390</td></tr><tr class="hl"><td class='yr'>2026</td><td>$147,212</td><td>$152,828</td><td>$153,450</td><td>$189,918</td><td>$140,243</td><td class='tot'>$783,650</td></tr></tbody></table>
-</div>
-
-<div class="section">
-  <h2>Ramp Activity</h2>
-  <div class="ghgrid" style="grid-template-columns:repeat(4,1fr);">
-    <div class="ghstat"><div class="ghv">$6,383</div><div class="ghl">Card spend &middot; June MTD (23 txns)</div></div>
-    <div class="ghstat"><div class="ghv">$12,428</div><div class="ghl">Card spend &middot; past 7 days (74 txns)</div></div>
-    <div class="ghstat"><div class="ghv">$3,304</div><div class="ghl">Bill Pay paid &middot; June MTD</div></div>
-    <div class="ghstat"><div class="ghv">$6,527</div><div class="ghl">Bill Pay outstanding (12 open)</div></div>
-  </div>
-  <div class="subh">Card transactions over $500 &middot; past 7 days</div>
-  <table class="ramptbl">
-    <thead><tr><th>Date</th><th>Merchant</th><th>Cardholder</th><th class="amt">Amount</th></tr></thead>
-    <tbody><tr><td>Jun 1</td><td>Church Finance</td><td>Aaron Cunningham</td><td class='amt'>$1,780.00</td></tr><tr><td>Jun 1</td><td>Grass Guru</td><td>Aaron Cunningham</td><td class='amt'>$1,400.00</td></tr><tr><td>May 26</td><td>TechKnowledgey, Inc.</td><td>Wrennie Howard</td><td class='amt'>$745.39</td></tr><tr><td>Jun 1</td><td>Waste Connections</td><td>Wrennie Howard</td><td class='amt'>$537.68</td></tr><tr><td>May 28</td><td>TCS Fundraising</td><td>Jessica Graber</td><td class='amt'>$518.62</td></tr><tr><td>May 29</td><td>Subsplash</td><td>Aaron Cunningham</td><td class='amt'>$505.39</td></tr></tbody>
-  </table>
-  <div class="subh">Bills paid &middot; past 7 days</div>
-  <table class="ramptbl">
-    <thead><tr><th>Paid</th><th>Vendor</th><th class="amt">Amount</th></tr></thead>
-    <tbody><tr><td>Jun 2</td><td>Mission Aviation Fellowship</td><td class='amt'>$800.00</td></tr><tr><td>Jun 1</td><td>Missionary Ventures</td><td class='amt'>$1,100.00</td></tr><tr><td>Jun 1</td><td>Wycliffe Bible Translators</td><td class='amt'>$800.00</td></tr><tr><td>Jun 1</td><td>GET PRINTING INC.</td><td class='amt'>$267.25</td></tr><tr><td>Jun 1</td><td>KSS Enterprises</td><td class='amt'>$189.62</td></tr><tr><td>Jun 1</td><td>Cintas</td><td class='amt'>$146.71</td></tr><tr><td>May 29</td><td>Clayton Nisly</td><td class='amt'>$800.00</td></tr><tr><td>May 28</td><td>Global Gates</td><td class='amt'>$750.00</td></tr><tr><td>May 28</td><td>Economy Offset Print and Digital Services</td><td class='amt'>$195.73</td></tr><tr><td>May 26</td><td>Best Sweeping Specialist</td><td class='amt'>$296.00</td></tr><tr><td>May 26</td><td>Wildman Uniform & Linen</td><td class='amt'>$210.98</td></tr></tbody>
-  </table>
-  <div class="caveat">Live from Ramp &middot; card spend (all cardholders, incl. pending) and Bill Pay / accounts payable. MTD = current month to date. Card spend posts to QBO Ramp Card &amp; expense accounts.</div>
-</div>
-
-<footer>
-  MCC Finance Team &middot; Prepared Tuesday, June 2, 2026 (ahead of the Wed 11 AM finance meeting)<br>
-  2022&ndash;2025: PowerChurch &middot; 2026: QuickBooks Online &middot; Giving: QBO 4100 &middot; Donors: Planning Center &middot; Card spend: Ramp
-</footer>
-
-</div>
 <script>
-const CD = {"labels": ["Jan", "Feb", "Mar", "Apr", "May"], "tithes": [96872.49, 101828.06, 121537.32, 171822.96, 106493.8], "y2025": [65693, 97362, 161385, 130448, 132355], "y2024": [76299, 86725, 138867, 114826, 97422]};
+const fmtK = v => '$' + (v/1000).toFixed(0) + 'k';
 new Chart(document.getElementById('givingChart'), {
   data: {
-    labels: CD.labels,
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     datasets: [
-      {type:'bar', label:'2026 Giving (4100)', data:CD.tithes, backgroundColor:'#1B3A6B', borderRadius:5, order:3},
-      {type:'line', label:'2025 Income', data:CD.y2025, borderColor:'#16A34A', backgroundColor:'#16A34A', borderWidth:2.5, tension:.3, fill:false, order:1},
-      {type:'line', label:'2024 Income', data:CD.y2024, borderColor:'#D97706', backgroundColor:'#D97706', borderWidth:2.5, borderDash:[6,4], tension:.3, fill:false, order:2}
+      {
+        type:'bar', label:'2026 Giving',
+        data:[96872.49,101828.06,121537.32,171822.96,106493.80,null,null,null,null,null,null,null],
+        backgroundColor:'rgba(27,58,107,0.85)', borderRadius:4, order:3
+      },
+      {
+        type:'line', label:'2025 Income',
+        data:[65693,97362,161385,130448,132355,132973,100146,145551,117019,123389,123635,223569],
+        borderColor:'#16A34A', backgroundColor:'#16A34A', borderWidth:2.5, tension:.3,
+        pointRadius:2.5, fill:false, order:1
+      },
+      {
+        type:'line', label:'2024 Income',
+        data:[76299,86725,138867,114826,97422,121975,111852,101834,129043,97945,99601,242301],
+        borderColor:'#D97706', backgroundColor:'#D97706', borderWidth:2, borderDash:[6,4], tension:.3,
+        pointRadius:2, fill:false, order:2
+      }
     ]
   },
   options: {
-    responsive:true, maintainAspectRatio:false,
-    plugins:{legend:{position:'bottom'},
-      tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.y.toLocaleString()}}},
-    scales:{y:{beginAtZero:true, ticks:{callback:v=>'$'+(v/1000)+'k'}}}
+    responsive:true, maintainAspectRatio:true,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{position:'top',labels:{boxWidth:14,font:{size:12}}},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'—':'$'+Number(c.raw).toLocaleString())}}
+    },
+    scales:{ y:{ ticks:{callback:fmtK}, grid:{color:'#eef1f5'} }, x:{grid:{display:false}} }
   }
 });
 </script>
-</body></html>
+</body>
+</html>
