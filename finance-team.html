@@ -129,8 +129,8 @@
   <!-- Monthly Giving chart -->
   <section>
     <div class="chart-card">
-      <h3>Monthly Giving — 2026 vs Prior-Year Income</h3>
-      <p class="callout">2026 giving of $598,555 through May is pacing slightly ahead of 2025 income ($587,243) for the same months and well above 2024.</p>
+      <h3>Monthly Giving — 2026 vs Prior Years</h3>
+      <p class="callout">2026 giving of $598,555 through May is pacing slightly ahead of 2025 ($587,243) for the same months and well above 2024.</p>
       <canvas id="givingChart" height="110"></canvas>
     </div>
   </section>
@@ -273,21 +273,21 @@ new Chart(document.getElementById('givingChart'), {
     labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
     datasets: [
       {
-        type:'bar', label:'2026 Giving',
-        data:[96872.49,101828.06,121537.32,171822.96,106493.80,null,null,null,null,null,null,null],
-        backgroundColor:'rgba(27,58,107,0.85)', borderRadius:4, order:3
+        type:'line', label:'2024 Giving',
+        data:[76299,86725,138867,114826,97422,121975,111852,101834,129043,97945,99601,242301],
+        borderColor:'#D97706', backgroundColor:'#D97706', borderWidth:2, borderDash:[6,4], tension:.3,
+        pointRadius:2, fill:false, order:2
       },
       {
-        type:'line', label:'2025 Income',
+        type:'line', label:'2025 Giving',
         data:[65693,97362,161385,130448,132355,132973,100146,145551,117019,123389,123635,223569],
         borderColor:'#16A34A', backgroundColor:'#16A34A', borderWidth:2.5, tension:.3,
         pointRadius:2.5, fill:false, order:1
       },
       {
-        type:'line', label:'2024 Income',
-        data:[76299,86725,138867,114826,97422,121975,111852,101834,129043,97945,99601,242301],
-        borderColor:'#D97706', backgroundColor:'#D97706', borderWidth:2, borderDash:[6,4], tension:.3,
-        pointRadius:2, fill:false, order:2
+        type:'bar', label:'2026 Giving',
+        data:[96872.49,101828.06,121537.32,171822.96,106493.80,null,null,null,null,null,null,null],
+        backgroundColor:'rgba(27,58,107,0.85)', borderRadius:4, order:3
       }
     ]
   },
@@ -295,8 +295,8 @@ new Chart(document.getElementById('givingChart'), {
     responsive:true, maintainAspectRatio:true,
     interaction:{mode:'index',intersect:false},
     plugins:{
-      legend:{position:'top',reverse:true,labels:{boxWidth:14,font:{size:12}}},
-      tooltip:{itemSort:(a,b)=>a.datasetIndex-b.datasetIndex,callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'—':'$'+Number(c.raw).toLocaleString())}}
+      legend:{position:'top',labels:{boxWidth:14,font:{size:12}}},
+      tooltip:{itemSort:(a,b)=>b.datasetIndex-a.datasetIndex,callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'—':'$'+Number(c.raw).toLocaleString())}}
     },
     scales:{ y:{ ticks:{callback:fmtK}, grid:{color:'#eef1f5'} }, x:{grid:{display:false}} }
   }
