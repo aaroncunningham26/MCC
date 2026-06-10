@@ -125,11 +125,6 @@
     <div class="caption">Internal trend analysis from QBO, Planning Center &amp; Ramp through June 7, 2026. Benchmarks (personnel 45&ndash;55%, facilities 15&ndash;25%, 1&ndash;3 months cash) are general guidelines &mdash; confirm major decisions with your CPA or finance committee.</div>
   </div>
 
-  <!-- MONTHLY GIVING CHART -->
-  <h2 class="section">Monthly Giving &mdash; 2026 vs Prior Years</h2>
-  <div class="yoy">2026 giving is pacing about <b>+2%</b> ahead of 2025 through May, but still below 2026's $34,900/week budget.</div>
-  <div class="panel"><canvas id="givingChart" height="120"></canvas></div>
-
   <!-- YTD INCOME VS BUDGET -->
   <h2 class="section">YTD Operating Income vs Budget</h2>
   <div class="panel">
@@ -157,6 +152,11 @@
     </ul>
   </div>
 
+  <!-- MONTHLY GIVING CHART -->
+  <h2 class="section">Monthly Giving &mdash; 2026 vs Prior Years</h2>
+  <div class="yoy">2026 giving is pacing about <b>+2%</b> ahead of 2025 through May, but still below 2026's $34,900/week budget.</div>
+  <div class="panel"><canvas id="givingChart" height="120"></canvas></div>
+
   <!-- OPERATING INCOME TABLE -->
   <h2 class="section">Operating Income Comparison</h2>
   <div class="panel">
@@ -166,6 +166,11 @@
     </table>
     <div class="caption">June 2026 (*) reflects partial month through June 7.</div>
   </div>
+
+  <!-- OPERATING EXPENSE CHART -->
+  <h2 class="section">Operating Expense &mdash; 2026 vs Prior Years</h2>
+  <div class="yoy">2026 operating expenses are running about <b>+26%</b> above the same Jan&ndash;May period in 2025, outpacing income growth (+10%).</div>
+  <div class="panel"><canvas id="expenseChart" height="120"></canvas></div>
 
   <!-- OPERATING EXPENSE TABLE -->
   <h2 class="section">Operating Expense Comparison</h2>
@@ -189,12 +194,12 @@
   <div class="panel" style="margin-top:16px;">
     <h3 style="margin:0 0 10px;font-size:.95rem;color:var(--navy);">Card transactions over $500 &middot; past 7 days</h3>
     <table>
-      <thead><tr><th>Date</th><th>Merchant</th><th>Cardholder</th><th>Amount</th></tr></thead>
+      <thead><tr><th>Date</th><th>Merchant</th><th>Cardholder</th><th style="text-align:left">Memo</th><th>Amount</th></tr></thead>
       <tbody>
-        <tr><td>Jun 3</td><td>Pyl Synergy Corporate Hou</td><td>Jenn Borden</td><td>$1,317</td></tr>
-        <tr><td>Jun 8</td><td>Grass Guru</td><td>Aaron Cunningham</td><td>$621</td></tr>
-        <tr><td>Jun 9</td><td>Amazon</td><td>Aaron Cunningham</td><td>$612</td></tr>
-        <tr><td>Jun 4</td><td>B&amp;H Photo</td><td>Chris Reed</td><td>$543</td></tr>
+        <tr><td>Jun 3</td><td>Pyl Synergy Corporate Hou</td><td>Jenn Borden</td><td style="text-align:left">JB- ALMS fund for Rent- Rocha Family</td><td>$1,317</td></tr>
+        <tr><td>Jun 8</td><td>Grass Guru</td><td>Aaron Cunningham</td><td style="text-align:left">AC - Fertilizer spreading</td><td>$621</td></tr>
+        <tr><td>Jun 9</td><td>Amazon</td><td>Aaron Cunningham</td><td style="text-align:left">&mdash;</td><td>$612</td></tr>
+        <tr><td>Jun 4</td><td>B&amp;H Photo</td><td>Chris Reed</td><td style="text-align:left">&mdash;</td><td>$543</td></tr>
       </tbody>
     </table>
   </div>
@@ -202,14 +207,14 @@
   <div class="panel" style="margin-top:16px;">
     <h3 style="margin:0 0 10px;font-size:.95rem;color:var(--navy);">Bills paid &middot; past 7 days</h3>
     <table>
-      <thead><tr><th>Paid</th><th>Vendor</th><th>Amount</th></tr></thead>
+      <thead><tr><th>Paid</th><th>Vendor</th><th style="text-align:left">Description</th><th>Amount</th></tr></thead>
       <tbody>
-        <tr><td>Jun 10</td><td>Bontrager Security Solutions</td><td>$717</td></tr>
-        <tr><td>Jun 9</td><td>Glendon and Lorna Bender</td><td>$800</td></tr>
-        <tr><td>Jun 9</td><td>CLC Designs LLC</td><td>$742</td></tr>
-        <tr><td>Jun 8</td><td>The Hunny Pot</td><td>$963</td></tr>
-        <tr><td>Jun 5</td><td>Heart &amp; Hand International</td><td>$750</td></tr>
-        <tr><td>Jun 4</td><td>Students International</td><td>$800</td></tr>
+        <tr><td>Jun 10</td><td>Bontrager Security Solutions</td><td style="text-align:left">Service call and parts for fire security system repair</td><td>$717</td></tr>
+        <tr><td>Jun 9</td><td>Glendon and Lorna Bender</td><td style="text-align:left">Missionary Support</td><td>$800</td></tr>
+        <tr><td>Jun 9</td><td>CLC Designs LLC</td><td style="text-align:left">Unisex and women's jersey short sleeve summer group shirts</td><td>$742</td></tr>
+        <tr><td>Jun 8</td><td>The Hunny Pot</td><td style="text-align:left">Prayer bowls for pop up event on March 28th</td><td>$963</td></tr>
+        <tr><td>Jun 5</td><td>Heart &amp; Hand International</td><td style="text-align:left">Pauline Yoder</td><td>$750</td></tr>
+        <tr><td>Jun 4</td><td>Students International</td><td style="text-align:left">Eric Miller Missionary Support</td><td>$800</td></tr>
       </tbody>
     </table>
     <div class="caption">Live from Ramp &middot; card spend (all cardholders, incl. pending) and Bill Pay / accounts payable. Card spend posts to QBO Ramp Card &amp; expense accounts.</div>
@@ -286,6 +291,43 @@ new Chart(document.getElementById('givingChart').getContext('2d'), {
         borderColor:'#16A34A', borderWidth:2,
         pointRadius:0, tension:.3, order:2, fill:false },
       { type:'bar', label:'2026 Giving', data:giving2026,
+        backgroundColor:'#1B3A6B', borderRadius:4, order:3 }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:true,
+    interaction:{mode:'index', intersect:false},
+    plugins:{
+      legend:{position:'top'},
+      tooltip:{
+        itemSort:function(a,b){return b.datasetIndex-a.datasetIndex;},
+        callbacks:{label:function(ctx){
+          if(ctx.parsed.y===null||ctx.parsed.y===undefined) return null;
+          return ctx.dataset.label+': '+fmt(ctx.parsed.y);
+        }}
+      }
+    },
+    scales:{ y:{ ticks:{ callback:function(v){return '$'+(v/1000)+'k';} } } }
+  }
+});
+
+// Operating Expense chart — last 3 years. 2026 navy bars (operating 5xxx+6xxx, Jan-Jun; Jun partial),
+// 2025 green solid line, 2024 amber dashed line. Same order/tooltip logic as the giving chart.
+var expense2024 = [102264,118014,91828,96847,134588,121862,96511,100754,102729,147714,104708,171347];
+var expense2025 = [121234,119485,120650,142802,124219,149949,112898,128108,120214,160439,129052,145528];
+var expense2026 = [147212.47,152827.55,153449.52,189917.69,147390.06,3954.66,null,null,null,null,null,null];
+
+new Chart(document.getElementById('expenseChart').getContext('2d'), {
+  data:{
+    labels: chartMonths,
+    datasets:[
+      { type:'line', label:'2024 Expense', data:expense2024,
+        borderColor:'#D97706', borderDash:[6,4], borderWidth:2,
+        pointRadius:0, tension:.3, order:1, fill:false },
+      { type:'line', label:'2025 Expense', data:expense2025,
+        borderColor:'#16A34A', borderWidth:2,
+        pointRadius:0, tension:.3, order:2, fill:false },
+      { type:'bar', label:'2026 Expense', data:expense2026,
         backgroundColor:'#1B3A6B', borderRadius:4, order:3 }
     ]
   },
