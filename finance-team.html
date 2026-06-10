@@ -7,61 +7,54 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
-    --navy:#1B3A6B; --green:#16A34A; --amber:#D97706; --red:#DC2626;
-    --bg:#F0F2F5; --card:#fff; --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --navy:#1B3A6B; --bg:#F0F2F5; --green:#16A34A; --amber:#D97706; --red:#DC2626;
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
-  .wrap{max-width:1180px;margin:0 auto;padding:20px 18px 48px;}
-  header.top{background:var(--navy);color:#fff;border-radius:12px;padding:22px 26px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;}
-  header.top h1{margin:0;font-size:24px;font-weight:700;letter-spacing:.2px;}
-  header.top .sub{margin-top:6px;font-size:13px;color:#cbd5e1;}
-  header.top .right{text-align:right;font-size:13px;color:#e2e8f0;line-height:1.5;}
-  header.top .right .wk{font-weight:600;color:#fff;font-size:15px;}
-  section{margin-top:22px;}
-  .sec-title{font-size:15px;font-weight:700;color:var(--navy);margin:0 0 12px;text-transform:uppercase;letter-spacing:.5px;}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-  .card{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .card .label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
-  .card .value{font-size:26px;font-weight:700;margin-top:8px;color:var(--ink);}
-  .card .sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45;}
-  .chart-card{background:var(--card);border-radius:12px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .chart-card h3{margin:0 0 4px;font-size:16px;color:var(--navy);}
-  .chart-card .callout{font-size:13px;color:var(--muted);margin:0 0 14px;}
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
-  .tile{background:var(--card);border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .tile .v{font-size:24px;font-weight:700;color:var(--navy);}
-  .tile .l{font-size:12px;color:var(--muted);margin-top:6px;font-weight:600;}
-  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:18px;}
-  .stat{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
-  .stat .v{font-size:21px;font-weight:700;}
-  .stat .l{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
-  .bar-wrap{margin:14px 0;}
-  .bar-wrap .bl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;font-weight:600;}
-  .track{position:relative;height:22px;background:#eef1f5;border-radius:6px;overflow:hidden;}
-  .fill{position:absolute;left:0;top:0;height:100%;border-radius:6px;}
-  .pace{position:absolute;top:-3px;height:28px;width:2px;background:#111;opacity:.65;}
-  .pace span{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:10px;color:#111;white-space:nowrap;}
-  ul.insights{margin:14px 0 0;padding-left:20px;font-size:13.5px;line-height:1.7;color:#374151;}
-  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06);font-size:13.5px;}
-  th,td{padding:10px 12px;text-align:right;border-bottom:1px solid var(--line);}
+  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 56px;}
+  header.top{background:var(--navy);color:#fff;border-radius:12px;padding:22px 24px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  header.top h1{margin:0 0 4px;font-size:1.5rem;}
+  header.top .sub{opacity:.85;font-size:.9rem;}
+  header.top .right{text-align:right;font-size:.85rem;opacity:.95;line-height:1.5;}
+  h2.section{font-size:1.1rem;margin:30px 4px 12px;color:var(--navy);}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .card{background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .card .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .card .value{font-size:1.5rem;font-weight:700;margin-top:6px;color:var(--navy);}
+  .card .note{font-size:.74rem;color:var(--muted);margin-top:6px;line-height:1.4;}
+  .insight-card{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-bottom:12px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  ul.insights{list-style:none;margin:0;padding:0;}
+  ul.insights li{border-left:4px solid var(--muted);background:#fafafa;border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:.9rem;line-height:1.5;}
+  ul.insights li.green{border-color:var(--green);}
+  ul.insights li.amber{border-color:var(--amber);}
+  ul.insights li.red{border-color:var(--red);}
+  ul.insights li b{color:var(--navy);}
+  .caption{font-size:.74rem;color:var(--muted);margin-top:10px;line-height:1.5;}
+  .panel{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+  .yoy{font-size:.85rem;color:var(--muted);margin:-6px 4px 12px;}
+  table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);}
   th:first-child,td:first-child{text-align:left;}
-  thead th{background:var(--navy);color:#fff;font-weight:600;font-size:12.5px;}
-  tr.cur td{background:#eff6ff;font-weight:700;color:var(--navy);}
-  td.tot,th.tot{font-weight:700;border-left:1px solid var(--line);}
-  .small-tables{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;}
-  .cap{font-size:11.5px;color:var(--muted);margin-top:10px;line-height:1.5;}
-  .insight-card{background:var(--card);border-radius:12px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .legend{display:flex;gap:18px;font-size:12px;color:var(--muted);margin-bottom:14px;font-weight:600;flex-wrap:wrap;}
-  .legend i.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;}
-  .dot.g{background:var(--green)} .dot.a{background:var(--amber)} .dot.r{background:var(--red)}
-  ul.ins-list{list-style:none;margin:0;padding:0;}
-  ul.ins-list li{padding:11px 14px 11px 16px;border-left:4px solid var(--muted);background:#f8fafc;border-radius:8px;margin-bottom:10px;font-size:13.5px;line-height:1.6;color:#374151;}
-  ul.ins-list li.g{border-left-color:var(--green)}
-  ul.ins-list li.a{border-left-color:var(--amber)}
-  ul.ins-list li.r{border-left-color:var(--red)}
-  footer{margin-top:30px;font-size:12px;color:var(--muted);text-align:center;line-height:1.7;}
-  @media(max-width:860px){.cards,.tiles,.statgrid{grid-template-columns:repeat(2,1fr)}.small-tables{grid-template-columns:1fr}}
+  thead th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
+  tr.cur{background:#eef3fb;font-weight:600;}
+  tr.total td{border-top:2px solid var(--navy);font-weight:700;}
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
+  .stat{background:#f8fafc;border-radius:10px;padding:14px;}
+  .stat .label{font-size:.74rem;color:var(--muted);text-transform:uppercase;}
+  .stat .value{font-size:1.25rem;font-weight:700;color:var(--navy);margin-top:4px;}
+  .bar-row{margin:14px 0;}
+  .bar-row .head{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:5px;}
+  .bar{position:relative;height:18px;background:#eef1f5;border-radius:9px;overflow:hidden;}
+  .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;}
+  .bar .pace{position:absolute;top:-3px;bottom:-3px;width:2px;background:#111;}
+  .pace-note{font-size:.72rem;color:var(--muted);margin-top:4px;}
+  .pos{color:var(--green);} .neg{color:var(--red);}
+  footer{margin-top:34px;font-size:.76rem;color:var(--muted);text-align:center;line-height:1.6;}
+  @media(max-width:720px){.cards,.statgrid{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
@@ -70,235 +63,246 @@
   <header class="top">
     <div>
       <h1>MCC Finance Team Dashboard</h1>
-      <div class="sub">General Fund · Operating figures only (excl. designated)</div>
+      <div class="sub">General Fund &middot; Operating figures only (excl. designated)</div>
     </div>
     <div class="right">
-      <div class="wk">Week of Jun 3, 2026</div>
-      <div>Data through May 31, 2026</div>
+      <div>Week of Wednesday, June 10, 2026</div>
+      <div>Data through June 7, 2026</div>
     </div>
   </header>
 
-  <!-- Snapshot -->
-  <section>
-    <div class="cards">
-      <div class="card">
-        <div class="label">Last Week's Giving</div>
-        <div class="value">$17,605</div>
-        <div class="sub">Week of May 25–31</div>
-      </div>
-      <div class="card">
-        <div class="label">May Giving</div>
-        <div class="value">$106,494</div>
-        <div class="sub">General Tithes &amp; Offerings</div>
-      </div>
-      <div class="card">
-        <div class="label">YTD Giving</div>
-        <div class="value">$598,555</div>
-        <div class="sub">Jan 1 – May 31, 2026</div>
-      </div>
-      <div class="card">
-        <div class="label">Bank Balance</div>
-        <div class="value">$788,659</div>
-        <div class="sub">Unrestricted: $346,298 · 2.2 mo. cash</div>
-      </div>
+  <!-- SNAPSHOT CARDS -->
+  <div class="cards" style="margin-top:18px;">
+    <div class="card">
+      <div class="label">Last Week's Giving</div>
+      <div class="value">$51,977</div>
+      <div class="note">Week of Jun 1&ndash;Jun 7</div>
     </div>
-  </section>
-
-  <!-- Key Insights -->
-  <section>
-    <h2 class="sec-title">Key Insights &amp; Watch Items</h2>
-    <div class="insight-card">
-      <div class="legend">
-        <span><i class="dot g"></i>Strength</span>
-        <span><i class="dot a"></i>Watch</span>
-        <span><i class="dot r"></i>Concern</span>
-      </div>
-      <ul class="ins-list">
-        <li class="r"><strong>Expenses are outpacing income.</strong> Operating expenses are up 24.7% vs 2025 while income grew 10.8%. All five months of 2026 ran an operating deficit — a combined -$132,908 YTD (avg -$26,582/mo).</li>
-        <li class="g"><strong>The monthly gap is narrowing.</strong> The operating deficit shrank from -$40,342 in February to -$17,464 in May, with April nearly breaking even at -$11,388 — the trend is moving the right direction.</li>
-        <li class="g"><strong>Giving is the strongest in five years.</strong> 2026 operating income of $650,742 tops 2025 ($587,243) and every year back to 2022. April was the peak month at $171,823 (Easter).</li>
-        <li class="a"><strong>Giving is pacing behind budget.</strong> Average weekly giving is $27,207 vs the $34,900 target (78%), leaving income roughly $117k behind plan YTD. Last week's $17,605 was about 50% of target — likely the Memorial Day weekend dip, but worth confirming a rebound.</li>
-        <li class="a"><strong>Personnel cost is elevated.</strong> Annualized, personnel runs ~62% of the annual budget — above the healthy 45–55% range and about 61% of operating expenses. It's the biggest single lever on the deficit.</li>
-        <li class="a"><strong>Cash is adequate but lean.</strong> The $788,659 bank balance is mostly restricted; only $346,298 (~2.2 months of operating expenses) is unrestricted. Reserves cover roughly a year at the current deficit pace — no near-term crisis, but the trend bears watching.</li>
-        <li class="a"><strong>Plan for the summer trough.</strong> Giving historically softens June–August before the December year-end surge — budget cash accordingly heading into the slower months.</li>
-      </ul>
-      <p class="cap">Internal trend analysis generated from QBO, Planning Center &amp; Ramp data through May 31, 2026. Benchmarks (personnel 45–55%, facilities 15–25%, 1–3 months cash) are general guidelines — confirm major decisions with your CPA or finance committee.</p>
+    <div class="card">
+      <div class="label">June Giving</div>
+      <div class="value">$51,977</div>
+      <div class="note">Month to date (through Jun 7)</div>
     </div>
-  </section>
-
-  <!-- Monthly Giving chart -->
-  <section>
-    <div class="chart-card">
-      <h3>Monthly Giving — 2026 vs Prior Years</h3>
-      <p class="callout">2026 giving of $598,555 through May is pacing slightly ahead of 2025 ($587,243) for the same months and well above 2024.</p>
-      <canvas id="givingChart" height="110"></canvas>
+    <div class="card">
+      <div class="label">YTD Giving</div>
+      <div class="value">$651,771</div>
+      <div class="note">General Tithes &amp; Offerings, Jan&ndash;Jun</div>
     </div>
-  </section>
-
-  <!-- Giving Health -->
-  <section>
-    <h2 class="sec-title">Giving Health</h2>
-    <div class="tiles">
-      <div class="tile"><div class="v">287</div><div class="l">Giving units · 2026 YTD</div></div>
-      <div class="tile"><div class="v">62.8%</div><div class="l">Participation (of 457 households)</div></div>
-      <div class="tile"><div class="v">37</div><div class="l">New donors to 4100 · this year</div></div>
-      <div class="tile"><div class="v">1</div><div class="l">New donors this week</div></div>
+    <div class="card">
+      <div class="label">Bank Balance</div>
+      <div class="value">$841,452</div>
+      <div class="note">Unrestricted: $399,091 &middot; ~2.5 mo. cash</div>
     </div>
-  </section>
+  </div>
 
-  <!-- YTD Operating Income vs Budget -->
-  <section>
-    <div class="chart-card">
-      <h3>YTD Operating Income vs Budget</h3>
-      <div class="statgrid" style="margin-top:14px;">
-        <div class="stat"><div class="v">$650,742</div><div class="l">YTD Operating Income</div></div>
-        <div class="stat"><div class="v">$767,800</div><div class="l">YTD Budget (22 wks)</div></div>
-        <div class="stat"><div class="v" style="color:var(--red)">-$117,058</div><div class="l">Variance vs Budget</div></div>
-        <div class="stat"><div class="v">84.8%</div><div class="l">% of YTD Budget</div></div>
-      </div>
-
-      <div class="bar-wrap">
-        <div class="bl"><span>Operating Income vs Annual Budget</span><span>$650,742 / $1,839,800 · 35.4%</span></div>
-        <div class="track">
-          <div class="fill" style="width:35.4%;background:var(--green)"></div>
-          <div class="pace" style="left:42.3%"><span>Pace 42.3%</span></div>
-        </div>
-      </div>
-      <div class="bar-wrap">
-        <div class="bl"><span>Operating Expenses vs Annual Budget</span><span>$783,650 / $1,839,800 · 42.6%</span></div>
-        <div class="track">
-          <div class="fill" style="width:42.6%;background:var(--amber)"></div>
-          <div class="pace" style="left:42.3%"><span>Pace 42.3%</span></div>
-        </div>
-      </div>
-
-      <ul class="insights">
-        <li><strong>vs budget:</strong> 22 weeks × $34,900/wk = $767,800 budgeted; actual operating income is $650,742 — behind by -$117,058 (84.8% of pace).</li>
-        <li><strong>vs prior year:</strong> 2025 Jan–May income was $587,243; 2026 is $650,742, up $63,499 (+10.8%).</li>
-        <li><strong>income vs expenses:</strong> operating expenses of $783,650 exceed operating income of $650,742 — a YTD operating shortfall of -$132,908.</li>
-      </ul>
+  <!-- KEY INSIGHTS -->
+  <h2 class="section">Key Insights &amp; Watch Items</h2>
+  <div class="insight-card">
+    <div class="legend">
+      <span><span class="dot" style="background:var(--green)"></span>Strength</span>
+      <span><span class="dot" style="background:var(--amber)"></span>Watch</span>
+      <span><span class="dot" style="background:var(--red)"></span>Concern</span>
     </div>
-  </section>
+    <ul class="insights">
+      <li class="red"><b>Operating deficit is the headline.</b> Through five complete months (Jan&ndash;May), operating expenses of $790,797 outran operating income of $648,210 &mdash; an operating shortfall of <span class="neg">-$142,587</span>. June's first week shows a temporary surplus only because giving has posted but most monthly bills have not.</li>
+      <li class="amber"><b>Expenses are growing faster than income.</b> Versus the same Jan&ndash;May window in 2025, operating income is up <b>+10.4%</b> but operating expenses are up <b>+25.8%</b> &mdash; a ~15-point gap. A large April personnel run ($134,667 vs the ~$83&ndash;89k monthly norm) is part of the spike and worth confirming.</li>
+      <li class="amber"><b>Monthly deficit trend is choppy.</b> Monthly operating deficits narrowed from <span class="neg">-$44,113</span> (Feb) to <span class="neg">-$11,388</span> (Apr), then widened back to <span class="neg">-$23,372</span> (May). Improving versus Q1 but not yet a clean trend.</li>
+      <li class="amber"><b>Giving is pacing below budget.</b> Average weekly giving YTD is $28,338 ($651,771 &divide; 23 weeks) against a $34,900 weekly giving budget &mdash; running about <b>19% under</b> pace. Summer (Jun&ndash;Aug) is typically the seasonal trough, so watch this closely.</li>
+      <li class="amber"><b>Personnel ratio above guideline.</b> Annualized personnel (~$1,077,065) is about <b>58.5%</b> of the $1.84M annual budget, above the 45&ndash;55% general guideline.</li>
+      <li class="green"><b>Facilities ratio is healthy.</b> Annualized facilities (~$318,535) is about <b>17.3%</b> of the annual budget &mdash; comfortably inside the 15&ndash;25% guideline.</li>
+      <li class="amber"><b>Cash runway is lean.</b> Unrestricted cash (~$399,091, after backing out $442,361 of donor-restricted funds) covers only about <b>2.5 months</b> of average operating expense. Total bank ($841,452) looks larger but much of it is restricted.</li>
+      <li class="green"><b>Donor base is engaged.</b> 292 giving units (64% of 457 households) have given in 2026, including 36 new donors this year and 4 new in the past week.</li>
+    </ul>
+    <div class="caption">Internal trend analysis from QBO, Planning Center &amp; Ramp through June 7, 2026. Benchmarks (personnel 45&ndash;55%, facilities 15&ndash;25%, 1&ndash;3 months cash) are general guidelines &mdash; confirm major decisions with your CPA or finance committee.</div>
+  </div>
 
-  <!-- Operating Income Comparison -->
-  <section>
-    <h2 class="sec-title">Operating Income Comparison</h2>
+  <!-- MONTHLY GIVING CHART -->
+  <h2 class="section">Monthly Giving &mdash; 2026 vs Prior Years</h2>
+  <div class="yoy">2026 giving is pacing about <b>+2%</b> ahead of 2025 through May, but still below 2026's $34,900/week budget.</div>
+  <div class="panel"><canvas id="givingChart" height="120"></canvas></div>
+
+  <!-- GIVING HEALTH -->
+  <h2 class="section">Giving Health</h2>
+  <div class="cards">
+    <div class="card"><div class="label">Giving Units</div><div class="value">292</div><div class="note">2026 YTD</div></div>
+    <div class="card"><div class="label">Participation</div><div class="value">64%</div><div class="note">of 457 households</div></div>
+    <div class="card"><div class="label">New Donors to 4100</div><div class="value">36</div><div class="note">this year</div></div>
+    <div class="card"><div class="label">New Donors</div><div class="value">4</div><div class="note">this week</div></div>
+  </div>
+
+  <!-- YTD INCOME VS BUDGET -->
+  <h2 class="section">YTD Operating Income vs Budget</h2>
+  <div class="panel">
+    <div class="statgrid">
+      <div class="stat"><div class="label">YTD Actual Income</div><div class="value">$702,325</div></div>
+      <div class="stat"><div class="label">YTD Budget (23 wks)</div><div class="value">$802,700</div></div>
+      <div class="stat"><div class="label">Variance</div><div class="value neg">-$100,375</div></div>
+      <div class="stat"><div class="label">% of YTD Budget</div><div class="value">87.5%</div></div>
+    </div>
+
+    <div class="bar-row">
+      <div class="head"><span>Operating Income vs Annual Budget</span><span>$702,325 / $1,839,800 &middot; 38.2%</span></div>
+      <div class="bar"><div class="fill" style="width:38.2%;background:var(--green)"></div><div class="pace" style="left:44.2%"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="head"><span>Operating Expense vs Annual Budget</span><span>$794,752 / $1,839,800 &middot; 43.2%</span></div>
+      <div class="bar"><div class="fill" style="width:43.2%;background:var(--amber)"></div><div class="pace" style="left:44.2%"></div></div>
+    </div>
+    <div class="pace-note">Vertical marker = expected year-to-date pace (23 of 52 weeks = 44.2%).</div>
+
+    <ul class="insights" style="margin-top:16px;">
+      <li class="amber"><b>vs Budget:</b> 23 weeks &times; $34,900/wk = $802,700 expected. Actual operating income of $702,325 is <span class="neg">-$100,375</span> (12.5%) behind the weekly-paced budget.</li>
+      <li class="green"><b>vs Prior Year:</b> Jan&ndash;May operating income of $648,210 is <b>+10.4%</b> above the same 2025 period ($587,243).</li>
+      <li class="red"><b>Income vs Expenses:</b> YTD operating income $702,325 vs operating expense $794,752. June expenses are only partially posted; through May the operating deficit was <span class="neg">-$142,587</span>.</li>
+    </ul>
+  </div>
+
+  <!-- OPERATING INCOME TABLE -->
+  <h2 class="section">Operating Income Comparison</h2>
+  <div class="panel">
     <table>
-      <thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th class="tot">Total</th></tr></thead>
+      <thead><tr><th>Month</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>2026</th></tr></thead>
+      <tbody id="incomeTable"></tbody>
+    </table>
+    <div class="caption">June 2026 (*) reflects partial month through June 7.</div>
+  </div>
+
+  <!-- OPERATING EXPENSE TABLE -->
+  <h2 class="section">Operating Expense Comparison</h2>
+  <div class="panel">
+    <table>
+      <thead><tr><th>Month</th><th>2022</th><th>2023</th><th>2024</th><th>2025</th><th>2026</th></tr></thead>
+      <tbody id="expenseTable"></tbody>
+    </table>
+    <div class="caption">June 2026 (*) reflects partial month through June 7.</div>
+  </div>
+
+  <!-- RAMP ACTIVITY -->
+  <h2 class="section">Ramp Activity</h2>
+  <div class="cards">
+    <div class="card"><div class="label">Card Spend &middot; June MTD</div><div class="value">$14,192</div><div class="note">89 transactions</div></div>
+    <div class="card"><div class="label">Card Spend &middot; Past 7 Days</div><div class="value">$7,828</div><div class="note">65 transactions</div></div>
+    <div class="card"><div class="label">Bill Pay Paid &middot; June MTD</div><div class="value">$8,075</div><div class="note">12 bills</div></div>
+    <div class="card"><div class="label">Bill Pay Outstanding</div><div class="value">$2,455</div><div class="note">10 open bills</div></div>
+  </div>
+
+  <div class="panel" style="margin-top:16px;">
+    <h3 style="margin:0 0 10px;font-size:.95rem;color:var(--navy);">Card transactions over $500 &middot; past 7 days</h3>
+    <table>
+      <thead><tr><th>Date</th><th>Merchant</th><th>Cardholder</th><th>Amount</th></tr></thead>
       <tbody>
-        <tr><td>2022</td><td>$87,163</td><td>$95,988</td><td>$109,900</td><td>$150,004</td><td>$113,555</td><td class="tot">$556,610</td></tr>
-        <tr><td>2023</td><td>$64,824</td><td>$89,895</td><td>$119,128</td><td>$130,114</td><td>$90,236</td><td class="tot">$494,197</td></tr>
-        <tr><td>2024</td><td>$76,299</td><td>$86,725</td><td>$138,867</td><td>$114,826</td><td>$97,422</td><td class="tot">$514,139</td></tr>
-        <tr><td>2025</td><td>$65,693</td><td>$97,362</td><td>$161,385</td><td>$130,448</td><td>$132,355</td><td class="tot">$587,243</td></tr>
-        <tr class="cur"><td>2026</td><td>$107,451</td><td>$112,486</td><td>$129,496</td><td>$178,530</td><td>$122,779</td><td class="tot">$650,742</td></tr>
+        <tr><td>Jun 3</td><td>Pyl Synergy Corporate Hou</td><td>Jenn Borden</td><td>$1,317</td></tr>
+        <tr><td>Jun 8</td><td>Grass Guru</td><td>Aaron Cunningham</td><td>$621</td></tr>
+        <tr><td>Jun 9</td><td>Amazon</td><td>Aaron Cunningham</td><td>$612</td></tr>
+        <tr><td>Jun 4</td><td>B&amp;H Photo</td><td>Chris Reed</td><td>$543</td></tr>
       </tbody>
     </table>
-  </section>
+  </div>
 
-  <!-- Operating Expense Comparison -->
-  <section>
-    <h2 class="sec-title">Operating Expense Comparison</h2>
+  <div class="panel" style="margin-top:16px;">
+    <h3 style="margin:0 0 10px;font-size:.95rem;color:var(--navy);">Bills paid &middot; past 7 days</h3>
     <table>
-      <thead><tr><th>Year</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th class="tot">Total</th></tr></thead>
+      <thead><tr><th>Paid</th><th>Vendor</th><th>Amount</th></tr></thead>
       <tbody>
-        <tr><td>2022</td><td>$94,382</td><td>$100,727</td><td>$141,604</td><td>$97,031</td><td>$111,113</td><td class="tot">$544,857</td></tr>
-        <tr><td>2023</td><td>$100,898</td><td>$112,560</td><td>$110,885</td><td>$112,667</td><td>$145,223</td><td class="tot">$582,233</td></tr>
-        <tr><td>2024</td><td>$102,264</td><td>$118,014</td><td>$91,828</td><td>$96,847</td><td>$134,588</td><td class="tot">$543,541</td></tr>
-        <tr><td>2025</td><td>$121,234</td><td>$119,485</td><td>$120,650</td><td>$142,802</td><td>$124,219</td><td class="tot">$628,390</td></tr>
-        <tr class="cur"><td>2026</td><td>$147,212</td><td>$152,828</td><td>$153,450</td><td>$189,918</td><td>$140,243</td><td class="tot">$783,650</td></tr>
+        <tr><td>Jun 10</td><td>Bontrager Security Solutions</td><td>$717</td></tr>
+        <tr><td>Jun 9</td><td>Glendon and Lorna Bender</td><td>$800</td></tr>
+        <tr><td>Jun 9</td><td>CLC Designs LLC</td><td>$742</td></tr>
+        <tr><td>Jun 8</td><td>The Hunny Pot</td><td>$963</td></tr>
+        <tr><td>Jun 5</td><td>Heart &amp; Hand International</td><td>$750</td></tr>
+        <tr><td>Jun 4</td><td>Students International</td><td>$800</td></tr>
       </tbody>
     </table>
-  </section>
-
-  <!-- Ramp Activity -->
-  <section>
-    <h2 class="sec-title">Ramp Activity</h2>
-    <div class="tiles">
-      <div class="tile"><div class="v">$6,429</div><div class="l">Card spend · June MTD (25 txns)</div></div>
-      <div class="tile"><div class="v">$8,978</div><div class="l">Card spend · past 7 days (55 txns)</div></div>
-      <div class="tile"><div class="v">$3,304</div><div class="l">Bill Pay paid · June MTD</div></div>
-      <div class="tile"><div class="v">$6,527</div><div class="l">Bill Pay outstanding (12 open)</div></div>
-    </div>
-
-    <div class="small-tables">
-      <div>
-        <table>
-          <thead>
-            <tr><th colspan="3" style="text-align:left">Card transactions over $500 · past 7 days</th></tr>
-            <tr><th>Date</th><th style="text-align:left">Merchant / Cardholder</th><th>Amount</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Jun 1</td><td style="text-align:left">Church Finance · Aaron Cunningham</td><td>$1,780.00</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">Grass Guru · Aaron Cunningham</td><td>$1,400.00</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">Waste Connections · Wrennie Howard</td><td>$537.68</td></tr>
-            <tr><td>May 28</td><td style="text-align:left">TCS Fundraising · Jessica Graber</td><td>$518.62</td></tr>
-            <tr><td>May 29</td><td style="text-align:left">Subsplash · Aaron Cunningham</td><td>$505.39</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <table>
-          <thead>
-            <tr><th colspan="3" style="text-align:left">Bills paid · past 7 days</th></tr>
-            <tr><th>Paid</th><th style="text-align:left">Vendor</th><th>Amount</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>Jun 2</td><td style="text-align:left">Mission Aviation Fellowship</td><td>$800.00</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">Missionary Ventures</td><td>$1,100.00</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">Wycliffe Bible Translators</td><td>$800.00</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">GET PRINTING INC.</td><td>$267.25</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">KSS Enterprises</td><td>$189.62</td></tr>
-            <tr><td>Jun 1</td><td style="text-align:left">Cintas</td><td>$146.71</td></tr>
-            <tr><td>May 29</td><td style="text-align:left">Clayton Nisly</td><td>$800.00</td></tr>
-            <tr><td>May 28</td><td style="text-align:left">Global Gates</td><td>$750.00</td></tr>
-            <tr><td>May 28</td><td style="text-align:left">Economy Offset Print &amp; Digital</td><td>$195.73</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <p class="cap">Live from Ramp · card spend (all cardholders, incl. pending) and Bill Pay / accounts payable. Card spend posts to QBO Ramp Card &amp; expense accounts.</p>
-  </section>
+    <div class="caption">Live from Ramp &middot; card spend (all cardholders, incl. pending) and Bill Pay / accounts payable. Card spend posts to QBO Ramp Card &amp; expense accounts.</div>
+  </div>
 
   <footer>
-    <div>MCC Finance Team · Prepared Wednesday, Jun 3, 2026</div>
-    <div>2022–2025: PowerChurch · 2026: QuickBooks Online · Giving: QBO 4100 · Donors: Planning Center · Card spend &amp; bills: Ramp</div>
+    MCC Finance Team &middot; Prepared Wednesday, June 10, 2026<br>
+    2022&ndash;2025: PowerChurch &middot; 2026: QuickBooks Online &middot; Giving: QBO 4100 &middot; Donors: Planning Center &middot; Card spend &amp; bills: Ramp
   </footer>
 
 </div>
 
 <script>
-const fmtK = v => '$' + (v/1000).toFixed(0) + 'k';
-new Chart(document.getElementById('givingChart'), {
-  data: {
-    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-    datasets: [
-      {
-        type:'line', label:'2024 Giving',
-        data:[76299,86725,138867,114826,97422,121975,111852,101834,129043,97945,99601,242301],
-        borderColor:'#D97706', backgroundColor:'#D97706', borderWidth:2, borderDash:[6,4], tension:.3,
-        pointRadius:2, fill:false, order:1
-      },
-      {
-        type:'line', label:'2025 Giving',
-        data:[65693,97362,161385,130448,132355,132973,100146,145551,117019,123389,123635,223569],
-        borderColor:'#16A34A', backgroundColor:'#16A34A', borderWidth:2.5, tension:.3,
-        pointRadius:2.5, fill:false, order:2
-      },
-      {
-        type:'bar', label:'2026 Giving',
-        data:[96872.49,101828.06,121537.32,171822.96,106493.80,null,null,null,null,null,null,null],
-        backgroundColor:'rgba(27,58,107,0.85)', borderRadius:4, order:3
-      }
+function fmt(n){
+  var neg = n < 0;
+  var s = '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
+  return neg ? '-' + s : s;
+}
+
+// Operating Income/Expense by month (Jan-Jun). Prior years from the historical sheet's operating columns;
+// 2026 from QBO operating P&L (4xxx income; 5xxx+6xxx expense, excludes designated 7xxx/8xxx).
+var months = ['January','February','March','April','May','June'];
+var income = {
+  2022:[87163,95988,109900,150004,113555,110814],
+  2023:[64824,89895,119128,130114,90236,125297],
+  2024:[76299,86725,138867,114826,97422,121975],
+  2025:[65693,97362,161385,130448,132355,132973],
+  2026:[107451.10,108714.84,129496.25,178529.59,124018.04,54115.24]
+};
+var expense = {
+  2022:[94382,100727,141604,97031,111113,157223],
+  2023:[100898,112560,110885,112667,145223,94965],
+  2024:[102264,118014,91828,96847,134588,121862],
+  2025:[121234,119485,120650,142802,124219,149949],
+  2026:[147212.47,152827.55,153449.52,189917.69,147390.06,3954.66]
+};
+
+function buildTable(tbodyId, data){
+  var tb = document.getElementById(tbodyId);
+  var tot = {2022:0,2023:0,2024:0,2025:0,2026:0};
+  months.forEach(function(m,i){
+    var tr = document.createElement('tr');
+    var cells = '<td>'+m+(m==='June'?' *':'')+'</td>';
+    [2022,2023,2024,2025,2026].forEach(function(y){
+      var v = data[y][i]; tot[y]+=v;
+      cells += '<td'+(y===2026?' class="cur"':'')+'>'+fmt(v)+'</td>';
+    });
+    tr.innerHTML = cells; tb.appendChild(tr);
+  });
+  var trt = document.createElement('tr'); trt.className='total';
+  var c = '<td>Total</td>';
+  [2022,2023,2024,2025,2026].forEach(function(y){ c+='<td>'+fmt(tot[y])+'</td>'; });
+  trt.innerHTML=c; tb.appendChild(trt);
+}
+buildTable('incomeTable', income);
+buildTable('expenseTable', expense);
+
+// Monthly Giving chart: 2026 = QBO 4100 (Jan-Jun); prior-year series shown as "Giving" from the
+// historical operating-income column (per Aaron's request). order ascending chronologically so the
+// legend reads 2024 -> 2025 -> 2026 and lines draw on top of the bar; tooltip sorts newest-first.
+var chartMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var giving2024 = [76299,86725,138867,114826,97422,121975,111852,101834,129043,97945,99601,242301];
+var giving2025 = [65693,97362,161385,130448,132355,132973,100146,145551,117019,123389,123635,223569];
+var giving2026 = [96872.49,101828.06,121537.32,171822.96,107732.80,51977.35,null,null,null,null,null,null];
+
+new Chart(document.getElementById('givingChart').getContext('2d'), {
+  data:{
+    labels: chartMonths,
+    datasets:[
+      { type:'line', label:'2024 Giving', data:giving2024,
+        borderColor:'#D97706', borderDash:[6,4], borderWidth:2,
+        pointRadius:0, tension:.3, order:1, fill:false },
+      { type:'line', label:'2025 Giving', data:giving2025,
+        borderColor:'#16A34A', borderWidth:2,
+        pointRadius:0, tension:.3, order:2, fill:false },
+      { type:'bar', label:'2026 Giving', data:giving2026,
+        backgroundColor:'#1B3A6B', borderRadius:4, order:3 }
     ]
   },
-  options: {
+  options:{
     responsive:true, maintainAspectRatio:true,
-    interaction:{mode:'index',intersect:false},
+    interaction:{mode:'index', intersect:false},
     plugins:{
-      legend:{position:'top',labels:{boxWidth:14,font:{size:12}}},
-      tooltip:{itemSort:(a,b)=>b.datasetIndex-a.datasetIndex,callbacks:{label:c=>c.dataset.label+': '+(c.raw==null?'—':'$'+Number(c.raw).toLocaleString())}}
+      legend:{position:'top'},
+      tooltip:{
+        itemSort:function(a,b){return b.datasetIndex-a.datasetIndex;},
+        callbacks:{label:function(ctx){
+          if(ctx.parsed.y===null||ctx.parsed.y===undefined) return null;
+          return ctx.dataset.label+': '+fmt(ctx.parsed.y);
+        }}
+      }
     },
-    scales:{ y:{ ticks:{callback:fmtK}, grid:{color:'#eef1f5'} }, x:{grid:{display:false}} }
+    scales:{ y:{ ticks:{ callback:function(v){return '$'+(v/1000)+'k';} } } }
   }
 });
 </script>
