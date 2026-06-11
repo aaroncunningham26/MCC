@@ -277,10 +277,10 @@ function fmt(n){
   return neg ? '-' + s : s;
 }
 
-// Brand chart palette (color = meaning; years differentiated by slate shade + line style).
-var C_CUR = '#343A44';   // current year — solid slate, the focus
-var C_2025 = '#6B7280';  // prior year — muted slate, solid
-var C_2024 = '#AEB6C2';  // two years back — light slate, dashed
+// Brand chart palette — each year a distinct color for at-a-glance reading.
+var C_CUR = '#343A44';   // current year — solid slate bars, the focus
+var C_2025 = '#2F8F5B';  // 2025 — MCC green, solid line
+var C_2024 = '#C8842A';  // 2024 — MCC amber, dashed line
 
 // Operating Income/Expense by month (Jan-Jun). Prior years from the historical sheet's operating columns;
 // 2026 from QBO operating P&L (4xxx income; 5xxx+6xxx expense, excludes designated 7xxx/8xxx).
