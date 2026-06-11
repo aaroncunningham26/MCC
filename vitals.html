@@ -5,150 +5,170 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MCC Vitals Dashboard</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light; }
+  :root {
+    --slate: #343A44;
+    --bg: #F2F2F2;
+    --card: #ffffff;
+    --ink: #23272e;
+    --muted: #6b7280;
+    --line: #e3e5ea;
+    --red: #DC2626;
+    --green: #2F8F5B;
+    --amber: #C8842A;
+    --chart: #4C5564;
+  }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #F0F2F5; color: #1A1A2E; font-size: 15px; line-height: 1.6; }
+  body { font-family: 'Lato', system-ui, -apple-system, Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.6; }
+
+  /* ── MCC Header ── */
+  .mcc-header { position: relative; overflow: hidden; background: var(--slate); color: #fff; padding: 26px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .mcc-header::before { content: ""; position: absolute; inset: 0; background: url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size: 620px; opacity: .065; pointer-events: none; }
+  .mcc-header .brand { display: flex; align-items: center; gap: 20px; position: relative; }
+  .mcc-header .logo { height: 42px; width: auto; display: block; }
+  .mcc-header .back { color: #aeb6c2; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; display: inline-block; margin-bottom: 5px; }
+  .mcc-header .back:hover { color: #fff; }
+  .mcc-header h1 { font-size: 27px; font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: 1; }
+  .mcc-header .sub { font-size: 11.5px; font-weight: 400; letter-spacing: .05em; text-transform: uppercase; opacity: .72; margin-top: 6px; }
+  .mcc-header .right { position: relative; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; text-align: right; line-height: 1.7; }
+
+  /* ── Layout ── */
   .page { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; margin-top: 32px; }
 
-  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #6B7280; text-decoration: none; margin-bottom: 20px; padding: 6px 0; }
-  .back-link:hover { color: #1B3A6B; }
-
-  .header { background: #1B3A6B; color: #fff; border-radius: 12px; padding: 24px 32px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .header-left h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
-  .header-left p  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 3px; }
-  .header-badge { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; color: rgba(255,255,255,0.9); text-align: right; }
-  .header-badge strong { display: block; font-size: 16px; font-weight: 600; color: #fff; }
-
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6B7280; margin-bottom: 12px; margin-top: 32px; }
-
-  /* Snapshot cards */
+  /* ── Snapshot cards ── */
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 4px; }
-  .card { background: #fff; border-radius: 10px; padding: 18px 20px; border: 1px solid #E5E7EB; }
-  .card .label { font-size: 12px; color: #6B7280; font-weight: 500; margin-bottom: 6px; }
-  .card .value { font-size: 26px; font-weight: 600; color: #1A1A2E; letter-spacing: -0.5px; }
+  .card { background: var(--card); border-radius: 10px; padding: 18px 20px; border: 1px solid var(--line); box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .card .label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .card .value { font-size: 26px; font-weight: 900; color: var(--slate); letter-spacing: -0.5px; }
   .card .sub   { font-size: 12px; margin-top: 4px; }
-  .card .sub.green  { color: #15803D; }
-  .card .sub.yellow { color: #B45309; }
-  .card .sub.red    { color: #B91C1C; }
-  .card.top-green  { border-top: 4px solid #16A34A; }
-  .card.top-yellow { border-top: 4px solid #D97706; }
-  .card.top-red    { border-top: 4px solid #DC2626; }
-  .card.top-blue   { border-top: 4px solid #1B3A6B; }
+  .card .sub.green  { color: var(--green); }
+  .card .sub.yellow { color: var(--amber); }
+  .card .sub.red    { color: var(--red); }
+  .card.top-green  { border-top: 4px solid var(--green); }
+  .card.top-yellow { border-top: 4px solid var(--amber); }
+  .card.top-red    { border-top: 4px solid var(--red); }
+  .card.top-blue   { border-top: 4px solid var(--slate); }
 
-  /* Insight box */
-  .insights { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 20px 24px; margin-top: 6px; }
-  .insights h2 { font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 12px; }
+  /* ── Insights ── */
+  .insights { background: #F4F5F7; border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin-top: 6px; }
+  .insights h2 { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--slate); margin-bottom: 12px; }
   .insights ul { list-style: none; }
-  .insights ul li { padding: 8px 0; border-bottom: 1px solid #DBEAFE; font-size: 13px; color: #1E3A5F; display: flex; align-items: flex-start; gap: 10px; line-height: 1.55; }
+  .insights ul li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink); display: flex; align-items: flex-start; gap: 10px; line-height: 1.55; }
   .insights ul li:last-child { border-bottom: none; }
   .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-  .dot-green  { background: #16A34A; }
-  .dot-red    { background: #DC2626; }
-  .dot-amber  { background: #D97706; }
-  .dot-blue   { background: #1B3A6B; }
+  .dot-green  { background: var(--green); }
+  .dot-red    { background: var(--red); }
+  .dot-amber  { background: var(--amber); }
+  .dot-blue   { background: var(--slate); }
 
-  /* Next steps funnel */
+  /* ── Funnel ── */
   .funnel-wrap { display: flex; align-items: stretch; gap: 0; }
   .funnel-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
-  .funnel-step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #D1D5DB; z-index: 1; }
-  .funnel-box { width: 100%; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 16px 10px; }
-  .funnel-step:nth-child(2) .funnel-box { background: #F0FDF4; border-color: #BBF7D0; }
-  .funnel-step:nth-child(3) .funnel-box { background: #FFF7ED; border-color: #FED7AA; }
-  .funnel-step:nth-child(4) .funnel-box { background: #F5F3FF; border-color: #DDD6FE; }
-  .funnel-num  { font-size: 26px; font-weight: 700; color: #1A1A2E; letter-spacing: -0.5px; }
-  .funnel-label { font-size: 12px; font-weight: 600; color: #374151; margin-top: 4px; }
-  .funnel-conv { font-size: 11px; color: #6B7280; margin-top: 6px; line-height: 1.4; }
-  .funnel-conv strong { color: #1A1A2E; }
+  .funnel-step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--line); z-index: 1; }
+  .funnel-box { width: 100%; background: #F4F5F7; border: 1px solid var(--line); border-radius: 10px; padding: 16px 10px; }
+  .funnel-step:nth-child(2) .funnel-box { background: #F0FBF5; border-color: #B6DCCA; }
+  .funnel-step:nth-child(3) .funnel-box { background: #FDF5EC; border-color: #E8C99A; }
+  .funnel-step:nth-child(4) .funnel-box { background: #F4F5F7; border-color: var(--line); }
+  .funnel-num   { font-size: 26px; font-weight: 900; color: var(--slate); letter-spacing: -0.5px; }
+  .funnel-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); margin-top: 4px; }
+  .funnel-conv  { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  .funnel-conv strong { color: var(--ink); }
   @media (max-width: 600px) {
     .funnel-wrap { flex-direction: column; gap: 8px; }
     .funnel-step:not(:last-child)::after { content: '↓'; right: auto; top: auto; bottom: -16px; left: 50%; transform: translateX(-50%); }
   }
 
-  /* Chart cards */
-  .chart-card { background: #fff; border-radius: 10px; padding: 22px 22px 18px; border: 1px solid #E5E7EB; margin-bottom: 14px; }
-  .chart-card h2 { font-size: 15px; font-weight: 600; color: #1A1A2E; margin-bottom: 4px; }
-  .chart-card .chart-sub { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+  /* ── Chart cards ── */
+  .chart-card { background: var(--card); border-radius: 10px; padding: 22px 22px 18px; border: 1px solid var(--line); margin-bottom: 14px; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .chart-card h2 { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); margin-bottom: 4px; }
+  .chart-card .chart-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
   .chart-wrap { position: relative; width: 100%; }
   .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4B5563; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 700; }
   .legend-dot  { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-  /* Metrics table */
+  /* ── Metrics table ── */
   .metrics-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .metrics-table th { background: #F9FAFB; font-weight: 600; color: #374151; padding: 9px 12px; text-align: right; border-bottom: 2px solid #E5E7EB; white-space: nowrap; }
+  .metrics-table th { background: #F9FAFB; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: var(--muted); padding: 9px 12px; text-align: right; border-bottom: 2px solid var(--line); white-space: nowrap; }
   .metrics-table th:first-child { text-align: left; width: 200px; }
-  .metrics-table th.goal-col { text-align: left; color: #6B7280; font-weight: 500; }
-  .metrics-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: #374151; vertical-align: middle; }
-  .metrics-table td:first-child { text-align: left; font-weight: 500; color: #1A1A2E; }
+  .metrics-table th.goal-col { text-align: left; font-weight: 500; }
+  .metrics-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: var(--ink); vertical-align: middle; }
+  .metrics-table td:first-child { text-align: left; font-weight: 700; color: var(--slate); }
   .metrics-table td.goal-cell { text-align: left; font-size: 11px; color: #9CA3AF; white-space: nowrap; }
   .metrics-table tr:hover td { background: #FAFAFA; }
   .metrics-table .ytd { font-size: 10px; color: #9CA3AF; display: block; }
+  .cur-val { font-weight: 900; color: var(--slate); }
+  .cur-pct { font-size: 11px; color: var(--muted); }
 
-  .cur-val { font-weight: 600; color: #1B3A6B; }
-  .cur-pct { font-size: 11px; color: #6B7280; }
-
-  /* Status pill */
-  .status { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 12px; white-space: nowrap; }
+  /* ── Status pill ── */
+  .status { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; border-radius: 12px; white-space: nowrap; }
   .status-green  { background: #DCFCE7; color: #15803D; }
   .status-yellow { background: #FEF9C3; color: #A16207; }
-  .status-red    { background: #FEE2E2; color: #B91C1C; }
-  .status-gray   { background: #F3F4F6; color: #6B7280; }
+  .status-red    { background: #FEE2E2; color: var(--red); }
+  .status-gray   { background: #F3F4F6; color: var(--muted); }
 
-  /* Section divider */
-  .section-divider { margin: 32px 0 20px; padding-bottom: 10px; border-bottom: 2px solid #1B3A6B; display: flex; align-items: center; gap: 10px; }
-  .section-divider h2 { font-size: 16px; font-weight: 600; color: #1B3A6B; }
-  .section-divider .badge { font-size: 11px; font-weight: 500; color: #6B7280; background: #F0F2F5; padding: 2px 8px; border-radius: 4px; }
+  /* ── Section divider ── */
+  .section-divider { margin: 32px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--slate); display: flex; align-items: center; gap: 10px; }
+  .section-divider h2 { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); }
+  .section-divider .badge { font-size: 11px; font-weight: 700; color: var(--muted); background: #F0F2F5; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .06em; }
 
-  .ytd-note { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400E; margin-bottom: 14px; }
+  .ytd-note { background: #FEF9C3; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400E; margin-bottom: 14px; }
 
-  .footer { text-align: center; font-size: 11px; color: #9CA3AF; margin-top: 44px; line-height: 1.8; }
+  /* ── Footer ── */
+  .mcc-footer { color: var(--muted); font-size: 11.5px; margin-top: 44px; line-height: 1.8; text-align: center; }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <a href="index.html" class="back-link">← Back to Metrics Portal</a>
+<script>
+// ══════════════════════════════════════════════════════════════
+//  DATA — Sam updates these values when new reports come in
+// ══════════════════════════════════════════════════════════════
+const LAST_UPDATED = 'Week 17 (April 2026)';
+const YEARS = [2022, 2023, 2024, 2025, 2026];
 
-  <script>
-  // ══════════════════════════════════════════════════════════════
-  //  DATA — Sam updates these values when new reports come in
-  // ══════════════════════════════════════════════════════════════
-  const LAST_UPDATED = 'Week 17 (April 2026)';
-  const YEARS = [2022, 2023, 2024, 2025, 2026];
+// Evangelism metrics
+// pcts = percentage column from spreadsheet (growth % for attendance, % of attendance for others)
+const evangelism = [
+  { name: 'Avg. attendance (in-person)', goal: 'Min. 5% growth', values: [771,928,967,1020,1059], pcts: [15,20,4,5,4], type: 'growth', goalMin: 5, isAvg: true },
+  { name: 'Avg. adults (in-person)',     goal: 'Min. 5% growth', values: [635,762,802,856,897],  pcts: [16,20,5,7,5],  type: 'growth', goalMin: 5, isAvg: true },
+  { name: 'Avg. students (in-person)',   goal: '10%–15% of attendance', values: [100,101,103,97,74], pcts: [16,13,13,11,8], type: 'range', goalMin: 10, goalMax: 15, isAvg: true },
+  { name: 'Avg. kids (in-person)',       goal: '15%–25% of attendance', values: [134,168,164,164,162], pcts: [21,18,17,16,15], type: 'range', goalMin: 15, goalMax: 25, isAvg: true },
+  { name: 'Avg. online attendance',      goal: '25%–30% of attendance', values: [166,154,143,214,207], pcts: [22,17,15,21,20], type: 'range', goalMin: 25, goalMax: 30, isAvg: true },
+  { name: 'Baptisms / POF',              goal: '10% of attendance', values: [17,29,43,34,16],   pcts: [2,3,4,3,2], type: 'min', goalMin: 10, isAvg: false },
+  { name: 'Sunday visitors',             goal: '100% of attendance', values: [508,645,671,586,186], pcts: [66,70,69,57,18], type: 'min', goalMin: 100, isAvg: false },
+  { name: 'Connect breakfast',           goal: '10% of attendance', values: [null,86,119,111,45], pcts: [null,9,12,11,4], type: 'min', goalMin: 10, isAvg: false },
+];
 
-  // Evangelism metrics
-  // pcts = percentage column from spreadsheet (growth % for attendance, % of attendance for others)
-  const evangelism = [
-    { name: 'Avg. attendance (in-person)', goal: 'Min. 5% growth', values: [771,928,967,1020,1059], pcts: [15,20,4,5,4], type: 'growth', goalMin: 5, isAvg: true },
-    { name: 'Avg. adults (in-person)',     goal: 'Min. 5% growth', values: [635,762,802,856,897],  pcts: [16,20,5,7,5],  type: 'growth', goalMin: 5, isAvg: true },
-    { name: 'Avg. students (in-person)',   goal: '10%–15% of attendance', values: [100,101,103,97,74], pcts: [16,13,13,11,8], type: 'range', goalMin: 10, goalMax: 15, isAvg: true },
-    { name: 'Avg. kids (in-person)',       goal: '15%–25% of attendance', values: [134,168,164,164,162], pcts: [21,18,17,16,15], type: 'range', goalMin: 15, goalMax: 25, isAvg: true },
-    { name: 'Avg. online attendance',      goal: '25%–30% of attendance', values: [166,154,143,214,207], pcts: [22,17,15,21,20], type: 'range', goalMin: 25, goalMax: 30, isAvg: true },
-    { name: 'Baptisms / POF',              goal: '10% of attendance', values: [17,29,43,34,16],   pcts: [2,3,4,3,2], type: 'min', goalMin: 10, isAvg: false },
-    { name: 'Sunday visitors',             goal: '100% of attendance', values: [508,645,671,586,186], pcts: [66,70,69,57,18], type: 'min', goalMin: 100, isAvg: false },
-    { name: 'Connect breakfast',           goal: '10% of attendance', values: [null,86,119,111,45], pcts: [null,9,12,11,4], type: 'min', goalMin: 10, isAvg: false },
-  ];
+// Discipleship metrics
+const discipleship = [
+  { name: 'Adults in circles',      goal: '70% of adults',            values: [297,396,450,536,593], pcts: [47,52,56,63,66], type: 'min',   goalMin: 70, isAvg: true },
+  { name: 'Regular serving',        goal: '50% of attendance',        values: [380,408,359,434,423], pcts: [60,54,45,51,47], type: 'min',   goalMin: 50, isAvg: true },
+  { name: 'Unique donors',          goal: '40%–60% of attendance',    values: [342,350,371,341,231], pcts: [44,38,38,21,22], type: 'range', goalMin: 40, goalMax: 60, isAvg: true },
+  { name: 'New donors',             goal: '5%–10% of unique donors',  values: [56,70,71,49,24],      pcts: [16,20,19,22,10], type: 'range', goalMin: 5,  goalMax: 10, isAvg: false },
+  { name: 'Giving / person / week', goal: '$25–$35 per person/week',  values: [33,31,28,29,10],      pcts: null, type: 'dollar', goalMin: 25, goalMax: 35, isAvg: false },
+  { name: 'Starting Point',         goal: '10% of guests',            values: [35,28,30,19,15],      pcts: [7,4,4,3,8], type: 'min', goalMin: 10, isAvg: false },
+];
+</script>
 
-  // Discipleship metrics
-  const discipleship = [
-    { name: 'Adults in circles',      goal: '70% of adults',            values: [297,396,450,536,593], pcts: [47,52,56,63,66], type: 'min',   goalMin: 70, isAvg: true },
-    { name: 'Regular serving',        goal: '50% of attendance',        values: [380,408,359,434,423], pcts: [60,54,45,51,47], type: 'min',   goalMin: 50, isAvg: true },
-    { name: 'Unique donors',          goal: '40%–60% of attendance',    values: [342,350,371,341,231], pcts: [44,38,38,21,22], type: 'range', goalMin: 40, goalMax: 60, isAvg: true },
-    { name: 'New donors',             goal: '5%–10% of unique donors',  values: [56,70,71,49,24],      pcts: [16,20,19,22,10], type: 'range', goalMin: 5,  goalMax: 10, isAvg: false },
-    { name: 'Giving / person / week', goal: '$25–$35 per person/week',  values: [33,31,28,29,10],      pcts: null, type: 'dollar', goalMin: 25, goalMax: 35, isAvg: false },
-    { name: 'Starting Point',         goal: '10% of guests',            values: [35,28,30,19,15],      pcts: [7,4,4,3,8], type: 'min', goalMin: 10, isAvg: false },
-  ];
-  </script>
-
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-left">
+<header class="mcc-header">
+  <div class="brand">
+    <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+    <div>
+      <a class="back" href="index.html">← Leadership Portal</a>
       <h1>MCC Vitals</h1>
-      <p>Attendance, engagement, and discipleship indicators</p>
+      <div class="sub">Attendance, Engagement &amp; Discipleship Indicators</div>
     </div>
-    <div class="header-badge">Data through<strong>Week 17 · April 2026</strong></div>
   </div>
+  <div class="right">Data through<br>Week 17 · April 2026</div>
+</header>
+
+<div class="page">
 
   <!-- SNAPSHOT CARDS -->
   <div class="section-label">2026 at a glance</div>
@@ -174,8 +194,8 @@
     <h2>Average weekly attendance — 2022 to 2026</h2>
     <p class="chart-sub">In-person total and online attendance each year. 2026 figures are averages through Week 17.</p>
     <div class="legend">
-      <span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>In-person (total)</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#60A5FA;"></span>Online</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>In-person (total)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>Online</span>
     </div>
     <div class="chart-wrap" style="height:220px;"><canvas id="attendanceChart" role="img" aria-label="Weekly attendance trend 2022 to 2026"></canvas></div>
   </div>
@@ -185,8 +205,8 @@
     <h2>In-person breakdown by group</h2>
     <p class="chart-sub">Average weekly adults, students, and kids — showing each group's contribution to in-person attendance over time.</p>
     <div class="legend">
-      <span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Adults</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#16A34A;"></span>Kids</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Adults</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Kids</span>
       <span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>Students</span>
     </div>
     <div class="chart-wrap" style="height:220px;"><canvas id="breakdownChart" role="img" aria-label="In-person breakdown adults students kids 2022 to 2026"></canvas></div>
@@ -195,7 +215,7 @@
   <!-- EVANGELISM METRICS TABLE -->
   <div class="section-divider">
     <h2>Evangelism vitals</h2>
-    <span class="badge">Outreach & growth</span>
+    <span class="badge">Outreach &amp; growth</span>
   </div>
 
   <div class="ytd-note">
@@ -209,7 +229,7 @@
   <!-- DISCIPLESHIP METRICS TABLE -->
   <div class="section-divider" style="margin-top: 36px;">
     <h2>Discipleship vitals</h2>
-    <span class="badge">Engagement & generosity</span>
+    <span class="badge">Engagement &amp; generosity</span>
   </div>
 
   <div class="ytd-note">
@@ -226,10 +246,10 @@
     <h2>Adults in circles and regular serving — % of adults/attendance</h2>
     <p class="chart-sub">Tracking progress toward the 70% circles goal and 50% serving goal.</p>
     <div class="legend">
-      <span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Adults in circles %</span>
-      <span class="legend-item"><span class="legend-dot" style="background:#16A34A;"></span>Regular serving %</span>
-      <span class="legend-item" style="margin-left:8px; border-left: 1px solid #E5E7EB; padding-left: 12px;"><span style="width:20px; height:2px; background:#1B3A6B; display:inline-block; margin-right:4px; border-top: 2px dashed #1B3A6B; vertical-align: middle;"></span>Circles goal (70%)</span>
-      <span class="legend-item"><span style="width:20px; height:2px; background:#16A34A; display:inline-block; margin-right:4px; border-top: 2px dashed #16A34A; vertical-align: middle;"></span>Serving goal (50%)</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Adults in circles %</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Regular serving %</span>
+      <span class="legend-item" style="margin-left:8px; border-left: 1px solid var(--line); padding-left: 12px;"><span style="width:20px; height:2px; background:#343A44; display:inline-block; margin-right:4px; border-top: 2px dashed #343A44; vertical-align: middle;"></span>Circles goal (70%)</span>
+      <span class="legend-item"><span style="width:20px; height:2px; background:#2F8F5B; display:inline-block; margin-right:4px; border-top: 2px dashed #2F8F5B; vertical-align: middle;"></span>Serving goal (50%)</span>
     </div>
     <div class="chart-wrap" style="height:220px;"><canvas id="discipleshipChart" role="img" aria-label="Adults in circles and regular serving percentage trend"></canvas></div>
   </div>
@@ -240,11 +260,11 @@
     <h2>How people move from visitor to engaged disciple</h2>
     <p class="chart-sub">Each stage shows the YTD count for 2026 and the conversion rate from the previous step. Count metrics are through Week 17.</p>
     <div class="funnel-wrap" id="funnel-wrap"></div>
-    <p style="font-size:11px; color:#9CA3AF; margin-top:16px;">† YTD counts through Week 17. Adults in circles is a point-in-time average, not a cumulative count — conversion rate shown vs. Starting Point completers is directional only.</p>
+    <p style="font-size:11px; color:var(--muted); margin-top:16px;">† YTD counts through Week 17. Adults in circles is a point-in-time average, not a cumulative count — conversion rate shown vs. Starting Point completers is directional only.</p>
   </div>
 
-  <div class="footer">
-    <p>MCC &nbsp;·&nbsp; MCC Vitals Dashboard &nbsp;·&nbsp; Data through Week 17, April 2026</p>
+  <div class="mcc-footer">
+    <p>Maple City Chapel &nbsp;·&nbsp; MCC Vitals Dashboard &nbsp;·&nbsp; Data through Week 17, April 2026</p>
     <p style="margin-top:2px;">Source: Planning Center / internal tracking. Updated by the Operations team.</p>
   </div>
 
@@ -299,11 +319,9 @@ function fmtPct(m, idx) {
   if (!m.pcts) return '';
   const p = m.pcts[idx];
   if (p === null || p === undefined) return '';
-  if (m.type === 'growth') return '<span style="font-size:11px;color:#6B7280;">+' + p + '%</span>';
-  return '<span style="font-size:11px;color:#6B7280;">' + p + '%</span>';
+  if (m.type === 'growth') return '<span style="font-size:11px;color:#6b7280;">+' + p + '%</span>';
+  return '<span style="font-size:11px;color:#6b7280;">' + p + '%</span>';
 }
-
-const nonAvgTypes = m => !m.isAvg;
 
 // ── Snapshot cards ─────────────────────────────────────────────────
 const snapMetrics = [
@@ -333,7 +351,7 @@ function buildTable(metrics, tableId) {
     <th>Metric</th>
     <th class="goal-col">Goal</th>
     <th>2022</th><th>2023</th><th>2024</th><th>2025</th>
-    <th style="color:#1B3A6B;">2026</th>
+    <th style="color:#343A44;">2026</th>
     <th>Status</th>
   </tr></thead><tbody>`;
 
@@ -358,40 +376,19 @@ buildTable(discipleship, 'discipleshipTable');
 
 // ── Next Steps Funnel ───────────────────────────────────────────────
 (function() {
-  // 2026 YTD values (Week 17)
-  const visitors      = evangelism.find(m => m.name === 'Sunday visitors').values[4];       // 186
-  const connectBreak  = evangelism.find(m => m.name === 'Connect breakfast').values[4];     // 45
-  const startingPt    = discipleship.find(m => m.name === 'Starting Point').values[4];      // 15
-  const inCircles     = discipleship.find(m => m.name === 'Adults in circles').values[4];   // 593
+  const visitors      = evangelism.find(m => m.name === 'Sunday visitors').values[4];
+  const connectBreak  = evangelism.find(m => m.name === 'Connect breakfast').values[4];
+  const startingPt    = discipleship.find(m => m.name === 'Starting Point').values[4];
+  const inCircles     = discipleship.find(m => m.name === 'Adults in circles').values[4];
 
   const conv1 = Math.round(connectBreak / visitors * 100);
   const conv2 = Math.round(startingPt / connectBreak * 100);
 
   const steps = [
-    {
-      num: visitors,
-      label: 'Sunday Visitors',
-      conv: 'Starting point — guests who attended a service',
-      color: '#1B3A6B'
-    },
-    {
-      num: connectBreak,
-      label: 'Connect Breakfast',
-      conv: `<strong>${conv1}%</strong> of visitors attended Connect Breakfast`,
-      color: '#16A34A'
-    },
-    {
-      num: startingPt,
-      label: 'Starting Point',
-      conv: `<strong>${conv2}%</strong> of Connect Breakfast attendees completed Starting Point`,
-      color: '#D97706'
-    },
-    {
-      num: inCircles,
-      label: 'Adults in Circles',
-      conv: `<strong>${inCircles}</strong> adults currently in a circle (avg) — the ultimate discipleship goal`,
-      color: '#7C3AED'
-    }
+    { num: visitors,     label: 'Sunday Visitors',     conv: 'Starting point — guests who attended a service',                                  color: '#343A44' },
+    { num: connectBreak, label: 'Connect Breakfast',    conv: `<strong>${conv1}%</strong> of visitors attended Connect Breakfast`,               color: '#2F8F5B' },
+    { num: startingPt,   label: 'Starting Point',       conv: `<strong>${conv2}%</strong> of Connect Breakfast attendees completed Starting Point`, color: '#C8842A' },
+    { num: inCircles,    label: 'Adults in Circles',    conv: `<strong>${inCircles}</strong> adults currently in a circle (avg) — the ultimate discipleship goal`, color: '#4C5564' }
   ];
 
   document.getElementById('funnel-wrap').innerHTML = steps.map(s => `
@@ -405,20 +402,19 @@ buildTable(discipleship, 'discipleshipTable');
 })();
 
 // ── Charts ─────────────────────────────────────────────────────────
-Chart.defaults.font.family = "-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
+Chart.defaults.font.family = "'Lato', system-ui, Arial, sans-serif";
 Chart.defaults.font.size = 12;
-Chart.defaults.color = '#6B7280';
+Chart.defaults.color = '#6b7280';
 const gc = 'rgba(0,0,0,0.06)';
 const labels = ['2022','2023','2024','2025','2026'];
 
-// Attendance trend
 new Chart(document.getElementById('attendanceChart'), {
   type: 'bar',
   data: {
     labels,
     datasets: [
-      { label: 'In-person', data: [771,928,967,1020,1059], backgroundColor: '#1B3A6B', borderRadius: 4 },
-      { label: 'Online',    data: [166,154,143,214,207],   backgroundColor: '#60A5FA', borderRadius: 4 }
+      { label: 'In-person', data: [771,928,967,1020,1059], backgroundColor: '#343A44', borderRadius: 4 },
+      { label: 'Online',    data: [166,154,143,214,207],   backgroundColor: '#8899AA', borderRadius: 4 }
     ]
   },
   options: {
@@ -431,14 +427,13 @@ new Chart(document.getElementById('attendanceChart'), {
   }
 });
 
-// In-person breakdown (stacked)
 new Chart(document.getElementById('breakdownChart'), {
   type: 'bar',
   data: {
     labels,
     datasets: [
-      { label: 'Adults',   data: [635,762,802,856,897], backgroundColor: '#1B3A6B', borderRadius: 0 },
-      { label: 'Kids',     data: [134,168,164,164,162], backgroundColor: '#16A34A', borderRadius: 0 },
+      { label: 'Adults',   data: [635,762,802,856,897], backgroundColor: '#343A44', borderRadius: 0 },
+      { label: 'Kids',     data: [134,168,164,164,162], backgroundColor: '#2F8F5B', borderRadius: 0 },
       { label: 'Students', data: [100,101,103,97,74],   backgroundColor: '#DC2626', borderRadius: 4 }
     ]
   },
@@ -452,7 +447,6 @@ new Chart(document.getElementById('breakdownChart'), {
   }
 });
 
-// Discipleship trend (line)
 new Chart(document.getElementById('discipleshipChart'), {
   type: 'line',
   data: {
@@ -461,25 +455,25 @@ new Chart(document.getElementById('discipleshipChart'), {
       {
         label: 'Adults in circles %',
         data: [47,52,56,63,66],
-        borderColor: '#1B3A6B', backgroundColor: 'rgba(27,58,107,0.08)',
+        borderColor: '#343A44', backgroundColor: 'rgba(52,58,68,0.08)',
         borderWidth: 2.5, pointRadius: 4, tension: 0.3, fill: true
       },
       {
         label: 'Regular serving %',
         data: [60,54,45,51,47],
-        borderColor: '#16A34A', backgroundColor: 'rgba(22,163,74,0.06)',
+        borderColor: '#2F8F5B', backgroundColor: 'rgba(47,143,91,0.07)',
         borderWidth: 2.5, pointRadius: 4, tension: 0.3, fill: true
       },
       {
         label: 'Circles goal',
         data: [70,70,70,70,70],
-        borderColor: '#1B3A6B', borderDash: [5,4],
+        borderColor: '#343A44', borderDash: [5,4],
         borderWidth: 1.5, pointRadius: 0, fill: false
       },
       {
         label: 'Serving goal',
         data: [50,50,50,50,50],
-        borderColor: '#16A34A', borderDash: [5,4],
+        borderColor: '#2F8F5B', borderDash: [5,4],
         borderWidth: 1.5, pointRadius: 0, fill: false
       }
     ]

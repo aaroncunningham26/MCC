@@ -5,76 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MCC Metrics — Leadership Portal</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light; }
+  :root {
+    --slate: #343A44;
+    --bg: #F2F2F2;
+    --card: #ffffff;
+    --ink: #23272e;
+    --muted: #6b7280;
+    --line: #e3e5ea;
+    --red: #DC2626;
+    --green: #2F8F5B;
+    --amber: #C8842A;
+  }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #F0F2F5; color: #1A1A2E; min-height: 100vh; }
+  body { font-family: 'Lato', system-ui, -apple-system, Arial, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
-  /* ── Hero header ────────────────────────────────────────────── */
-  .hero { background: #1B3A6B; padding: 56px 24px 48px; text-align: center; }
-  .hero-inner { max-width: 680px; margin: 0 auto; }
-  .hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 12px; }
-  .hero h1 { font-size: 32px; font-weight: 700; color: #fff; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 12px; }
-  .hero p { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.6; max-width: 480px; margin: 0 auto; }
+  /* ── MCC Header ── */
+  .mcc-header { position: relative; overflow: hidden; background: var(--slate); color: #fff; padding: 26px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .mcc-header::before { content: ""; position: absolute; inset: 0; background: url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size: 620px; opacity: .065; pointer-events: none; }
+  .mcc-header .brand { display: flex; align-items: center; gap: 20px; position: relative; }
+  .mcc-header .logo { height: 42px; width: auto; display: block; }
+  .mcc-header h1 { font-size: 27px; font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: 1; }
+  .mcc-header .sub { font-size: 11.5px; font-weight: 400; letter-spacing: .05em; text-transform: uppercase; opacity: .72; margin-top: 6px; }
 
-  /* ── Page body ──────────────────────────────────────────────── */
-  .page { max-width: 900px; margin: 0 auto; padding: 48px 24px 80px; }
+  /* ── Layout ── */
+  .page { max-width: 1000px; margin: 0 auto; padding: 40px 28px 80px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
 
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6B7280; margin-bottom: 20px; }
+  /* ── Cards ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
 
-  /* ── Metric cards grid ──────────────────────────────────────── */
-  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .metric-card { background: var(--card); border-radius: 12px; border: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column; transition: .15s; text-decoration: none; color: inherit; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .metric-card:hover { border-color: var(--slate); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(52,58,68,.14); }
 
-  .metric-card { background: #fff; border-radius: 14px; border: 1px solid #E5E7EB; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.15s; }
-  .metric-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
-  .metric-card.coming-soon { opacity: 0.7; }
-
-  .card-accent { height: 5px; }
-  .accent-blue   { background: #1B3A6B; }
-  .accent-green  { background: #16A34A; }
-  .accent-purple { background: #7C3AED; }
-  .accent-amber  { background: #D97706; }
-  .accent-teal   { background: #0D9488; }
-  .accent-gray   { background: #9CA3AF; }
+  .card-accent { height: 4px; }
+  .accent-slate { background: var(--slate); }
+  .accent-green { background: var(--green); }
+  .accent-amber { background: var(--amber); }
+  .accent-muted { background: var(--muted); }
 
   .card-body { padding: 24px 24px 20px; flex: 1; display: flex; flex-direction: column; }
+  .card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 20px; background: #F4F5F7; }
+  .card-title { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); margin-bottom: 8px; }
+  .card-desc { font-size: 13.5px; color: var(--muted); line-height: 1.55; flex: 1; margin-bottom: 20px; }
 
-  .card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 20px; }
-  .icon-blue   { background: #EFF6FF; }
-  .icon-green  { background: #F0FDF4; }
-  .icon-purple { background: #F5F3FF; }
-  .icon-amber  { background: #FFFBEB; }
-  .icon-teal   { background: #F0FDFA; }
-  .icon-gray   { background: #F9FAFB; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: auto; gap: 12px; flex-wrap: wrap; }
+  .card-updated { font-size: 11px; color: var(--muted); }
+  .card-updated span { color: var(--ink); font-weight: 700; }
 
-  .card-title { font-size: 16px; font-weight: 600; color: #1A1A2E; margin-bottom: 6px; }
-  .card-desc  { font-size: 13px; color: #6B7280; line-height: 1.55; flex: 1; margin-bottom: 20px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; transition: background .12s; }
+  .btn-slate { background: var(--slate); color: #fff; }
+  .btn-slate:hover { background: #23272e; }
 
-  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
-  .card-updated { font-size: 11px; color: #9CA3AF; }
-  .card-updated span { color: #6B7280; font-weight: 500; }
-
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; text-decoration: none; transition: background 0.12s; }
-  .btn-primary { background: #1B3A6B; color: #fff; }
-  .btn-primary:hover { background: #15305A; }
-  .btn-disabled { background: #F3F4F6; color: #9CA3AF; cursor: default; pointer-events: none; }
-
-  .badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
-  .badge-soon { background: #F3F4F6; color: #9CA3AF; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+  .badge-soon { background: #F3F4F6; color: var(--muted); }
   .badge-live { background: #DCFCE7; color: #15803D; }
 
-  /* ── Footer ─────────────────────────────────────────────────── */
-  .footer { text-align: center; font-size: 11px; color: #9CA3AF; margin-top: 60px; line-height: 1.8; }
+  /* ── Footer ── */
+  .mcc-footer { color: var(--muted); font-size: 11.5px; margin-top: 60px; line-height: 1.8; text-align: center; }
+  .mcc-footer a { color: var(--slate); font-weight: 700; text-decoration: none; }
+  .mcc-footer a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
 
-<div class="hero">
-  <div class="hero-inner">
-    <h1>MCC Leadership Metrics Portal</h1>
-    <p>A central view of the data that matters most — updated regularly to help our team make informed, mission-driven decisions.</p>
+<header class="mcc-header">
+  <div class="brand">
+    <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+    <div>
+      <h1>Leadership Metrics</h1>
+      <div class="sub">metrics.maplecity.church</div>
+    </div>
   </div>
-</div>
+</header>
 
 <div class="page">
 
@@ -82,11 +89,10 @@
 
   <div class="cards-grid">
 
-    <!-- General Fund -->
-    <div class="metric-card">
-      <div class="card-accent accent-blue"></div>
+    <a href="financials.html" class="metric-card">
+      <div class="card-accent accent-slate"></div>
       <div class="card-body">
-        <div class="card-icon icon-blue">💰</div>
+        <div class="card-icon">💰</div>
         <div class="card-title">MCC Financials</div>
         <p class="card-desc">Annual giving trends, income vs operating costs, 2026 year-to-date performance, and budget vs actual.</p>
         <div class="card-meta">
@@ -94,16 +100,15 @@
             <span class="badge badge-live">Live</span>
             <div class="card-updated" style="margin-top:6px;">Updated through <span>April 2026</span></div>
           </div>
-          <a href="financials.html" class="btn btn-primary">View dashboard →</a>
+          <span class="btn btn-slate">View →</span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <!-- MCC Vitals -->
-    <div class="metric-card">
+    <a href="vitals.html" class="metric-card">
       <div class="card-accent accent-green"></div>
       <div class="card-body">
-        <div class="card-icon icon-green">📊</div>
+        <div class="card-icon">📊</div>
         <div class="card-title">MCC Vitals</div>
         <p class="card-desc">Weekend attendance, engagement trends, volunteer participation, and key ministry health indicators — tracked against goals.</p>
         <div class="card-meta">
@@ -111,16 +116,15 @@
             <span class="badge badge-live">Live</span>
             <div class="card-updated" style="margin-top:6px;">Updated through <span>April 2026</span></div>
           </div>
-          <a href="vitals.html" class="btn btn-primary">View dashboard →</a>
+          <span class="btn btn-slate">View →</span>
         </div>
       </div>
-    </div>
+    </a>
 
-    <!-- Finance Team Dashboard -->
-    <div class="metric-card">
+    <a href="finance-team.html" class="metric-card">
       <div class="card-accent accent-amber"></div>
       <div class="card-body">
-        <div class="card-icon icon-amber">📈</div>
+        <div class="card-icon">📈</div>
         <div class="card-title">Finance Team Dashboard</div>
         <p class="card-desc">Weekly operating view for the finance team — last weekend giving, YTD giving vs budget, monthly comparisons, and cash position. Refreshed every week from QuickBooks Online.</p>
         <div class="card-meta">
@@ -128,16 +132,16 @@
             <span class="badge badge-live">Live</span>
             <div class="card-updated" style="margin-top:6px;">Updated through <span>May 2026</span></div>
           </div>
-          <a href="finance-team.html" class="btn btn-primary">View dashboard →</a>
+          <span class="btn btn-slate">View →</span>
         </div>
       </div>
-    </div>
+    </a>
 
   </div>
 
-  <div class="footer">
-    <p>MCC &nbsp;·&nbsp; Leadership Metrics Portal &nbsp;·&nbsp; metrics.maplecity.church</p>
-    <p style="margin-top:4px;">Dashboards are updated by the Operations team. Contact Aaron Cunningham with questions.</p>
+  <div class="mcc-footer">
+    <p>Maple City Chapel &nbsp;·&nbsp; Leadership Metrics Portal &nbsp;·&nbsp; metrics.maplecity.church</p>
+    <p style="margin-top:4px;">Dashboards updated by the Operations team. Questions? Contact <a href="mailto:aaroncunningham@maplecitychapel.org">Aaron Cunningham</a>.</p>
   </div>
 
 </div>

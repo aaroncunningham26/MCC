@@ -5,111 +5,138 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MCC Financials Dashboard</title>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
-  :root { color-scheme: light; }
+  :root {
+    --slate: #343A44;
+    --bg: #F2F2F2;
+    --card: #ffffff;
+    --ink: #23272e;
+    --muted: #6b7280;
+    --line: #e3e5ea;
+    --red: #DC2626;
+    --green: #2F8F5B;
+    --amber: #C8842A;
+    --chart: #4C5564;
+  }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #F0F2F5; color: #1A1A2E; font-size: 15px; line-height: 1.6; }
+  body { font-family: 'Lato', system-ui, -apple-system, Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.6; }
+
+  /* ── MCC Header ── */
+  .mcc-header { position: relative; overflow: hidden; background: var(--slate); color: #fff; padding: 26px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .mcc-header::before { content: ""; position: absolute; inset: 0; background: url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size: 620px; opacity: .065; pointer-events: none; }
+  .mcc-header .brand { display: flex; align-items: center; gap: 20px; position: relative; }
+  .mcc-header .logo { height: 42px; width: auto; display: block; }
+  .mcc-header .back { color: #aeb6c2; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; display: inline-block; margin-bottom: 5px; }
+  .mcc-header .back:hover { color: #fff; }
+  .mcc-header h1 { font-size: 27px; font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: 1; }
+  .mcc-header .sub { font-size: 11.5px; font-weight: 400; letter-spacing: .05em; text-transform: uppercase; opacity: .72; margin-top: 6px; }
+  .mcc-header .right { position: relative; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; text-align: right; line-height: 1.7; }
+  .mcc-header .right strong { display: block; font-size: 15px; font-weight: 900; letter-spacing: -.01em; opacity: 1; }
+
+  /* ── Layout ── */
   .page { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; margin-top: 32px; }
 
-  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #6B7280; text-decoration: none; margin-bottom: 20px; padding: 6px 0; }
-  .back-link:hover { color: #1B3A6B; }
-
-  .header { background: #1B3A6B; color: #fff; border-radius: 12px; padding: 24px 32px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .header-left h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; }
-  .header-left p  { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 3px; }
-  .header-badge   { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 8px 16px; font-size: 13px; color: rgba(255,255,255,0.9); text-align: right; }
-  .header-badge strong { display: block; font-size: 16px; font-weight: 600; color: #fff; }
-
-  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6B7280; margin-bottom: 12px; margin-top: 32px; }
-
+  /* ── Snapshot cards ── */
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 4px; }
-  .card  { background: #fff; border-radius: 10px; padding: 18px 20px; border: 1px solid #E5E7EB; }
-  .card .label { font-size: 12px; color: #6B7280; font-weight: 500; margin-bottom: 6px; }
-  .card .value { font-size: 24px; font-weight: 600; color: #1A1A2E; letter-spacing: -0.5px; }
-  .card .sub   { font-size: 12px; color: #6B7280; margin-top: 4px; }
-  .card .sub.up      { color: #15803D; }
-  .card .sub.down    { color: #B91C1C; }
-  .card .sub.neutral { color: #6B7280; }
-  .card.accent-green { border-top: 4px solid #16A34A; }
-  .card.accent-red   { border-top: 4px solid #DC2626; }
-  .card.accent-blue  { border-top: 4px solid #1B3A6B; }
-  .card.accent-amber { border-top: 4px solid #D97706; }
+  .card { background: var(--card); border-radius: 10px; padding: 18px 20px; border: 1px solid var(--line); box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .card .label { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .card .value { font-size: 24px; font-weight: 900; color: var(--slate); letter-spacing: -0.5px; }
+  .card .sub   { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .card .sub.up      { color: var(--green); }
+  .card .sub.down    { color: var(--red); }
+  .card .sub.neutral { color: var(--muted); }
+  .card.accent-green { border-top: 4px solid var(--green); }
+  .card.accent-red   { border-top: 4px solid var(--red); }
+  .card.accent-blue  { border-top: 4px solid var(--slate); }
+  .card.accent-amber { border-top: 4px solid var(--amber); }
 
-  .chart-card { background: #fff; border-radius: 10px; padding: 22px 22px 18px; border: 1px solid #E5E7EB; margin-bottom: 14px; }
-  .chart-card h2 { font-size: 15px; font-weight: 600; color: #1A1A2E; margin-bottom: 4px; }
-  .chart-card .chart-sub { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+  /* ── Chart cards ── */
+  .chart-card { background: var(--card); border-radius: 10px; padding: 22px 22px 18px; border: 1px solid var(--line); margin-bottom: 14px; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .chart-card h2 { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); margin-bottom: 4px; }
+  .chart-card .chart-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
   .chart-wrap { position: relative; width: 100%; }
 
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 680px) { .grid-2 { grid-template-columns: 1fr; } }
 
   .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4B5563; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 700; }
   .legend-dot  { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 
-  .insights { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 20px 24px; margin-top: 6px; }
-  .insights h2 { font-size: 14px; font-weight: 600; color: #1E40AF; margin-bottom: 12px; }
+  /* ── Insights ── */
+  .insights { background: #F4F5F7; border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin-top: 6px; }
+  .insights h2 { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--slate); margin-bottom: 12px; }
   .insights ul { list-style: none; }
-  .insights ul li { padding: 8px 0; border-bottom: 1px solid #DBEAFE; font-size: 13px; color: #1E3A5F; display: flex; align-items: flex-start; gap: 10px; line-height: 1.55; }
+  .insights ul li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink); display: flex; align-items: flex-start; gap: 10px; line-height: 1.55; }
   .insights ul li:last-child { border-bottom: none; }
   .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
-  .dot-green  { background: #16A34A; }
-  .dot-red    { background: #DC2626; }
-  .dot-amber  { background: #D97706; }
-  .dot-blue   { background: #1B3A6B; }
+  .dot-green  { background: var(--green); }
+  .dot-red    { background: var(--red); }
+  .dot-amber  { background: var(--amber); }
+  .dot-blue   { background: var(--slate); }
 
+  /* ── Data table ── */
   .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .data-table th { background: #F9FAFB; font-weight: 600; color: #374151; padding: 9px 12px; text-align: right; border-bottom: 1px solid #E5E7EB; }
+  .data-table th { background: #F9FAFB; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: var(--muted); padding: 9px 12px; text-align: right; border-bottom: 1px solid var(--line); }
   .data-table th:first-child { text-align: left; }
-  .data-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: #374151; }
-  .data-table td:first-child { text-align: left; font-weight: 500; color: #1A1A2E; }
-  .data-table tr:last-child td { border-bottom: none; font-weight: 600; background: #F9FAFB; }
-  .pos { color: #15803D; font-weight: 600; }
-  .neg { color: #B91C1C; font-weight: 600; }
-  .ytd-col { color: #1B3A6B; font-weight: 600; }
+  .data-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: var(--ink); }
+  .data-table td:first-child { text-align: left; font-weight: 700; color: var(--slate); }
+  .data-table tr:last-child td { border-bottom: none; font-weight: 700; background: #F9FAFB; }
+  .pos { color: var(--green); font-weight: 700; }
+  .neg { color: var(--red); font-weight: 700; }
+  .ytd-col { color: var(--slate); font-weight: 700; }
 
-  .footer { text-align: center; font-size: 11px; color: #9CA3AF; margin-top: 44px; line-height: 1.8; }
+  /* ── Footer ── */
+  .mcc-footer { color: var(--muted); font-size: 11.5px; margin-top: 44px; line-height: 1.8; text-align: center; }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <a href="index.html" class="back-link">← Back to Metrics Portal</a>
+<script>
+// ══════════════════════════════════════════════════════════════
+//  DATA — Sam updates these values when new reports come in
+// ══════════════════════════════════════════════════════════════
 
-  <script>
-  // ══════════════════════════════════════════════════════════════
-  //  DATA — Sam updates these values when new reports come in
-  // ══════════════════════════════════════════════════════════════
+const annualIncome  = { 2022:1406184, 2023:1515712, 2024:1418690, 2025:1553525 };
+const annualExpense = { 2022:1374577, 2023:1349295, 2024:1389166, 2025:1574578 };
 
-  const annualIncome  = { 2022:1406184, 2023:1515712, 2024:1418690, 2025:1553525 };
-  const annualExpense = { 2022:1374577, 2023:1349295, 2024:1389166, 2025:1574578 };
+const annualBudgetIncome  = { 2022:1203775, 2023:1220300, 2024:1482025, 2025:1604875, 2026:1839800 };
+const annualBudgetExpense = { 2022:1228900, 2023:1220800, 2024:1471869, 2025:1603860 };
 
-  const annualBudgetIncome  = { 2022:1203775, 2023:1220300, 2024:1482025, 2025:1604875, 2026:1839800 };
-  const annualBudgetExpense = { 2022:1228900, 2023:1220800, 2024:1471869, 2025:1603860 };
+const ytd2026Income  = [107451, 112486, 129496, 178530];
+const ytd2026Expense = [147212, 152828, 153450, 189918];
+const ytd2026Months  = ['Jan','Feb','Mar','Apr'];
 
-  const ytd2026Income  = [107451, 112486, 129496, 178530];
-  const ytd2026Expense = [147212, 152828, 153450, 189918];
-  const ytd2026Months  = ['Jan','Feb','Mar','Apr'];
+const janAprIncome  = { 2022:443055, 2023:403961, 2024:416717, 2025:454888, 2026:527963 };
+const janAprExpense = { 2022:433744, 2023:437010, 2024:408953, 2025:504171, 2026:643408 };
 
-  const janAprIncome  = { 2022:443055, 2023:403961, 2024:416717, 2025:454888, 2026:527963 };
-  const janAprExpense = { 2022:433744, 2023:437010, 2024:408953, 2025:504171, 2026:643408 };
+const LAST_UPDATED = 'April 2026';
+const DATA_NOTE    = '2022–2023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024–2026: General Fund only. Source: PowerChurch (2022–2025), QuickBooks Online (2026).';
 
-  const LAST_UPDATED = 'April 2026';
-  const DATA_NOTE    = '2022–2023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024–2026: General Fund only. Source: PowerChurch (2022–2025), QuickBooks Online (2026).';
+// ── Months of Cash on Hand ──────────────────────────────────────
+// Update CASH_ON_HAND each time the dashboard is refreshed.
+// Pull the unrestricted checking/savings balance from QBO Balance Sheet.
+const CASH_ON_HAND = 383202; // ← update this value each month (unrestricted bank balance — total bank accounts minus all designated/restricted fund balances). As of Apr 30, 2026.
+</script>
 
-  // ── Months of Cash on Hand ──────────────────────────────────────
-  // Update CASH_ON_HAND each time the dashboard is refreshed.
-  // Pull the unrestricted checking/savings balance from QBO Balance Sheet.
-  const CASH_ON_HAND = 383202; // ← update this value each month (unrestricted bank balance — total bank accounts minus all designated/restricted fund balances). As of Apr 30, 2026.
-  </script>
-
-  <div class="header">
-    <div class="header-left">
+<header class="mcc-header">
+  <div class="brand">
+    <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+    <div>
+      <a class="back" href="index.html">← Leadership Portal</a>
       <h1>MCC Financials</h1>
-      <p>Financial Health Dashboard &nbsp;·&nbsp; General Fund</p>
+      <div class="sub">Financial Health Dashboard &nbsp;·&nbsp; General Fund</div>
     </div>
-    <div class="header-badge">Data through<strong id="hdr-date"></strong></div>
   </div>
+  <div class="right">Data through<strong id="hdr-date"></strong></div>
+</header>
+
+<div class="page">
 
   <div class="section-label">2026 Year-to-Date Snapshot (January – <span class="hdr-month"></span>)</div>
   <div class="cards" id="snapshot-cards"></div>
@@ -121,15 +148,15 @@
   <div class="chart-card">
     <h2>Total giving received each year</h2>
     <p class="chart-sub">Full-year totals for 2022–2025. The 2026 bar shows giving received so far (January through <span class="hdr-month"></span>).</p>
-    <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#60A5FA;"></span>2026 year-to-date</span></div>
+    <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>2026 year-to-date</span></div>
     <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
   </div>
 
   <div class="section-label">Is giving covering our costs?</div>
   <div class="chart-card">
     <h2>Annual giving vs operating costs</h2>
-    <p class="chart-sub">When the blue bar is taller, we finished the year with a surplus. When orange is taller, we ran a deficit.</p>
-    <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Giving received</span><span class="legend-item"><span class="legend-dot" style="background:#F97316;"></span>Operating costs</span></div>
+    <p class="chart-sub">When the slate bar is taller, we finished the year with a surplus. When amber is taller, we ran a deficit.</p>
+    <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Giving received</span><span class="legend-item"><span class="legend-dot" style="background:#C8842A;"></span>Operating costs</span></div>
     <div class="chart-wrap" style="height:230px;"><canvas id="incExpChart" role="img" aria-label="Giving vs operating costs 2022 through 2026 YTD"></canvas></div>
   </div>
 
@@ -138,13 +165,13 @@
     <div class="chart-card">
       <h2>2026 month-by-month</h2>
       <p class="chart-sub">Giving vs costs for each month so far in 2026.</p>
-      <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#1B3A6B;"></span>Giving</span><span class="legend-item"><span class="legend-dot" style="background:#F97316;"></span>Costs</span></div>
+      <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Giving</span><span class="legend-item"><span class="legend-dot" style="background:#C8842A;"></span>Costs</span></div>
       <div class="chart-wrap" style="height:190px;"><canvas id="monthlyChart" role="img" aria-label="2026 monthly giving vs costs"></canvas></div>
     </div>
     <div class="chart-card">
       <h2>Jan–<span class="hdr-month"></span> net: 5-year view</h2>
       <p class="chart-sub">Surplus or deficit in the same window across all five years.</p>
-      <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#16A34A;"></span>Surplus</span><span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>Deficit</span></div>
+      <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Surplus</span><span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>Deficit</span></div>
       <div class="chart-wrap" style="height:190px;"><canvas id="netChart" role="img" aria-label="Jan through Apr net by year 2022 to 2026"></canvas></div>
     </div>
   </div>
@@ -163,8 +190,8 @@
     <table class="data-table" id="summaryTable"></table>
   </div>
 
-  <div class="footer">
-    <p>MCC &nbsp;·&nbsp; Financials Dashboard &nbsp;·&nbsp; Updated through <span id="ftr-date"></span></p>
+  <div class="mcc-footer">
+    <p>Maple City Chapel &nbsp;·&nbsp; Financials Dashboard &nbsp;·&nbsp; Updated through <span id="ftr-date"></span></p>
     <p id="ftr-note" style="margin-top:2px;"></p>
   </div>
 
@@ -213,21 +240,22 @@ document.getElementById('insights-list').innerHTML = [
   { dot: monthsCash >= 3 ? 'dot-green' : monthsCash >= 1.5 ? 'dot-amber' : 'dot-red', text:`We currently have <strong>${monthsCash} months of cash on hand</strong> (${fmt(CASH_ON_HAND)} in reserves ÷ ${fmt(Math.round(avgMonthlyExp))} avg monthly costs). The healthy target for a church is <strong>3–6 months</strong>. ${monthsCash >= 3 ? 'We are within that range.' : 'Building reserves toward the 3-month floor should be a priority.'}` }
 ].map(i=>`<li><span class="dot ${i.dot}"></span><span>${i.text}</span></li>`).join('');
 
-Chart.defaults.font.family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif";
-Chart.defaults.font.size=12; Chart.defaults.color='#6B7280';
-const gc='rgba(0,0,0,0.06)';
-const yT={callback:v=>'$'+Math.round(Math.abs(v)/1000)+'K',color:'#9CA3AF'};
-const yN={callback:v=>(v<0?'-$':'$')+Math.round(Math.abs(v)/1000)+'K',color:'#9CA3AF'};
-const priorYears=[2022,2023,2024,2025];
+Chart.defaults.font.family = "'Lato', system-ui, Arial, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6b7280';
+const gc = 'rgba(0,0,0,0.06)';
+const yT = { callback: v => '$' + Math.round(Math.abs(v)/1000) + 'K', color: '#9CA3AF' };
+const yN = { callback: v => (v<0?'-$':'$') + Math.round(Math.abs(v)/1000) + 'K', color: '#9CA3AF' };
+const priorYears = [2022,2023,2024,2025];
 
-new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:[...priorYears.map(()=>'#1B3A6B'),'#60A5FA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:[...priorYears.map(()=>'#343A44'),'#8899AA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
-new Chart(document.getElementById('incExpChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{label:'Giving received',data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:'#1B3A6B',borderRadius:4},{label:'Operating costs',data:[...priorYears.map(y=>annualExpense[y]),ytdExp],backgroundColor:'#F97316',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+new Chart(document.getElementById('incExpChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{label:'Giving received',data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:'#343A44',borderRadius:4},{label:'Operating costs',data:[...priorYears.map(y=>annualExpense[y]),ytdExp],backgroundColor:'#C8842A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
-new Chart(document.getElementById('monthlyChart'),{type:'bar',data:{labels:ytd2026Months,datasets:[{label:'Giving',data:ytd2026Income,backgroundColor:'#1B3A6B',borderRadius:4},{label:'Costs',data:ytd2026Expense,backgroundColor:'#F97316',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+new Chart(document.getElementById('monthlyChart'),{type:'bar',data:{labels:ytd2026Months,datasets:[{label:'Giving',data:ytd2026Income,backgroundColor:'#343A44',borderRadius:4},{label:'Costs',data:ytd2026Expense,backgroundColor:'#C8842A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
 const nv=[2022,2023,2024,2025,2026].map(y=>janAprIncome[y]-janAprExpense[y]);
-new Chart(document.getElementById('netChart'),{type:'bar',data:{labels:['2022','2023','2024','2025','2026'],datasets:[{data:nv,backgroundColor:nv.map(v=>v>=0?'#16A34A':'#DC2626'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' Net: '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yN}}}});
+new Chart(document.getElementById('netChart'),{type:'bar',data:{labels:['2022','2023','2024','2025','2026'],datasets:[{data:nv,backgroundColor:nv.map(v=>v>=0?'#2F8F5B':'#DC2626'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' Net: '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yN}}}});
 
 let bh=`<thead><tr><th>Year</th><th>Giving goal</th><th>Giving received</th><th>Variance</th><th>vs goal</th></tr></thead><tbody>`;
 priorYears.forEach(y=>{const b=annualBudgetIncome[y],a=annualIncome[y],d=a-b,c=d>=0?'pos':'neg';bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td class="${c}">${d>=0?'+':''}${fmt(d)}</td><td class="${c}">${d>=0?'+':''}${(d/b*100).toFixed(1)}%</td></tr>`;});
