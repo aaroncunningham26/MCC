@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCC Building Energy &amp; Activity Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#F0F2F5;--header:#1B3A6B;--navy:#1B3A6B;--blue:#2E75B6;--card:#fff;
+        --ink:#1f2733;--muted:#6b7280;--line:#e4e8ee;--red:#DC2626;--amber:#D97706;--green:#16A34A;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+  header{background:var(--header);color:#fff;padding:20px 26px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:8px;}
+  header h1{font-size:20px;font-weight:700;}
+  header .sub{font-size:12.5px;opacity:.85;margin-top:3px;}
+  header .right{font-size:12px;opacity:.9;text-align:right;}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px 26px 60px;}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px;box-shadow:0 1px 4px rgba(20,30,60,.05);}
+  .kpi .label{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+  .kpi .val{font-size:27px;font-weight:800;color:var(--navy);margin-top:4px;line-height:1.05;}
+  .kpi .unit{font-size:12px;color:var(--muted);font-weight:600;}
+  .kpi .delta{font-size:12.5px;font-weight:700;margin-top:7px;}
+  .delta.bad{color:var(--red);} .delta.good{color:var(--green);} .delta.neutral{color:var(--muted);}
+  .callout{background:#FBEAEA;border:1px solid #F2C9C9;border-left:5px solid var(--red);border-radius:10px;padding:13px 15px;font-size:13.5px;line-height:1.55;color:#7C1D1D;margin:16px 0;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:820px){.grid2{grid-template-columns:1fr;}}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 1px 4px rgba(20,30,60,.05);}
+  .panel h2{font-size:15px;color:var(--navy);margin-bottom:3px;}
+  .panel p.cap{font-size:12px;color:var(--muted);margin-bottom:12px;}
+  .chart-box{position:relative;height:270px;}
+  .full{grid-column:1/-1;}
+  .health{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;margin-bottom:14px;}
+  .stat{background:#F7F9FC;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;}
+  .stat .n{font-size:21px;font-weight:800;color:var(--navy);} .stat .n.warn{color:var(--red);}
+  .stat .t{font-size:11px;color:var(--muted);margin-top:2px;}
+  .flags{list-style:none;} .flags li{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.4;}
+  .dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex:none;}
+  .dot.high{background:var(--red);}.dot.med{background:var(--amber);}.dot.low{background:var(--muted);}
+  footer{color:var(--muted);font-size:11.5px;margin-top:18px;line-height:1.6;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>MCC Building Energy &amp; Activity Dashboard</h1>
+    <div class="sub">General building energy use &amp; activity trends · aggregated figures only</div>
+  </div>
+  <div class="right" id="headRight"></div>
+</header>
+
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+  <div class="callout" id="headline"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Electricity — 13-month trend (kWh)</h2>
+      <p class="cap">Monthly usage. The red band (Mar–May 2026) is running ~60% above the prior year.</p>
+      <div class="chart-box"><canvas id="elec"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Activity vs. electricity</h2>
+      <p class="cap">Building events (right) vs. electricity (left), same months. Activity flat; energy climbs.</p>
+      <div class="chart-box"><canvas id="overlay"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Natural gas — 13-month trend (therms)</h2>
+      <p class="cap">Heating load. Winter peak (Dec–Feb) dominates; spring/summer is minimal.</p>
+      <div class="chart-box"><canvas id="gas"></canvas></div>
+    </div>
+    <div class="panel">
+      <h2>Energy per event (efficiency index)</h2>
+      <p class="cap">kWh per building event, Apr–May window. Lower is better.</p>
+      <div class="chart-box"><canvas id="index"></canvas></div>
+    </div>
+    <div class="panel full">
+      <h2>System health — WebComfort / Autani</h2>
+      <p class="cap" id="opsAsOf"></p>
+      <div class="health" id="health"></div>
+      <ul class="flags" id="flags"></ul>
+    </div>
+  </div>
+  <footer id="footer"></footer>
+</div>
+
+<script>
+/* ============================================================================
+   DATA — edit here each month, save, push. Aggregated only (no $ / no names).
+   Sources: NIPSCO (energy), Planning Center Calendar (activity), WebComfort (ops).
+   ============================================================================ */
+const DATA = {
+  updated: "2026-06-11",
+  dataThrough: "May 2026",
+  // 13 months, oldest→newest. electric = kWh, gas = therms. (NIPSCO, confirmed)
+  months: ["2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05"],
+  electric: [21024,25056,34272,30816,24192,21888,18144,25632,24192,22176,29376,34272,33120],
+  gas:      [334.5,189.3,141.6,149.9,151.4,304.1,1334.9,4356.4,5088.0,3755.5,2151.5,786.5,510.9],
+  // Electric year-over-year % where NIPSCO reports it (history table).
+  elecYoY:  {"2025-08":0,"2025-09":10,"2025-10":20,"2025-11":-10,"2025-12":10,"2026-01":10,"2026-02":10,"2026-03":60,"2026-04":60,"2026-05":60},
+  // Building events per month (Planning Center). Jun 2025→May 2026 (May 2025 alone n/a).
+  activityMonths: ["2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04","2026-05"],
+  activity:       [191,174,185,205,218,173,175,167,156,214,193,186],
+  // Apr–May window comparison for the activity-vs-energy headline + index.
+  window: {
+    label: "Apr–May",
+    events2025: 353, events2026: 379,           // PCO (confirmed)
+    elec2025: 42444, elec2026: 67392             // kWh; 2025 Apr derived from NIPSCO +60% YoY
+  },
+  annual: { electricKwh: 259616, gasTherms: 37891, avgMoElec: 23365, avgMoGas: 1785 },
+  ops: {
+    asOf: "2026-06-11", thermostats: 29, thermostatsActive: 29, sensors: 47, sensorErrors: 3,
+    occupancyPct: 100, meters: 0, lightingLoads: 6,
+    flags: [
+      {t:"Occupancy reads 100% — automatic setback isn't engaging", s:"high"},
+      {t:"3 of 47 sensors reporting errors", s:"high"},
+      {t:"Thermostat #17 (Front Desk) has no wireless route — commands not delivered", s:"high"},
+      {t:"Schedules have a Fri/Sat gap and shallow setbacks (65/75)", s:"med"},
+      {t:"Stale automation rules (Parking Lot Lights last ran Nov 2024)", s:"med"},
+      {t:"No energy meters in the EMS — no internal kWh/therm tracking", s:"med"},
+      {t:"Demand curtailment not configured", s:"low"}
+    ]
+  }
+};
+
+/* ----------------------------- render ------------------------------------ */
+const $=id=>document.getElementById(id);
+const navy="#1B3A6B",blue="#2E75B6",red="#DC2626",grey="#9aa4b2",green="#16A34A",amber="#D97706";
+const mlabel=m=>{const[y,mo]=m.split("-");return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+mo-1]+" '"+y.slice(2);};
+const pct=(c,p)=>Math.round((c/p-1)*100);
+const fmt=n=>Math.round(n).toLocaleString();
+
+$("headRight").innerHTML="Updated "+DATA.updated+"<br>Data through "+DATA.dataThrough;
+
+// KPIs
+const elecMay=DATA.electric[DATA.electric.length-1], elecMay25=DATA.electric[0];
+const gasMay=DATA.gas[DATA.gas.length-1], gasMay25=DATA.gas[0];
+const w=DATA.window;
+const actYoY=pct(w.events2026,w.events2025);
+const idx25=w.elec2025/w.events2025, idx26=w.elec2026/w.events2026;
+const elecWinYoY=pct(w.elec2026,w.elec2025);
+function delta(p,badUp){const up=p>=0,cls=up?(badUp?"bad":"good"):(badUp?"good":"bad");
+  return '<div class="delta '+cls+'">'+(up?"▲":"▼")+" "+Math.abs(p)+"% vs a year ago</div>";}
+const kpis=[
+  {l:"Electricity · May 2026",v:fmt(elecMay),u:" kWh",d:delta(pct(elecMay,elecMay25),true)},
+  {l:"Natural gas · May 2026",v:fmt(gasMay),u:" therms",d:delta(pct(gasMay,gasMay25),true)},
+  {l:"Building activity · "+w.label,v:fmt(w.events2026),u:" events",d:delta(actYoY,false)},
+  {l:"Energy per event · "+w.label,v:fmt(idx26),u:" kWh/event",d:delta(pct(idx26,idx25),true)}
+];
+$("kpis").innerHTML=kpis.map(k=>'<div class="kpi"><div class="label">'+k.l+'</div><div class="val">'+k.v+'<span class="unit">'+k.u+'</span></div>'+k.d+'</div>').join("");
+
+$("headline").innerHTML="<b>The core finding:</b> over the Apr–May window, building activity rose ~"+actYoY+
+  "% while electricity use rose ~"+elecWinYoY+"% — on comparable weather. The +60% year-over-year jump began in <b>March 2026</b> and has held since. Energy per event is up ~"+
+  pct(idx26,idx25)+"%. Same building use, far more energy: an operations/controls issue, not growth.";
+
+Chart.defaults.font.family="system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif";
+Chart.defaults.font.size=11.5; Chart.defaults.color="#566";
+
+// Electricity trend with red band for the +60% months
+const spikeColor=DATA.months.map(m=>DATA.elecYoY[m]>=60?red:blue);
+new Chart($("elec"),{type:"bar",
+  data:{labels:DATA.months.map(mlabel),datasets:[{label:"kWh",data:DATA.electric,backgroundColor:spikeColor,borderRadius:4}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},
+    tooltip:{callbacks:{label:c=>{const m=DATA.months[c.dataIndex],y=DATA.elecYoY[m];return fmt(c.raw)+" kWh"+(y!=null?"  ("+(y>=0?"+":"")+y+"% YoY)":"");}}}},
+    scales:{y:{beginAtZero:true,title:{display:true,text:"kWh"}}}}});
+
+// Gas trend
+new Chart($("gas"),{type:"bar",
+  data:{labels:DATA.months.map(mlabel),datasets:[{label:"therms",data:DATA.gas,backgroundColor:amber,borderRadius:4}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)+" therms"}}},
+    scales:{y:{beginAtZero:true,title:{display:true,text:"therms"}}}}});
+
+// Activity vs electricity overlay (dual axis), Jun 2025→May 2026
+const ovElec=DATA.activityMonths.map(m=>DATA.electric[DATA.months.indexOf(m)]);
+new Chart($("overlay"),{
+  data:{labels:DATA.activityMonths.map(mlabel),
+    datasets:[
+      {type:"bar",label:"Electricity (kWh)",data:ovElec,backgroundColor:"rgba(46,117,182,.30)",borderColor:blue,yAxisID:"y",order:2},
+      {type:"line",label:"Events",data:DATA.activity,borderColor:green,backgroundColor:green,tension:.25,yAxisID:"y1",order:1,pointRadius:3}
+    ]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},
+    scales:{y:{beginAtZero:true,position:"left",title:{display:true,text:"kWh"}},
+      y1:{beginAtZero:true,position:"right",grid:{drawOnChartArea:false},title:{display:true,text:"events"}}}}});
+
+// Energy-per-event index
+new Chart($("index"),{type:"bar",
+  data:{labels:[w.label+" 2025",w.label+" 2026"],datasets:[{data:[Math.round(idx25),Math.round(idx26)],backgroundColor:[grey,red],borderRadius:6}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+" kWh/event"}}},
+    scales:{y:{beginAtZero:true,title:{display:true,text:"kWh per event"}}}}});
+
+// System health
+const o=DATA.ops;
+$("opsAsOf").textContent="Snapshot as of "+o.asOf+". From the WebComfort/Autani review.";
+const stats=[
+  {n:o.thermostatsActive+"/"+o.thermostats,t:"Thermostats active"},
+  {n:o.sensorErrors,t:"Sensor errors",warn:o.sensorErrors>0},
+  {n:o.occupancyPct+"%",t:"Occupancy reading",warn:o.occupancyPct>=100},
+  {n:o.meters,t:"Energy meters",warn:o.meters===0},
+  {n:o.lightingLoads,t:"Lighting loads"}
+];
+$("health").innerHTML=stats.map(s=>'<div class="stat"><div class="n'+(s.warn?" warn":"")+'">'+s.n+'</div><div class="t">'+s.t+'</div></div>').join("");
+$("flags").innerHTML=o.flags.map(f=>'<li><span class="dot '+f.s+'"></span>'+f.t+'</li>').join("");
+
+$("footer").innerHTML="Part of MCC Metrics · metrics.maplecity.church. Sources: NIPSCO (energy usage), Planning Center Calendar (activity), WebComfort/Autani (operations). "+
+  "Aggregated figures only — no dollar amounts or names. Annual context: "+fmt(DATA.annual.electricKwh)+" kWh &amp; "+fmt(DATA.annual.gasTherms)+
+  " therms (rolling 12 mo). One Apr-2025 value is derived from NIPSCO's reported +60% YoY.";
+</script>
+</body>
+</html>
