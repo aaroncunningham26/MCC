@@ -25,7 +25,8 @@
   body { font-family: 'Lato', system-ui, -apple-system, Arial, sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
 
   /* ── MCC Header ── */
-  .mcc-header { position: relative; overflow: hidden; background: var(--slate); color: #fff; padding: 26px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .mcc-header { position: relative; overflow: hidden; background: var(--slate); color: #fff; }
+  .mcc-header-inner { position: relative; max-width: 1180px; margin: 0 auto; padding: 26px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
   .mcc-header::before { content: ""; position: absolute; inset: 0; background: url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size: 620px; opacity: .065; pointer-events: none; }
   .mcc-header .brand { display: flex; align-items: center; gap: 20px; position: relative; }
   .mcc-header .logo { height: 42px; width: auto; display: block; }
@@ -33,7 +34,7 @@
   .mcc-header .sub { font-size: 11.5px; font-weight: 400; letter-spacing: .05em; text-transform: uppercase; opacity: .72; margin-top: 6px; }
 
   /* ── Layout ── */
-  .page { max-width: 1000px; margin: 0 auto; padding: 40px 28px 80px; }
+  .page { max-width: 1180px; margin: 0 auto; padding: 40px 30px 80px; }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
 
   /* ── Cards ── */
@@ -74,12 +75,14 @@
 <body>
 
 <header class="mcc-header">
+  <div class="mcc-header-inner">
   <div class="brand">
     <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
     <div>
       <h1>Leadership Metrics</h1>
       <div class="sub">metrics.maplecity.church</div>
     </div>
+  </div>
   </div>
 </header>
 
