@@ -3,76 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MCC Finance Team Dashboard</title>
+<title>Maple City Chapel — Finance Team Dashboard</title>
+
+<!-- MCC brand: Lato webfont + shared favicon -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root{
-    --navy:#1B3A6B; --bg:#F0F2F5; --green:#16A34A; --amber:#D97706; --red:#DC2626;
-    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --slate:#343A44; --bg:#F2F2F2; --card:#ffffff; --ink:#23272e;
+    --muted:#6b7280; --line:#e3e5ea; --red:#DC2626; --green:#2F8F5B; --amber:#C8842A;
+    --chart:#4C5564;
+    --logo:url('https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png');
+    --texture:url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png');
   }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
-  .wrap{max-width:1080px;margin:0 auto;padding:20px 16px 56px;}
-  header.top{background:var(--navy);color:#fff;border-radius:12px;padding:22px 24px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
-  header.top h1{margin:0 0 4px;font-size:1.5rem;}
-  header.top .sub{opacity:.85;font-size:.9rem;}
-  header.top .right{text-align:right;font-size:.85rem;opacity:.95;line-height:1.5;}
-  h2.section{font-size:1.1rem;margin:30px 4px 12px;color:var(--navy);}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-  .card{background:#fff;border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .card .label{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-  .card .value{font-size:1.5rem;font-weight:700;margin-top:6px;color:var(--navy);}
-  .card .note{font-size:.74rem;color:var(--muted);margin-top:6px;line-height:1.4;}
-  .insight-card{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-bottom:12px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Lato',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
+
+  /* ---- Header ---- */
+  .mcc-header{position:relative;overflow:hidden;background:var(--slate);color:#fff;
+    padding:26px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
+  .mcc-header::before{content:"";position:absolute;inset:0;background:var(--texture);background-size:620px;opacity:.065;pointer-events:none;}
+  .mcc-header .brand{display:flex;align-items:center;gap:20px;position:relative;}
+  .mcc-header .logo{height:42px;width:auto;display:block;}
+  .mcc-header .back{color:#aeb6c2;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;display:inline-block;margin-bottom:5px;}
+  .mcc-header .back:hover{color:#fff;}
+  .mcc-header h1{font-size:27px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;line-height:1;}
+  .mcc-header .sub{font-size:11.5px;font-weight:400;letter-spacing:.05em;text-transform:uppercase;opacity:.72;margin-top:6px;}
+  .mcc-header .right{position:relative;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.82;text-align:right;line-height:1.7;}
+
+  /* ---- Layout ---- */
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 30px 60px;}
+  h2.section{font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:-.01em;color:var(--slate);margin:30px 2px 12px;}
+
+  /* ---- Cards / KPI ---- */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(20,30,60,.05);}
+  .card .label{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;font-weight:700;}
+  .card .value{font-size:30px;font-weight:900;color:var(--slate);line-height:1;margin-top:6px;}
+  .card .note{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.45;}
+
+  /* ---- Panels ---- */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(20,30,60,.05);}
+
+  /* ---- Insights ---- */
+  .insight-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:0 1px 4px rgba(20,30,60,.05);}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px;}
   .legend span{display:inline-flex;align-items:center;gap:6px;}
   .dot{width:10px;height:10px;border-radius:50%;display:inline-block;}
-  ul.insights{list-style:none;margin:0;padding:0;}
-  ul.insights li{border-left:4px solid var(--muted);background:#fafafa;border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:.9rem;line-height:1.5;}
+  ul.insights{list-style:none;}
+  ul.insights li{border-left:4px solid var(--muted);background:#f7f8f9;border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:13.5px;line-height:1.5;}
   ul.insights li.green{border-color:var(--green);}
   ul.insights li.amber{border-color:var(--amber);}
   ul.insights li.red{border-color:var(--red);}
-  ul.insights li b{color:var(--navy);}
-  .caption{font-size:.74rem;color:var(--muted);margin-top:10px;line-height:1.5;}
-  .panel{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
-  .yoy{font-size:.85rem;color:var(--muted);margin:-6px 4px 12px;}
-  table{width:100%;border-collapse:collapse;font-size:.85rem;}
-  th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);}
+  ul.insights li b{color:var(--slate);}
+  .caption{font-size:11px;color:var(--muted);margin-top:12px;line-height:1.55;}
+  .yoy{font-size:12.5px;color:var(--muted);margin:-4px 2px 12px;}
+
+  /* ---- Tables ---- */
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);}
   th:first-child,td:first-child{text-align:left;}
-  thead th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
-  tr.cur{background:#eef3fb;font-weight:600;}
-  tr.total td{border-top:2px solid var(--navy);font-weight:700;}
-  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;}
-  .stat{background:#f8fafc;border-radius:10px;padding:14px;}
-  .stat .label{font-size:.74rem;color:var(--muted);text-transform:uppercase;}
-  .stat .value{font-size:1.25rem;font-weight:700;color:var(--navy);margin-top:4px;}
+  thead th{color:var(--muted);font-weight:700;font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;}
+  tr.cur{background:#eef0f3;font-weight:700;}
+  tr.total td{border-top:2px solid var(--slate);font-weight:900;color:var(--slate);}
+
+  /* ---- Stat grid + bars ---- */
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px;}
+  .stat{background:#f7f8f9;border:1px solid var(--line);border-radius:10px;padding:14px;}
+  .stat .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+  .stat .value{font-size:23px;font-weight:900;color:var(--slate);margin-top:5px;line-height:1;}
   .bar-row{margin:14px 0;}
-  .bar-row .head{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:5px;}
-  .bar{position:relative;height:18px;background:#eef1f5;border-radius:9px;overflow:hidden;}
+  .bar-row .head{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;color:var(--ink);}
+  .bar{position:relative;height:18px;background:#e9ebef;border-radius:9px;overflow:hidden;}
   .bar .fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;}
-  .bar .pace{position:absolute;top:-3px;bottom:-3px;width:2px;background:#111;}
-  .pace-note{font-size:.72rem;color:var(--muted);margin-top:4px;}
-  .pos{color:var(--green);} .neg{color:var(--red);}
-  footer{margin-top:34px;font-size:.76rem;color:var(--muted);text-align:center;line-height:1.6;}
-  @media(max-width:720px){.cards,.statgrid{grid-template-columns:repeat(2,1fr);}}
+  .bar .pace{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--slate);}
+  .pace-note{font-size:11px;color:var(--muted);margin-top:5px;}
+  .neg{color:var(--red);} .pos{color:var(--green);}
+  h3.panel-title{font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.01em;color:var(--slate);margin-bottom:10px;}
+
+  /* ---- Footer ---- */
+  .mcc-footer{color:var(--muted);font-size:11.5px;margin-top:30px;line-height:1.7;text-align:center;}
+  .mcc-footer a{color:var(--slate);font-weight:700;text-decoration:none;}
+
+  @media(max-width:760px){.cards,.statgrid{grid-template-columns:repeat(2,1fr);}.wrap{padding:20px 16px 48px;}}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header class="top">
-    <div>
-      <h1>MCC Finance Team Dashboard</h1>
-      <div class="sub">General Fund &middot; Operating figures only (excl. designated)</div>
+  <header class="mcc-header">
+    <div class="brand">
+      <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+      <div>
+        <a class="back" href="index.html">&larr; Metrics</a>
+        <h1>Finance Team Dashboard</h1>
+        <div class="sub">General Fund &middot; Operating figures only (excl. designated)</div>
+      </div>
     </div>
     <div class="right">
-      <div>Week of Wednesday, June 10, 2026</div>
-      <div>Data through June 7, 2026</div>
+      Week of Wed, June 10, 2026<br>
+      Data through June 7, 2026
     </div>
   </header>
 
+<div class="wrap">
+
   <!-- SNAPSHOT CARDS -->
-  <div class="cards" style="margin-top:18px;">
+  <div class="cards">
     <div class="card">
       <div class="label">Last Week's Giving</div>
       <div class="value">$51,977</div>
@@ -141,7 +182,7 @@
     </div>
     <div class="bar-row">
       <div class="head"><span>Operating Expense vs Annual Budget</span><span>$794,752 / $1,839,800 &middot; 43.2%</span></div>
-      <div class="bar"><div class="fill" style="width:43.2%;background:var(--amber)"></div><div class="pace" style="left:44.2%"></div></div>
+      <div class="bar"><div class="fill" style="width:43.2%;background:var(--chart)"></div><div class="pace" style="left:44.2%"></div></div>
     </div>
     <div class="pace-note">Vertical marker = expected year-to-date pace (23 of 52 weeks = 44.2%).</div>
 
@@ -192,7 +233,7 @@
   </div>
 
   <div class="panel" style="margin-top:16px;">
-    <h3 style="margin:0 0 10px;font-size:.95rem;color:var(--navy);">Card transactions over $500 &middot; past 7 days</h3>
+    <h3 class="panel-title">Card transactions over $500 &middot; past 7 days</h3>
     <table>
       <thead><tr><th>Date</th><th>Merchant</th><th>Cardholder</th><th style="text-align:left">Memo</th><th>Amount</th></tr></thead>
       <tbody>
@@ -205,7 +246,7 @@
   </div>
 
   <div class="panel" style="margin-top:16px;">
-    <h3 style="margin:0 0 10px;font-size:.95rem;color:var(--navy);">Bills paid &middot; past 7 days</h3>
+    <h3 class="panel-title">Bills paid &middot; past 7 days</h3>
     <table>
       <thead><tr><th>Paid</th><th>Vendor</th><th style="text-align:left">Description</th><th>Amount</th></tr></thead>
       <tbody>
@@ -220,19 +261,26 @@
     <div class="caption">Live from Ramp &middot; card spend (all cardholders, incl. pending) and Bill Pay / accounts payable. Card spend posts to QBO Ramp Card &amp; expense accounts.</div>
   </div>
 
-  <footer>
-    MCC Finance Team &middot; Prepared Wednesday, June 10, 2026<br>
+  <footer class="mcc-footer">
+    MCC Finance Team &middot; Prepared Wednesday, June 10, 2026 &middot; <a href="https://metrics.maplecity.church/finance-team.html">metrics.maplecity.church</a><br>
     2022&ndash;2025: PowerChurch &middot; 2026: QuickBooks Online &middot; Giving: QBO 4100 &middot; Donors: Planning Center &middot; Card spend &amp; bills: Ramp
   </footer>
 
 </div>
 
 <script>
+Chart.defaults.font.family = "'Lato', system-ui, Arial, sans-serif";
+
 function fmt(n){
   var neg = n < 0;
   var s = '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
   return neg ? '-' + s : s;
 }
+
+// Brand chart palette (color = meaning; years differentiated by slate shade + line style).
+var C_CUR = '#343A44';   // current year — solid slate, the focus
+var C_2025 = '#6B7280';  // prior year — muted slate, solid
+var C_2024 = '#AEB6C2';  // two years back — light slate, dashed
 
 // Operating Income/Expense by month (Jan-Jun). Prior years from the historical sheet's operating columns;
 // 2026 from QBO operating P&L (4xxx income; 5xxx+6xxx expense, excludes designated 7xxx/8xxx).
@@ -272,10 +320,11 @@ function buildTable(tbodyId, data){
 buildTable('incomeTable', income);
 buildTable('expenseTable', expense);
 
-// Monthly Giving chart: 2026 = QBO 4100 (Jan-Jun); prior-year series shown as "Giving" from the
-// historical operating-income column (per Aaron's request). order ascending chronologically so the
-// legend reads 2024 -> 2025 -> 2026 and lines draw on top of the bar; tooltip sorts newest-first.
 var chartMonths = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// Monthly Giving: 2026 = QBO 4100 (Jan-Jun) navy/slate bars; prior years shown as "Giving" from the
+// historical operating-income column (per Aaron). order ascending so legend reads 2024 -> 2025 -> 2026
+// and lines draw on top of the bar; tooltip sorts newest-first.
 var giving2024 = [76299,86725,138867,114826,97422,121975,111852,101834,129043,97945,99601,242301];
 var giving2025 = [65693,97362,161385,130448,132355,132973,100146,145551,117019,123389,123635,223569];
 var giving2026 = [96872.49,101828.06,121537.32,171822.96,107732.80,51977.35,null,null,null,null,null,null];
@@ -285,13 +334,11 @@ new Chart(document.getElementById('givingChart').getContext('2d'), {
     labels: chartMonths,
     datasets:[
       { type:'line', label:'2024 Giving', data:giving2024,
-        borderColor:'#D97706', borderDash:[6,4], borderWidth:2,
-        pointRadius:0, tension:.3, order:1, fill:false },
+        borderColor:C_2024, borderDash:[6,4], borderWidth:2, pointRadius:0, tension:.3, order:1, fill:false },
       { type:'line', label:'2025 Giving', data:giving2025,
-        borderColor:'#16A34A', borderWidth:2,
-        pointRadius:0, tension:.3, order:2, fill:false },
+        borderColor:C_2025, borderWidth:2, pointRadius:0, tension:.3, order:2, fill:false },
       { type:'bar', label:'2026 Giving', data:giving2026,
-        backgroundColor:'#1B3A6B', borderRadius:4, order:3 }
+        backgroundColor:C_CUR, borderRadius:4, order:3 }
     ]
   },
   options:{
@@ -311,8 +358,7 @@ new Chart(document.getElementById('givingChart').getContext('2d'), {
   }
 });
 
-// Operating Expense chart — last 3 years. 2026 navy bars (operating 5xxx+6xxx, Jan-Jun; Jun partial),
-// 2025 green solid line, 2024 amber dashed line. Same order/tooltip logic as the giving chart.
+// Operating Expense — last 3 years. Same style/order/tooltip logic as the giving chart.
 var expense2024 = [102264,118014,91828,96847,134588,121862,96511,100754,102729,147714,104708,171347];
 var expense2025 = [121234,119485,120650,142802,124219,149949,112898,128108,120214,160439,129052,145528];
 var expense2026 = [147212.47,152827.55,153449.52,189917.69,147390.06,3954.66,null,null,null,null,null,null];
@@ -322,13 +368,11 @@ new Chart(document.getElementById('expenseChart').getContext('2d'), {
     labels: chartMonths,
     datasets:[
       { type:'line', label:'2024 Expense', data:expense2024,
-        borderColor:'#D97706', borderDash:[6,4], borderWidth:2,
-        pointRadius:0, tension:.3, order:1, fill:false },
+        borderColor:C_2024, borderDash:[6,4], borderWidth:2, pointRadius:0, tension:.3, order:1, fill:false },
       { type:'line', label:'2025 Expense', data:expense2025,
-        borderColor:'#16A34A', borderWidth:2,
-        pointRadius:0, tension:.3, order:2, fill:false },
+        borderColor:C_2025, borderWidth:2, pointRadius:0, tension:.3, order:2, fill:false },
       { type:'bar', label:'2026 Expense', data:expense2026,
-        backgroundColor:'#1B3A6B', borderRadius:4, order:3 }
+        backgroundColor:C_CUR, borderRadius:4, order:3 }
     ]
   },
   options:{
