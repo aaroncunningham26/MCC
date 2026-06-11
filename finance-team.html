@@ -25,7 +25,8 @@
   body{font-family:'Lato',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);}
 
   /* ---- Header ---- */
-  .mcc-header{position:relative;overflow:hidden;background:var(--slate);color:#fff;
+  .mcc-header{position:relative;overflow:hidden;background:var(--slate);color:#fff;}
+  .mcc-header-inner{position:relative;max-width:1180px;margin:0 auto;
     padding:26px 30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;}
   .mcc-header::before{content:"";position:absolute;inset:0;background:var(--texture);background-size:620px;opacity:.065;pointer-events:none;}
   .mcc-header .brand{display:flex;align-items:center;gap:20px;position:relative;}
@@ -96,16 +97,18 @@
 <body>
 
   <header class="mcc-header">
-    <div class="brand">
-      <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
-      <div>
-        <h1>Finance Team Dashboard</h1>
-        <div class="sub">General Fund &middot; Operating figures only (excl. designated)</div>
+    <div class="mcc-header-inner">
+      <div class="brand">
+        <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+        <div>
+          <h1>Finance Team Dashboard</h1>
+          <div class="sub">General Fund &middot; Operating figures only (excl. designated)</div>
+        </div>
       </div>
-    </div>
-    <div class="right">
-      Week of Wed, June 10, 2026<br>
-      Data through June 7, 2026
+      <div class="right">
+        Week of Wed, June 10, 2026<br>
+        Data through June 7, 2026
+      </div>
     </div>
   </header>
 
