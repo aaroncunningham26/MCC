@@ -1,0 +1,12 @@
+{
+  "_note": "Finalized (closed) 2026 months from QBO. A month's numbers are final once the month closes and the books are reconciled. The weekly job pulls ONLY the current/open month live; it reads closed months from here. When a month closes, pull it once, append it below, and stop re-pulling it. Order: Jan..Dec. giving4100=QBO 4100; op_income=Total for Revenue (4xxx); op_expense=Total for Expenditures (5xxx+6xxx, excl 8xxx); personnel=5000 group; facilities=6200 group.",
+  "year": 2026,
+  "closed_through": "May",
+  "closed_months": {
+    "Jan": {"giving4100": 96872.49, "op_income": 107451.10, "op_expense": 147212.47, "personnel": 86634.34, "facilities": 24028.13},
+    "Feb": {"giving4100": 101828.06, "op_income": 108714.84, "op_expense": 152827.55, "personnel": 83309.28, "facilities": 23453.99},
+    "Mar": {"giving4100": 121537.32, "op_income": 129496.25, "op_expense": 153449.52, "personnel": 88842.16, "facilities": 33034.75},
+    "Apr": {"giving4100": 171822.96, "op_income": 178529.59, "op_expense": 189917.69, "personnel": 134667.22, "facilities": 28512.80},
+    "May": {"giving4100": 107732.80, "op_income": 124018.04, "op_expense": 147390.06, "personnel": 82941.25, "facilities": 29111.93}
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with static.json + 2026-actuals.json.",
+  "run_date": "June 24, 2026",
+  "run_weekday": "Wednesday",
+  "data_through": "June 21, 2026",
+  "weeks_ytd": 25,
+  "reporting_month_index": 6,
+  "reporting_month_name": "June",
+  "current_month": {"giving4100": 109451.65, "op_income": 114245.40, "op_expense": 66341.10, "personnel": 46453.14, "facilities": 15792.38, "partial": true},
+  "last_week_giving": 22105.22,
+  "bank": 795966.17,
+  "loan_balance": 1460643.30,
+  "giving_health": {"committed": 311, "households": 457, "new_donors_year": 36, "new_donors_week": 0},
+  "retention": {"retained": 240, "lapsed": 84, "new": 71, "rate": 74.1, "prior": 324},
+  "ramp": {
+    "card_mtd": 25033.32, "card_mtd_n": 189, "card_7d": 4329.03, "card_7d_n": 45,
+    "ap_paid_mtd": 9767.05, "ap_paid_n": 20, "ap_out": 9489.20, "ap_open_n": 15,
+    "card_over": [["06/18", "Church Media Squad", "Ryan Graham", "Communications Outsourcing", 1597.00]],
+    "bills_paid": [
+      ["06/23", "Best Sweeping Specialist", "Parking lot sweeping services for full sweep and fire lanes", 402.00],
+      ["06/18", "Economy Offset Print and Digital Services", "Men's Conference invite cards and golf outing schedule cards", 216.59],
+      ["06/17", "Wildman Uniform  Linen", "Rental and cleaning of mats including delivery and green services", 210.98]
+    ]
+  }
+}

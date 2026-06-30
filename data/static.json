@@ -1,0 +1,29 @@
+{
+  "_note": "Frozen reference data for the Finance Team Dashboard. Changes rarely. Update annual_budget/weekly_budget in January; loan_terms only on re-amortization; restricted_offset when a newer SOFP lands; never edit the historical arrays (closed years).",
+  "constants": {
+    "weekly_budget": 34900,
+    "annual_budget": 1839800,
+    "restricted_offset": 442361,
+    "restricted_offset_source": "Apr 2026 SOFP"
+  },
+  "loan_terms": {
+    "lender": "First State Bank",
+    "rate": "6.67%",
+    "payment": 12830.83,
+    "principal": 4806.51,
+    "interest": 8024.32,
+    "source": "ONE Campaign Loan Info sheet (last-known); update on re-amortization"
+  },
+  "history_income": {
+    "2022": [87163, 95988, 109900, 150004, 113555, 110814, 95557, 87095, 118557, 104098, 107596, 225857],
+    "2023": [64824, 89895, 119128, 130114, 90236, 125297, 138285, 105685, 167928, 128029, 112626, 243665],
+    "2024": [76299, 86725, 138867, 114826, 97422, 121975, 111852, 101834, 129043, 97945, 99601, 242301],
+    "2025": [65693, 97362, 161385, 130448, 132355, 132973, 100146, 145551, 117019, 123389, 123635, 223569]
+  },
+  "history_expense": {
+    "2022": [94382, 100727, 141604, 97031, 111113, 157223, 94621, 108767, 128289, 96490, 139379, 104951],
+    "2023": [100898, 112560, 110885, 112667, 145223, 94965, 122961, 99505, 103231, 104863, 137802, 103735],
+    "2024": [102264, 118014, 91828, 96847, 134588, 121862, 96511, 100754, 102729, 147714, 104708, 171347],
+    "2025": [121234, 119485, 120650, 142802, 124219, 149949, 112898, 128108, 120214, 160439, 129052, 145528]
+  }
+}
