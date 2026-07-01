@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>MCC Metrics — Leadership Portal</title>
+<title>Care &amp; Connections — MCC Metrics</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,11 +31,14 @@
   .mcc-header::before { content: ""; position: absolute; inset: 0; background: url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size: 620px; opacity: .065; pointer-events: none; }
   .mcc-header .brand { display: flex; align-items: center; gap: 20px; position: relative; }
   .mcc-header .logo { height: 42px; width: auto; display: block; }
+  .mcc-header .back { color: #aeb6c2; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; display: inline-block; margin-bottom: 5px; }
+  .mcc-header .back:hover { color: #fff; }
   .mcc-header h1 { font-size: 27px; font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: 1; }
   .mcc-header .sub { font-size: 11.5px; font-weight: 400; letter-spacing: .05em; text-transform: uppercase; opacity: .72; margin-top: 6px; }
 
   /* ── Layout ── */
   .page { max-width: 1180px; margin: 0 auto; padding: 40px 30px 80px; }
+  .intro { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 720px; margin-bottom: 34px; }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
 
   /* ── Cards ── */
@@ -43,6 +46,7 @@
 
   .metric-card { background: var(--card); border-radius: 12px; border: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column; transition: .15s; text-decoration: none; color: inherit; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
   .metric-card:hover { border-color: var(--slate); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(52,58,68,.14); }
+  .metric-card.disabled { opacity: .72; pointer-events: none; }
 
   .card-accent { height: 4px; }
   .accent-slate { background: var(--slate); }
@@ -80,8 +84,9 @@
   <div class="brand">
     <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
     <div>
-      <h1>Leadership Metrics</h1>
-      <div class="sub">metrics.maplecity.church</div>
+      <a class="back" href="index.html">← Leadership Portal</a>
+      <h1>Care &amp; Connections</h1>
+      <div class="sub">Attendance · Guests · Groups · Next Steps</div>
     </div>
   </div>
   </div>
@@ -89,48 +94,18 @@
 
 <div class="page">
 
+  <p class="intro">Dashboards tracking how people find, join, and stay connected at Maple City Chapel — weekend attendance, first-time guests, Life/Care/Legacy group participation, and next-steps milestones like baptisms and Starting Point.</p>
+
   <div class="section-label">Dashboards</div>
 
   <div class="cards-grid">
 
-    <a href="financials.html" class="metric-card">
-      <div class="card-accent accent-slate"></div>
-      <div class="card-body">
-        <div class="card-icon">💰</div>
-        <div class="card-title">MCC Financials</div>
-        <p class="card-desc">Annual giving trends, income vs operating costs, 2026 year-to-date performance, and budget vs actual.</p>
-        <div class="card-meta">
-          <div>
-            <span class="badge badge-live">Live</span>
-            <div class="card-updated" style="margin-top:6px;">Updated through <span>April 2026</span></div>
-          </div>
-          <span class="btn btn-slate">View →</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="vitals.html" class="metric-card">
-      <div class="card-accent accent-green"></div>
-      <div class="card-body">
-        <div class="card-icon">📊</div>
-        <div class="card-title">MCC Vitals</div>
-        <p class="card-desc">Weekend attendance, engagement trends, volunteer participation, and key ministry health indicators — tracked against goals.</p>
-        <div class="card-meta">
-          <div>
-            <span class="badge badge-live">Live</span>
-            <div class="card-updated" style="margin-top:6px;">Updated through <span>April 2026</span></div>
-          </div>
-          <span class="btn btn-slate">View →</span>
-        </div>
-      </div>
-    </a>
-
-    <a href="care-connections.html" class="metric-card">
+    <a href="connections.html" class="metric-card">
       <div class="card-accent accent-amber"></div>
       <div class="card-body">
         <div class="card-icon">🤝</div>
-        <div class="card-title">Care &amp; Connections</div>
-        <p class="card-desc">Weekend attendance, first-time guests, Life/Care/Legacy group participation, and next-steps milestones like baptisms and Starting Point.</p>
+        <div class="card-title">MCC Connections</div>
+        <p class="card-desc">Weekend attendance and moving averages, first-time guests, Sunday visitor trends, Life/Care/Legacy group participation, and baptisms &amp; Starting Point next-steps.</p>
         <div class="card-meta">
           <div>
             <span class="badge badge-live">Live</span>
@@ -141,11 +116,24 @@
       </div>
     </a>
 
+    <div class="metric-card disabled">
+      <div class="card-accent accent-muted"></div>
+      <div class="card-body">
+        <div class="card-icon">💬</div>
+        <div class="card-title">Guest Follow-Up</div>
+        <p class="card-desc">First-time guest response and follow-up completion rates — tracking how effectively new visitors are contacted and moved toward a next step.</p>
+        <div class="card-meta">
+          <div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 
   <div class="mcc-footer">
-    <p>Maple City Chapel &nbsp;·&nbsp; Leadership Metrics Portal &nbsp;·&nbsp; metrics.maplecity.church</p>
+    <p>Maple City Chapel &nbsp;·&nbsp; Care &amp; Connections &nbsp;·&nbsp; metrics.maplecity.church</p>
     <p style="margin-top:4px;">Dashboards updated by the Operations team. Questions? Contact <a href="mailto:aaroncunningham@maplecitychapel.org">Aaron Cunningham</a>.</p>
   </div>
 

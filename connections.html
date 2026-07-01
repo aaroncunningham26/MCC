@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>MCC Connections Dashboard</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --slate: #343A44;
+    --bg: #F2F2F2;
+    --card: #ffffff;
+    --ink: #23272e;
+    --muted: #6b7280;
+    --line: #e3e5ea;
+    --red: #DC2626;
+    --green: #2F8F5B;
+    --amber: #C8842A;
+    --chart: #4C5564;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Lato', system-ui, -apple-system, Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 15px; line-height: 1.6; }
+
+  /* ── MCC Header ── */
+  .mcc-header { position: relative; overflow: hidden; background: var(--slate); color: #fff; }
+  .mcc-header-inner { position: relative; max-width: 1180px; margin: 0 auto; padding: 26px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  .mcc-header::before { content: ""; position: absolute; inset: 0; background: url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size: 620px; opacity: .065; pointer-events: none; }
+  .mcc-header .brand { display: flex; align-items: center; gap: 20px; position: relative; }
+  .mcc-header .logo { height: 42px; width: auto; display: block; }
+  .mcc-header .back { color: #aeb6c2; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; text-decoration: none; display: inline-block; margin-bottom: 5px; }
+  .mcc-header .back:hover { color: #fff; }
+  .mcc-header h1 { font-size: 27px; font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; line-height: 1; }
+  .mcc-header .sub { font-size: 11.5px; font-weight: 400; letter-spacing: .05em; text-transform: uppercase; opacity: .72; margin-top: 6px; }
+  .mcc-header .right { position: relative; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .8; text-align: right; line-height: 1.7; }
+
+  /* ── Layout ── */
+  .page { max-width: 1180px; margin: 0 auto; padding: 28px 30px 60px; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; margin-top: 32px; }
+
+  /* ── Snapshot cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 4px; }
+  .card { background: var(--card); border-radius: 10px; padding: 18px 20px; border: 1px solid var(--line); box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .card .label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+  .card .value { font-size: 26px; font-weight: 900; color: var(--slate); letter-spacing: -0.5px; }
+  .card .sub   { font-size: 12px; margin-top: 4px; color: var(--muted); }
+  .card .sub.green  { color: var(--green); }
+  .card .sub.yellow { color: var(--amber); }
+  .card .sub.red    { color: var(--red); }
+  .card.top-green  { border-top: 4px solid var(--green); }
+  .card.top-yellow { border-top: 4px solid var(--amber); }
+  .card.top-red    { border-top: 4px solid var(--red); }
+  .card.top-blue   { border-top: 4px solid var(--slate); }
+
+  /* ── Profile data strip ── */
+  .profile-strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .profile-strip .cell { padding: 18px 16px; text-align: center; border-right: 1px solid var(--line); }
+  .profile-strip .cell:last-child { border-right: none; }
+  .profile-strip .cell .plabel { font-size: 11px; color: var(--green); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .profile-strip .cell .pval { font-size: 24px; font-weight: 900; color: var(--slate); letter-spacing: -0.5px; }
+  @media (max-width: 720px) { .profile-strip { grid-template-columns: repeat(2, 1fr); } .profile-strip .cell { border-bottom: 1px solid var(--line); } }
+
+  /* ── Insights ── */
+  .insights { background: #F4F5F7; border: 1px solid var(--line); border-radius: 10px; padding: 20px 24px; margin-top: 6px; }
+  .insights h2 { font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--slate); margin-bottom: 12px; }
+  .insights ul { list-style: none; }
+  .insights ul li { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink); display: flex; align-items: flex-start; gap: 10px; line-height: 1.55; }
+  .insights ul li:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .dot-green  { background: var(--green); }
+  .dot-red    { background: var(--red); }
+  .dot-amber  { background: var(--amber); }
+  .dot-blue   { background: var(--slate); }
+
+  /* ── Chart cards ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 820px) { .grid-2 { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--card); border-radius: 10px; padding: 22px 22px 18px; border: 1px solid var(--line); margin-bottom: 14px; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
+  .chart-card h2 { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); margin-bottom: 4px; }
+  .chart-card .chart-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  .chart-wrap { position: relative; width: 100%; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 700; }
+  .legend-dot  { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── Metrics table ── */
+  .metrics-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .metrics-table th { background: #F9FAFB; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; color: var(--muted); padding: 9px 12px; text-align: right; border-bottom: 2px solid var(--line); white-space: nowrap; }
+  .metrics-table th:first-child { text-align: left; }
+  .metrics-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: var(--ink); vertical-align: middle; }
+  .metrics-table td:first-child { text-align: left; font-weight: 700; color: var(--slate); }
+  .metrics-table tr:hover td { background: #FAFAFA; }
+  .cur-val { font-weight: 900; color: var(--slate); }
+
+  /* ── Status pill ── */
+  .status { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; border-radius: 12px; white-space: nowrap; }
+  .status-green  { background: #DCFCE7; color: #15803D; }
+  .status-yellow { background: #FEF9C3; color: #A16207; }
+  .status-red    { background: #FEE2E2; color: var(--red); }
+  .status-gray   { background: #F3F4F6; color: var(--muted); }
+
+  /* ── Section divider ── */
+  .section-divider { margin: 32px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--slate); display: flex; align-items: center; gap: 10px; }
+  .section-divider h2 { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); }
+  .section-divider .badge { font-size: 11px; font-weight: 700; color: var(--muted); background: #F0F2F5; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .06em; }
+
+  .ytd-note { background: #FEF9C3; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400E; margin-bottom: 14px; }
+
+  /* ── Footer ── */
+  .mcc-footer { color: var(--muted); font-size: 11.5px; margin-top: 44px; line-height: 1.8; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="mcc-header">
+  <div class="mcc-header-inner">
+  <div class="brand">
+    <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+    <div>
+      <a class="back" href="care-connections.html">← Care &amp; Connections</a>
+      <h1>MCC Connections</h1>
+      <div class="sub">Attendance, Guests, Groups &amp; Next Steps</div>
+    </div>
+  </div>
+  <div class="right">Data through<br>Close of June 2026</div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- SNAPSHOT CARDS -->
+  <div class="section-label">Connection KPMs — at the close of June</div>
+  <div class="cards">
+    <div class="card top-blue">
+      <div class="label">Weekend Attendance</div>
+      <div class="value">870</div>
+      <div class="sub">Most recent weekend</div>
+    </div>
+    <div class="card top-blue">
+      <div class="label">6-Week Moving Avg</div>
+      <div class="value">966</div>
+      <div class="sub">Rolling 6-week average</div>
+    </div>
+    <div class="card top-green">
+      <div class="label">Avg Weekly Att. YTD</div>
+      <div class="value">1,042</div>
+      <div class="sub green">Year-to-date average</div>
+    </div>
+    <div class="card top-green">
+      <div class="label">Avg Weekly Att. — June</div>
+      <div class="value">1,151</div>
+      <div class="sub green">Strongest month YTD</div>
+    </div>
+    <div class="card top-blue">
+      <div class="label">New Visitors</div>
+      <div class="value">37</div>
+      <div class="sub">Most recent month</div>
+    </div>
+    <div class="card top-blue">
+      <div class="label">Avg New Guests / Month</div>
+      <div class="value">47</div>
+      <div class="sub">Monthly average</div>
+    </div>
+  </div>
+
+  <!-- PLANNING CENTER PROFILE DATA -->
+  <div class="section-label">Planning Center profile data</div>
+  <div class="profile-strip">
+    <div class="cell"><div class="plabel">Active Profiles</div><div class="pval">1,452</div></div>
+    <div class="cell"><div class="plabel">Adults</div><div class="pval">990</div></div>
+    <div class="cell"><div class="plabel">Students</div><div class="pval">150</div></div>
+    <div class="cell"><div class="plabel">Kids</div><div class="pval">312</div></div>
+    <div class="cell"><div class="plabel">Unique Households</div><div class="pval">449</div></div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-label">Key takeaways</div>
+  <div class="insights">
+    <h2>What this data is telling us</h2>
+    <ul>
+      <li><span class="dot dot-green"></span><span>Attendance is strong and climbing — the <strong>June weekly average hit 1,151</strong>, the highest month of the year, pulling the YTD average up to 1,042. Weekly averages have risen every year (942 → 977 → 1,122 → 1,151).</span></li>
+      <li><span class="dot dot-green"></span><span>Adult engagement is healthy — average weekly adult attendance has grown from 798 (2023) to <strong>982</strong>, and group serving now runs at 54–58% of adult/student attendance.</span></li>
+      <li><span class="dot dot-amber"></span><span>Sunday visitors are tracking behind — 2026 YTD is <strong>186 (18% of attendance)</strong> against a 100% goal. Prior years landed 57–70%, so guest volume relative to attendance is the key watch area.</span></li>
+      <li><span class="dot dot-amber"></span><span>Next-steps pathways are quieter this year — <strong>Starting Point (15) and baptisms (16)</strong> are YTD counts through June and are pacing below recent full years. Both are cumulative, so they will grow through the fall.</span></li>
+      <li><span class="dot dot-blue"></span><span>Life / Care / Legacy group membership is steady at ~575–615 members (42–46% of adult/student attendance), holding the discipleship base as attendance grows.</span></li>
+    </ul>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div class="section-divider">
+    <h2>Attendance</h2>
+    <span class="badge">Weekly averages</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-card">
+      <h2>Weekly average attendance</h2>
+      <p class="chart-sub">Total weekly average vs. adult weekly average, by year. 2026 reflects year-to-date through June.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Total weekly avg</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Adult weekly avg</span>
+      </div>
+      <div class="chart-wrap" style="height:230px;"><canvas id="attChart" role="img" aria-label="Weekly average attendance by year"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <h2>Unique kids check-ins</h2>
+      <p class="chart-sub">Monthly unique kids check-ins — most recent full year (2025), Jan–Apr shown for context.</p>
+      <div class="chart-wrap" style="height:230px;"><canvas id="kidsChart" role="img" aria-label="Unique kids check-ins by month"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SUNDAY VISITORS -->
+  <div class="section-divider">
+    <h2>Sunday visitors</h2>
+    <span class="badge">Goal: 100% of attendance</span>
+  </div>
+
+  <div class="ytd-note">
+    ⚠️ <strong>Note:</strong> 2026 is a year-to-date count through June and should not be compared directly to prior full-year totals.
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-card">
+      <h2>Total Sunday visitors by year</h2>
+      <p class="chart-sub">Annual guest count. 2026 is YTD through June.</p>
+      <div class="chart-wrap" style="height:220px;"><canvas id="visitorsChart" role="img" aria-label="Sunday visitors by year"></canvas></div>
+    </div>
+
+    <div class="chart-card" style="padding:0; overflow:hidden;">
+      <div style="padding:22px 22px 6px;">
+        <h2>Visitors as % of attendance</h2>
+        <p class="chart-sub">Tracking toward the 100%-of-attendance goal.</p>
+      </div>
+      <table class="metrics-table">
+        <thead><tr><th>Year</th><th>Total visitors</th><th>% of attendance</th><th>Status</th></tr></thead>
+        <tbody id="visitorsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GROUPS & SERVING -->
+  <div class="section-divider">
+    <h2>Life / Care / Legacy groups &amp; serving</h2>
+    <span class="badge">Discipleship base</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-card">
+      <h2>Life / Care / Legacy group members</h2>
+      <p class="chart-sub">Total members in a Life, Care, or Legacy group, by month (2026 YTD).</p>
+      <div class="chart-wrap" style="height:220px;"><canvas id="groupsChart" role="img" aria-label="Group members by month"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <h2>Participation as % of adult/student attendance</h2>
+      <p class="chart-sub">Share of adult/student attendance in a group vs. actively serving, by month.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>In a group %</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Serving %</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="pctChart" role="img" aria-label="Group and serving participation percentage by month"></canvas></div>
+    </div>
+  </div>
+
+  <!-- NEXT STEPS -->
+  <div class="section-divider">
+    <h2>Baptisms &amp; next steps</h2>
+    <span class="badge">Milestones</span>
+  </div>
+
+  <div class="ytd-note">
+    ⚠️ <strong>Note:</strong> Baptisms and Starting Point figures are cumulative year-to-date counts. 2026 reflects Jan–June and will continue to grow through the year.
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-card">
+      <h2>Baptisms &amp; professions of faith</h2>
+      <p class="chart-sub">Total per year, with number of times baptisms were offered.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Total baptisms</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Times offered</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="baptismChart" role="img" aria-label="Baptisms by year"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <h2>Starting Point attendees</h2>
+      <p class="chart-sub">Total per year, with number of times Starting Point was offered.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Total attendees</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#C8842A;"></span>Times offered</span>
+      </div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="startingChart" role="img" aria-label="Starting Point attendees by year"></canvas></div>
+    </div>
+  </div>
+
+  <div class="mcc-footer">
+    <p>Maple City Chapel &nbsp;·&nbsp; MCC Connections Dashboard &nbsp;·&nbsp; Data through the close of June 2026</p>
+    <p style="margin-top:2px;">Source: Planning Center / internal tracking. Mirrors the Klipfolio Connections dashboard. Updated by the Operations team.</p>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+//  DATA — mirrors the Klipfolio Connections dashboard (close of June 2026)
+//  Update these values when new reports come in.
+// ══════════════════════════════════════════════════════════════
+
+// Sunday visitors: total + % of attendance (goal 100%)
+const visitorsData = [
+  { year: '2023', total: 645, pct: 70 },
+  { year: '2024', total: 671, pct: 69 },
+  { year: '2025', total: 586, pct: 57 },
+  { year: '2026', total: 186, pct: 18, ytd: true },
+];
+
+// ── Visitors table ──
+function visitorStatus(pct) {
+  if (pct >= 65) return 'green';
+  if (pct >= 40) return 'yellow';
+  return 'red';
+}
+function visitorStatusLabel(s) {
+  return { green: 'On pace', yellow: 'Watch', red: 'Behind' }[s];
+}
+document.getElementById('visitorsTable').innerHTML = visitorsData.map(v => {
+  const s = visitorStatus(v.pct);
+  return `<tr>
+    <td>${v.year}${v.ytd ? ' <span style="color:#9CA3AF;font-weight:400;">(YTD)</span>' : ''}</td>
+    <td><span class="cur-val">${v.total.toLocaleString('en-US')}</span></td>
+    <td>${v.pct}%</td>
+    <td><span class="status status-${s}">${visitorStatusLabel(s)}</span></td>
+  </tr>`;
+}).join('');
+
+// ── Chart defaults ──
+Chart.defaults.font.family = "'Lato', system-ui, Arial, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6b7280';
+const gc = 'rgba(0,0,0,0.06)';
+
+// ── Weekly average attendance (by year) ──
+new Chart(document.getElementById('attChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2023', '2024', '2025', '2026'],
+    datasets: [
+      { label: 'Total weekly avg', data: [942, 977, 1122, 1151], backgroundColor: '#343A44', borderRadius: 4 },
+      { label: 'Adult weekly avg',  data: [798, 822, 960, 982],   backgroundColor: '#2F8F5B', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index' } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 0 }
+    }
+  }
+});
+
+// ── Unique kids check-ins (2025, monthly) ──
+new Chart(document.getElementById('kidsChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [
+      { label: 'Unique kids check-ins', data: [253, 268, 300, 311, null, null, null, null, null, null, null, null],
+        borderColor: '#343A44', backgroundColor: 'rgba(52,58,68,0.08)', borderWidth: 2.5, pointRadius: 4, tension: 0.3, fill: true, spanGaps: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 100, suggestedMax: 350 }
+    }
+  }
+});
+
+// ── Sunday visitors total by year ──
+new Chart(document.getElementById('visitorsChart'), {
+  type: 'bar',
+  data: {
+    labels: visitorsData.map(v => v.year),
+    datasets: [
+      { label: 'Total visitors', data: visitorsData.map(v => v.total),
+        backgroundColor: ['#343A44','#343A44','#343A44','#C8842A'], borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + ' visitors' } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 0 }
+    }
+  }
+});
+
+// ── Life/Care/Legacy group members (monthly, 2026 YTD) ──
+new Chart(document.getElementById('groupsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr'],
+    datasets: [
+      { label: 'Group members', data: [604, 615, 579, 575], backgroundColor: '#343A44', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + ' members' } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 0 }
+    }
+  }
+});
+
+// ── Participation % of adult/student attendance (monthly) ──
+new Chart(document.getElementById('pctChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr'],
+    datasets: [
+      { label: 'In a group %', data: [45, 46, 42, 37], backgroundColor: '#343A44', borderRadius: 4 },
+      { label: 'Serving %',    data: [54, 54, 58, 58], backgroundColor: '#2F8F5B', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { callback: v => v + '%', color: '#9CA3AF' }, min: 0, max: 70 }
+    }
+  }
+});
+
+// ── Baptisms by year ──
+new Chart(document.getElementById('baptismChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2022','2023','2024','2025','2026'],
+    datasets: [
+      { label: 'Total baptisms', data: [17, 29, 43, 34, 16], backgroundColor: '#343A44', borderRadius: 4 },
+      { label: 'Times offered',  data: [4, 4, 3, 3, 1],       backgroundColor: '#2F8F5B', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index' } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 0 }
+    }
+  }
+});
+
+// ── Starting Point attendees by year ──
+new Chart(document.getElementById('startingChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2023','2024','2025','2026'],
+    datasets: [
+      { label: 'Total attendees', data: [28, 30, 19, 15], backgroundColor: '#343A44', borderRadius: 4 },
+      { label: 'Times offered',   data: [4, 3, 2, 1],      backgroundColor: '#C8842A', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index' } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 0 }
+    }
+  }
+});
+</script>
+</body>
+</html>
