@@ -1,21 +1,22 @@
 {
   "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with static.json + 2026-actuals.json.",
-  "run_date": "June 30, 2026",
-  "run_weekday": "Tuesday",
+  "run_date": "July 1, 2026",
+  "run_weekday": "Wednesday",
   "data_through": "June 28, 2026",
   "weeks_ytd": 26,
   "reporting_month_index": 6,
   "reporting_month_name": "June",
-  "current_month": {"giving4100": 135781.08, "op_income": 141151.88, "op_expense": 113614.23, "personnel": 85987.25, "facilities": 17807.34, "partial": true},
+  "current_month": {"giving4100": 135781.08, "op_income": 141151.88, "op_expense": 114041.19, "personnel": 85987.25, "facilities": 17807.34, "partial": true},
   "last_week_giving": 26329.43,
-  "bank": 787124.94,
-  "loan_balance": 1460643.30,
-  "giving_health": {"committed": 313, "households": 457, "new_donors_year": 36, "new_donors_week": 0},
-  "retention": {"retained": 240, "lapsed": 84, "new": 73, "rate": 74.1, "prior": 324},
+  "bank": 783490.23,
+  "loan_balance": 1459329.92,
+  "giving_health": {"committed": 310, "households": 470, "new_donors_year": 36, "new_donors_week": 0},
+  "retention": {"retained": 243, "lapsed": 79, "new": 67, "rate": 75.5, "prior": 322},
   "ramp": {
-    "card_mtd": 28002.24, "card_mtd_n": 212, "card_7d": 3217.33, "card_7d_n": 30,
-    "ap_paid_mtd": 12717.05, "ap_paid_n": 24, "ap_out": 6539.20, "ap_open_n": 11,
+    "card_mtd": 30880.80, "card_mtd_n": 218, "card_7d": 5847.48, "card_7d_n": 29,
+    "ap_paid_mtd": 12717.05, "ap_paid_n": 24, "ap_out": 8018.20, "ap_open_n": 13,
     "card_over": [
+      ["07/01", "Church Finance", "Aaron Cunningham", "AC - Outsourced accounting subscription", 1780.00],
       ["06/29", "TechKnowledgey Inc", "Wrennie Howard", "Monthly copier lease", 726.29],
       ["06/29", "Subsplash", "Aaron Cunningham", "AC - Subsplash subscription", 505.39]
     ],
@@ -23,8 +24,7 @@
       ["06/30", "Mission Aviation Fellowship", "Dan and Stephanie Kramer Support", 800.00],
       ["06/30", "Clayton Nisly", "Clayton Nisly Support", 800.00],
       ["06/30", "Global Gates", "Jayne Delegrange Missionary Support", 750.00],
-      ["06/30", "Tanya Wieland", "Professional counseling services for Jenn and Chase Borden", 600.00],
-      ["06/23", "Best Sweeping Specialist", "Parking lot sweeping services for full sweep and fire lanes", 402.00]
+      ["06/30", "Tanya Wieland", "Professional counseling services for Jenn and Chase Borden", 600.00]
     ]
   }
 }
