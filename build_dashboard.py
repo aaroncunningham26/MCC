@@ -13,6 +13,7 @@ Weekly job only needs to: refresh live.json (and, when a month closes, append it
 The template/CSS/chart config below is stable; numbers come entirely from the JSON.
 """
 import json, os, sys
+from datetime import datetime, timedelta
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 def load(p):
@@ -30,6 +31,12 @@ WEEKLY_BUDGET = C["weekly_budget"]; ANNUAL_BUDGET = C["annual_budget"]; RESTR = 
 LT = static["loan_terms"]
 RUN_DATE = live["run_date"]; RUN_WEEKDAY = live["run_weekday"]; DATA_THROUGH = live["data_through"]
 WEEKS_YTD = live["weeks_ytd"]; RMI = live["reporting_month_index"]  # 1-based count of months Jan..reporting
+# Last-week giving window = the 7 days ending on the last Sunday (= DATA_THROUGH). Derived, never hardcoded.
+_wk_end = datetime.strptime(DATA_THROUGH, "%B %d, %Y"); _wk_start = _wk_end - timedelta(days=6)
+if _wk_start.month == _wk_end.month:
+    WEEK_LABEL = "%s %d&ndash;%d" % (_wk_start.strftime("%b"), _wk_start.day, _wk_end.day)
+else:
+    WEEK_LABEL = "%s %d&ndash;%s %d" % (_wk_start.strftime("%b"), _wk_start.day, _wk_end.strftime("%b"), _wk_end.day)
 
 # ---- Merge closed + current into 2026 monthly arrays (length = RMI) ----
 def series(field):
@@ -268,7 +275,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 
 <section>
   <div class="grid g4">
-    <div class="card"><div class="kpi-l">Last Week's Giving</div><div class="kpi-n">{d(last_week_giving)}</div><div class="kpi-s">Week of Jun 15&ndash;21 &middot; QBO 4100</div></div>
+    <div class="card"><div class="kpi-l">Last Week's Giving</div><div class="kpi-n">{d(last_week_giving)}</div><div class="kpi-s">Week of {WEEK_LABEL} &middot; QBO 4100</div></div>
     <div class="card"><div class="kpi-l">{RMONTH} Giving</div><div class="kpi-n">{d(current_giving)}</div><div class="kpi-s">Month to date (through {DATA_THROUGH})</div></div>
     <div class="card"><div class="kpi-l">YTD Giving</div><div class="kpi-n">{d(ytd_giving)}</div><div class="kpi-s">Jan&ndash;{RMONTH} &middot; sum of 4100</div></div>
     <div class="card"><div class="kpi-l">Bank Balance</div><div class="kpi-n">{d(bank)}</div><div class="kpi-s">Unrestricted: {d(unrestricted)} &middot; {months_cash:.1f} mo. cash</div></div>
