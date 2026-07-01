@@ -1,0 +1,63 @@
+{
+  "_note": "Live data for the Connections dashboard. Refreshed weekly (Tue 7am) by the Connections refresh job, which pulls PCO list counts + the Google Sheet attendance, overwrites this file, then runs build_connections.py. Attendance = weekly (from the Sheet); PCO roster/groups/serving/guests = as of the close of the previous month.",
+  "meta": {
+    "run_date": "July 1, 2026",
+    "run_weekday": "Wednesday",
+    "data_through": "June 28, 2026",
+    "prev_month_num": 6,
+    "prev_month_label": "June 2026",
+    "pco_pulled_at": "July 1, 2026"
+  },
+  "attendance": {
+    "_source": "Google Sheet '2026' tab, weekly total attendance (col B). weekend = latest week; moving_avg_6wk, avg_weekly_ytd, avg_weekly_prev_month computed in the renderer.",
+    "weekly": [
+      ["2026-01-04", 1015], ["2026-01-11", 1009], ["2026-01-18", 1056], ["2026-01-25", 687],
+      ["2026-02-01", 1024], ["2026-02-08", 1080], ["2026-02-15", 965], ["2026-02-22", 839],
+      ["2026-03-01", 1009], ["2026-03-08", 1032], ["2026-03-15", 1050], ["2026-03-22", 1096], ["2026-03-29", 1421],
+      ["2026-04-05", 1373], ["2026-04-12", 1028], ["2026-04-19", 1114], ["2026-04-26", 1087],
+      ["2026-05-03", 1085], ["2026-05-10", 1209], ["2026-05-17", 1015], ["2026-05-24", 1041], ["2026-05-31", 1022],
+      ["2026-06-07", 1041], ["2026-06-14", 967], ["2026-06-21", 967], ["2026-06-28", 847]
+    ]
+  },
+  "pco": {
+    "_source": "Planning Center saved Lists (People). Counts are point-in-time; the monthly-refresh lists reflect the close of the previous month.",
+    "active_profiles": 1517,
+    "student_profiles": 155,
+    "kid_profiles": 333,
+    "households": 470,
+    "group_members": 612,
+    "serving_sundays": 387,
+    "serving_anywhere": 444,
+    "kids_checkins": 273,
+    "student_checkins": 28,
+    "new_guests_month": 33,
+    "starting_point": 22,
+    "baptisms": null,
+    "connect_breakfast": null
+  },
+  "flags": {
+    "baptisms": "PCO 'Baptisms' list (Baptism y/n = Yes) returns only 3 and was last refreshed in 2021 — not a maintained source. Shown as not tracked until a real source is chosen.",
+    "connect_breakfast": "PCO 'Connect Breakfast' list is currently empty (0). Shown as not tracked until repopulated or another source is chosen.",
+    "starting_point": "Pulled from PCO 'Starting Point Attendance' list (22) as a fallback; a Starting Point column was not found on the Google Sheet."
+  },
+  "config": {
+    "sheet_id": "1Fi0w8ruPvTx37MTs7wlwmn4y45kXH4n0H3UY0Zjy0MA",
+    "sheet_tabs": ["2026", "Charts"],
+    "pco_list_ids": {
+      "active_profiles": "1621270",
+      "student_profiles": "2701176",
+      "kid_profiles": "1621253",
+      "households": "1905339",
+      "group_members_adults_in_circles": "2718541",
+      "life_group_members": "2214090",
+      "serving_sundays": "2013985",
+      "serving_anywhere": "2718376",
+      "kids_checkins": "1893771",
+      "student_checkins": "1621724",
+      "new_guests_month": "2767939",
+      "starting_point": "2700474",
+      "baptisms": "1989506",
+      "connect_breakfast": "2502975"
+    }
+  }
+}
