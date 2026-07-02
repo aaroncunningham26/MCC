@@ -94,18 +94,40 @@ def takeaway_items():
     return "".join('<li><span class="dot %s"></span><span>%s</span></li>' % (dot[s], b) for s, b in takeaways)
 
 # ---- Chart palette for YoY ----
-YOY_COLORS = {"2021":"#C9CED6","2022":"#AEB6C2","2023":"#8899AA","2024":"#C8842A","2025":"#2F8F5B","2026":"#343A44"}
+YOY_COLORS = {"2024":"#C8842A","2025":"#8899AA","2026":"#343A44"}
+# Show only the last 3 years on trend charts (older years stay in the sheet, just not plotted).
+YOY_SHOW = ("2024", "2025", "2026")
 def yoy_datasets(series):
     out = []
-    for yr in sorted(series.keys()):
+    for yr in sorted(k for k in series.keys() if k in YOY_SHOW):
         bold = (yr == "2026")
         out.append({
             "label": yr, "data": series[yr], "borderColor": YOY_COLORS.get(yr, "#8899AA"),
             "backgroundColor": YOY_COLORS.get(yr, "#8899AA"),
-            "borderWidth": 3 if bold else 1.8, "pointRadius": 3 if bold else 0,
-            "tension": 0.3, "spanGaps": False, "borderDash": [] if bold or yr == "2025" else ([4,3] if yr in ("2021","2022") else [])
+            "borderWidth": 3 if bold else 2, "pointRadius": 3 if bold else 0,
+            "tension": 0.3, "spanGaps": False, "borderDash": []
         })
     return out
+
+def yoy_callout(series):
+    """'April: 1,151 vs 1,116 in 2025 · ▲ +3% YoY' for the latest recorded 2026 month."""
+    s26 = series.get("2026"); s25 = series.get("2025")
+    if not s26 or not s25:
+        return ""
+    idx = max((i for i, v in enumerate(s26) if v is not None), default=None)
+    if idx is None or idx >= len(s25) or s25[idx] is None:
+        return ""
+    cur, prev = s26[idx], s25[idx]
+    pct = round((cur / prev - 1) * 100) if prev else 0
+    up = cur >= prev
+    arrow = "&#9650;" if up else "&#9660;"
+    return ('<p class="yoy-callout %s">%s: <strong>%s</strong> vs %s in 2025 &middot; %s %s%d%% YoY</p>'
+            % ("up" if up else "down", MONTHS[idx], f"{cur:,}", f"{prev:,}", arrow, "+" if up else "&minus;", abs(pct)))
+
+co_att = yoy_callout(H["attendance_monthly"])
+co_guests = yoy_callout(H["guests_monthly"])
+co_kids = yoy_callout(H["kids_checkins_monthly"])
+co_students = yoy_callout(H["student_checkins_monthly"])
 
 html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -165,6 +187,8 @@ html = f"""<!DOCTYPE html>
   .chart-card {{ background:var(--card); border-radius:10px; padding:22px 22px 18px; border:1px solid var(--line); margin-bottom:14px; box-shadow:0 1px 4px rgba(20,30,60,.05); }}
   .chart-card h2 {{ font-size:15px; font-weight:900; text-transform:uppercase; letter-spacing:-.01em; color:var(--slate); margin-bottom:4px; }}
   .chart-card .chart-sub {{ font-size:13px; color:var(--muted); margin-bottom:16px; }}
+  .yoy-callout {{ font-size:12.5px; font-weight:700; margin:-10px 0 14px; }}
+  .yoy-callout.up {{ color:var(--green); }} .yoy-callout.down {{ color:var(--red); }}
   .chart-wrap {{ position:relative; width:100%; }}
   .legend {{ display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px; }}
   .legend-item {{ display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); font-weight:700; }}
@@ -250,12 +274,14 @@ html = f"""<!DOCTYPE html>
   <div class="grid-2">
     <div class="chart-card">
       <h2>Average weekly attendance</h2>
-      <p class="chart-sub">Monthly average weekly attendance, this year vs prior years.</p>
+      <p class="chart-sub">Monthly average weekly attendance, 2024&ndash;2026.</p>
+      {co_att}
       <div class="chart-wrap" style="height:230px;"><canvas id="attYoY"></canvas></div>
     </div>
     <div class="chart-card">
       <h2>New Sunday guests</h2>
-      <p class="chart-sub">First-time guests by month, this year vs prior years.</p>
+      <p class="chart-sub">First-time guests by month, 2024&ndash;2026.</p>
+      {co_guests}
       <div class="chart-wrap" style="height:230px;"><canvas id="guestsYoY"></canvas></div>
     </div>
   </div>
@@ -263,12 +289,14 @@ html = f"""<!DOCTYPE html>
   <div class="grid-2">
     <div class="chart-card">
       <h2>Kids check-ins</h2>
-      <p class="chart-sub">Unique kids check-ins by month, year over year.</p>
+      <p class="chart-sub">Unique kids check-ins by month, 2024&ndash;2026.</p>
+      {co_kids}
       <div class="chart-wrap" style="height:230px;"><canvas id="kidsYoY"></canvas></div>
     </div>
     <div class="chart-card">
       <h2>Student check-ins</h2>
-      <p class="chart-sub">Unique student check-ins by month, year over year.</p>
+      <p class="chart-sub">Unique student check-ins by month, 2024&ndash;2026.</p>
+      {co_students}
       <div class="chart-wrap" style="height:230px;"><canvas id="studentsYoY"></canvas></div>
     </div>
   </div>
