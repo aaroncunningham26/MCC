@@ -97,6 +97,8 @@
   "config": {
     "attendance_sheet_id": "1Fi0w8ruPvTx37MTs7wlwmn4y45kXH4n0H3UY0Zjy0MA",
     "kpm_sheet_id": "1muehaLqYXOx3F4TE-el_9_26thBF49vF1ilf1Q1xUNg",
+    "writeback_url": "",
+    "writeback_secret_ref": "Set writeback_url to the deployed Apps Script /exec URL (apps-script/kpm-writeback.gs) and store its shared secret here or alongside github_token; leave url empty to disable the monthly write-back.",
     "pco_list_ids": {
       "active_profiles": "1621270",
       "student_profiles": "2701176",
