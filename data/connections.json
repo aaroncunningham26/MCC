@@ -96,9 +96,9 @@
   },
   "config": {
     "attendance_sheet_id": "1Fi0w8ruPvTx37MTs7wlwmn4y45kXH4n0H3UY0Zjy0MA",
-    "kpm_sheet_id": "1muehaLqYXOx3F4TE-el_9_26thBF49vF1ilf1Q1xUNg",
-    "writeback_url": "",
-    "writeback_secret_ref": "Set writeback_url to the deployed Apps Script /exec URL (apps-script/kpm-writeback.gs) and store its shared secret here or alongside github_token; leave url empty to disable the monthly write-back.",
+    "kpm_xlsx_path": "../Data Sheets/Data Source Sheets/MCC Connection KPMs.xlsx",
+    "kpm_history_source": "Read history from the Excel file above (openpyxl, read-only). Note: read raw input columns and compute derived columns; formula cells may not carry cached values.",
+    "writeback": "Monthly write-back is done by MCC/write_kpm_month.py, which surgically edits the .xlsx (preserves charts). The Apps Script route (apps-script/kpm-writeback.gs) is retained but superseded by the Excel path.",
     "pco_list_ids": {
       "active_profiles": "1621270",
       "student_profiles": "2701176",
