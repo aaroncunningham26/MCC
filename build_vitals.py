@@ -1,4 +1,174 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""
+MCC Vitals Dashboard renderer.
+
+Reads the source-of-truth spreadsheet ...
+  Data Sheets/Data Source Sheets/MCC VITALS.xlsx  (tab: VITALS)
+... and writes:
+  MCC/data/vitals.json   -- structured data (years, metrics, values, pcts, through-week)
+  MCC/vitals.html        -- the leadership dashboard, numbers baked in
+
+The VITALS tab lays each year out as two columns: a value column and a
+second column (percent for most metrics, per-person $ for Giving, YoY growth %
+for the attendance rows). Column pairs:
+   2022 D/E   2023 F/G   2024 H/I   2025 J/K   2026 L/M
+Row 26 col C holds the current "Thru Week #".
+
+Monthly refresh: update the spreadsheet (or run build_vitals_pull.py to pull the
+current numbers from Planning Center), then run:  python3 build_vitals.py
+"""
+import json, os, datetime
+import openpyxl
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+XLSX = os.path.normpath(os.path.join(
+    BASE, "..", "Data Sheets", "Data Source Sheets", "MCC VITALS.xlsx"))
+YEARS = [2022, 2023, 2024, 2025, 2026]
+VAL_COLS = {2022: 4, 2023: 6, 2024: 8, 2025: 10, 2026: 12}   # D F H J L
+PCT_COLS = {2022: 5, 2023: 7, 2024: 9, 2025: 11, 2026: 13}   # E G I K M
+
+# row -> metric definition. `pct_is` tells us what the 2nd column means.
+METRICS = [
+    # Evangelism
+    dict(row=2,  group="evangelism",  name="Avg. attendance (in-person)", goal="Min. 5% growth",
+         type="growth", goalMin=5, isAvg=True,  pct_is="growth"),
+    dict(row=3,  group="evangelism",  name="Avg. adults (in-person)",     goal="Min. 5% growth",
+         type="growth", goalMin=5, isAvg=True,  pct_is="growth"),
+    dict(row=4,  group="evangelism",  name="Avg. students (in-person)",   goal="10%–15% of attendance",
+         type="range",  goalMin=10, goalMax=15, isAvg=True, pct_is="share"),
+    dict(row=5,  group="evangelism",  name="Avg. kids (in-person)",       goal="15%–25% of attendance",
+         type="range",  goalMin=15, goalMax=25, isAvg=True, pct_is="share"),
+    dict(row=6,  group="evangelism",  name="Avg. online attendance",      goal="25%–30% of attendance",
+         type="range",  goalMin=25, goalMax=30, isAvg=True, pct_is="share"),
+    dict(row=7,  group="evangelism",  name="Baptisms / POF",              goal="10% of attendance",
+         type="min",    goalMin=10, isAvg=False, pct_is="share"),
+    dict(row=8,  group="evangelism",  name="Sunday visitors",             goal="100% of attendance",
+         type="min",    goalMin=100, isAvg=False, pct_is="share"),
+    dict(row=9,  group="evangelism",  name="Connect breakfast",           goal="10% of attendance",
+         type="min",    goalMin=10, isAvg=False, pct_is="share"),
+    # Discipleship
+    dict(row=16, group="discipleship", name="Adults in circles",      goal="70% of adults",
+         type="min",   goalMin=70, isAvg=True,  pct_is="share"),
+    dict(row=17, group="discipleship", name="Regular serving",        goal="50% of attendance",
+         type="min",   goalMin=50, isAvg=True,  pct_is="share"),
+    dict(row=18, group="discipleship", name="Unique donors",          goal="40%–60% of attendance",
+         type="range", goalMin=40, goalMax=60, isAvg=True, pct_is="share"),
+    dict(row=19, group="discipleship", name="New donors",             goal="5%–10% of unique donors",
+         type="range", goalMin=5, goalMax=10, isAvg=False, pct_is="share"),
+    dict(row=20, group="discipleship", name="Giving / person / week",  goal="$25–$35 per person/week",
+         type="dollar", goalMin=25, goalMax=35, isAvg=False, pct_is="dollar"),
+    dict(row=21, group="discipleship", name="Starting Point",         goal="10% of guests",
+         type="min",   goalMin=10, isAvg=False, pct_is="share"),
+]
+
+def num(v):
+    if v is None: return None
+    if isinstance(v, str):
+        try: return float(v)
+        except ValueError: return None
+    return float(v)
+
+def extract():
+    wb = openpyxl.load_workbook(XLSX, data_only=True)
+    ws = wb["VITALS"]
+    # through-week
+    through_week = None
+    for r in range(1, ws.max_row + 1):
+        if str(ws.cell(r, 2).value or "").strip().startswith("Thru Week"):
+            through_week = int(num(ws.cell(r, 3).value) or 0); break
+    # close-of month from KPM Format tab
+    month = None
+    kf = wb["KPM Format"]
+    for row in kf.iter_rows():
+        for c in row:
+            if c.value and "close of" in str(c.value).lower():
+                month = str(kf.cell(c.row, c.column + 1).value or "").strip()
+    out = []
+    for m in METRICS:
+        r = m["row"]
+        raw_val = {y: num(ws.cell(r, VAL_COLS[y]).value) for y in YEARS}
+        raw_pct = {y: num(ws.cell(r, PCT_COLS[y]).value) for y in YEARS}
+        if m["pct_is"] == "dollar":
+            # display value = per-person $ (2nd col); keep the total separately
+            values = [round(raw_pct[y]) if raw_pct[y] is not None else None for y in YEARS]
+            pcts = None
+            totals = [round(raw_val[y]) if raw_val[y] is not None else None for y in YEARS]
+        else:
+            values = [round(raw_val[y]) if raw_val[y] is not None else None for y in YEARS]
+            pcts = [round(raw_pct[y] * 100) if raw_pct[y] is not None else None for y in YEARS]
+            totals = None
+        rec = dict(name=m["name"], goal=m["goal"], group=m["group"], type=m["type"],
+                   goalMin=m["goalMin"], isAvg=m["isAvg"], values=values, pcts=pcts)
+        if "goalMax" in m: rec["goalMax"] = m["goalMax"]
+        if totals is not None: rec["totals"] = totals
+        out.append(rec)
+    wb.close()
+    return out, through_week, month
+
+def get(metrics, name):
+    for m in metrics:
+        if m["name"] == name: return m
+    return None
+
+def cur(m):  # current-year (2026) value
+    return m["values"][-1]
+def curpct(m):
+    return m["pcts"][-1] if m.get("pcts") else None
+
+def build_insights(metrics):
+    att   = get(metrics, "Avg. attendance (in-person)")
+    circ  = get(metrics, "Adults in circles")
+    serv  = get(metrics, "Regular serving")
+    stu   = get(metrics, "Avg. students (in-person)")
+    don   = get(metrics, "Unique donors")
+    bullets = []
+    # 1. Attendance
+    prev_max = max(v for v in att["values"][:-1] if v is not None)
+    hi = cur(att) >= prev_max
+    g = curpct(att)
+    lead = "the highest on record" if hi else "steady"
+    tail = (f"comfortably above the 5% growth goal." if g >= 5
+            else f"positive but under the 5% growth goal.")
+    bullets.append(("green" if g >= 5 else "amber",
+        f"Weekend attendance is {lead} — <strong>{cur(att):,} average</strong> through the "
+        f"reporting window, up {g}% over 2025. Growth is {tail}"))
+    # 2. Circles
+    bullets.append(("green" if curpct(circ) >= circ["goalMin"] else "green",
+        f"Adults in circles continues to climb — <strong>{cur(circ):,} adults ({curpct(circ)}%)</strong> "
+        f"are in a circle, the strongest on record. The 70% goal is within reach."))
+    # 3. Watch areas (below-goal averages)
+    watch = []
+    if curpct(att) < 5:  watch.append(f"attendance growth ({curpct(att)}%)")
+    if curpct(serv) < serv["goalMin"]: watch.append(f"regular serving ({curpct(serv)}%)")
+    if curpct(don) < don["goalMin"]:   watch.append(f"unique donors ({curpct(don)}%)")
+    if watch:
+        joined = ", ".join(watch[:-1]) + (f", and {watch[-1]}" if len(watch) > 1 else watch[0])
+        if len(watch) == 1: joined = watch[0]
+        bullets.append(("amber",
+            f"The key watch areas are {joined} — each sits below its 2026 goal and is worth "
+            f"deliberate leadership attention this half of the year."))
+    # 4. Students (worst trend)
+    s24, s26 = stu["values"][2], stu["values"][-1]
+    p24, p26 = stu["pcts"][2], stu["pcts"][-1]
+    bullets.append(("red",
+        f"Student ministry is the most concerning trend — average students has fallen from "
+        f"<strong>{s24} in 2024 to {s26} in 2026</strong> ({p24}% → {p26}% of attendance), "
+        f"consistently under the 10–15% goal and still declining."))
+    # 5. Donors
+    d22 = don["pcts"][0]
+    bullets.append(("amber",
+        f"Unique donors ({cur(don):,}, {curpct(don)}%) remain well below the 40–60% goal and have "
+        f"contracted from {d22}% of attendance in 2022. Track this alongside the finance dashboard "
+        f"as a long-term giving-health signal."))
+    # 6. Methodology note
+    bullets.append(("blue",
+        "Count-based metrics (visitors, baptisms, Connect Breakfast, giving) are year-to-date and "
+        "should not be compared directly to prior full-year totals. Averages (attendance, serving, "
+        "circles) are fully comparable."))
+    return bullets
+
+# ── HTML template ──────────────────────────────────────────────────────────
+TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -88,8 +258,8 @@
 // ══════════════════════════════════════════════════════════════
 //  DATA — generated by build_vitals.py from MCC VITALS.xlsx. Do not hand-edit.
 // ══════════════════════════════════════════════════════════════
-const VITALS = {"years": [2022, 2023, 2024, 2025, 2026], "through_week": 26, "month": "June", "generated": "2026-07-02", "metrics": [{"name": "Avg. attendance (in-person)", "goal": "Min. 5% growth", "group": "evangelism", "type": "growth", "goalMin": 5, "isAvg": true, "values": [771, 928, 967, 1020, 1042], "pcts": [15, 20, 4, 5, 2]}, {"name": "Avg. adults (in-person)", "goal": "Min. 5% growth", "group": "evangelism", "type": "growth", "goalMin": 5, "isAvg": true, "values": [635, 762, 802, 856, 880], "pcts": [16, 20, 5, 7, 3]}, {"name": "Avg. students (in-person)", "goal": "10%\u201315% of attendance", "group": "evangelism", "type": "range", "goalMin": 10, "isAvg": true, "values": [100, 101, 103, 97, 74], "pcts": [16, 13, 13, 11, 8], "goalMax": 15}, {"name": "Avg. kids (in-person)", "goal": "15%\u201325% of attendance", "group": "evangelism", "type": "range", "goalMin": 15, "isAvg": true, "values": [134, 168, 164, 164, 162], "pcts": [21, 18, 17, 16, 16], "goalMax": 25}, {"name": "Avg. online attendance", "goal": "25%\u201330% of attendance", "group": "evangelism", "type": "range", "goalMin": 25, "isAvg": true, "values": [166, 154, 143, 214, 202], "pcts": [22, 17, 15, 21, 19], "goalMax": 30}, {"name": "Baptisms / POF", "goal": "10% of attendance", "group": "evangelism", "type": "min", "goalMin": 10, "isAvg": false, "values": [17, 29, 43, 34, 16], "pcts": [2, 3, 4, 3, 2]}, {"name": "Sunday visitors", "goal": "100% of attendance", "group": "evangelism", "type": "min", "goalMin": 100, "isAvg": false, "values": [508, 645, 671, 586, 186], "pcts": [66, 70, 69, 57, 18]}, {"name": "Connect breakfast", "goal": "10% of attendance", "group": "evangelism", "type": "min", "goalMin": 10, "isAvg": false, "values": [null, 86, 119, 111, 45], "pcts": [null, 9, 12, 11, 4]}, {"name": "Adults in circles", "goal": "70% of adults", "group": "discipleship", "type": "min", "goalMin": 70, "isAvg": true, "values": [297, 396, 450, 536, 593], "pcts": [47, 52, 56, 63, 67]}, {"name": "Regular serving", "goal": "50% of attendance", "group": "discipleship", "type": "min", "goalMin": 50, "isAvg": true, "values": [380, 408, 359, 434, 423], "pcts": [60, 54, 45, 51, 48]}, {"name": "Unique donors", "goal": "40%\u201360% of attendance", "group": "discipleship", "type": "range", "goalMin": 40, "isAvg": true, "values": [342, 350, 371, 341, 231], "pcts": [44, 38, 38, 21, 22], "goalMax": 60}, {"name": "New donors", "goal": "5%\u201310% of unique donors", "group": "discipleship", "type": "range", "goalMin": 5, "isAvg": false, "values": [56, 70, 71, 49, 24], "pcts": [16, 20, 19, 22, 10], "goalMax": 10}, {"name": "Giving / person / week", "goal": "$25\u2013$35 per person/week", "group": "discipleship", "type": "dollar", "goalMin": 25, "isAvg": false, "values": [33, 31, 28, 29, 10], "pcts": null, "goalMax": 35, "totals": [1324989, 1488185, 1418298, 1553524, 532578]}, {"name": "Starting Point", "goal": "10% of guests", "group": "discipleship", "type": "min", "goalMin": 10, "isAvg": false, "values": [35, 28, 30, 19, 15], "pcts": [7, 4, 4, 3, 8]}]};
-const LAST_UPDATED = "Week 26 (June 2026)";
+const VITALS = __DATA__;
+const LAST_UPDATED = "__LAST_UPDATED__";
 const YEARS = VITALS.years;
 const evangelism   = VITALS.metrics.filter(m => m.group === "evangelism");
 const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
@@ -105,7 +275,7 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
       <div class="sub">Attendance, Engagement &amp; Discipleship Indicators</div>
     </div>
   </div>
-  <div class="right">Data through<br>Week 26 · June 2026</div>
+  <div class="right">Data through<br>__DATA_THROUGH__</div>
   </div>
 </header>
 
@@ -116,13 +286,13 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
   <div class="section-label">Key takeaways</div>
   <div class="insights">
     <h2>What this data is telling us</h2>
-    <ul id="insights-list"><li><span class="dot dot-amber"></span><span>Weekend attendance is the highest on record — <strong>1,042 average</strong> through the reporting window, up 2% over 2025. Growth is positive but under the 5% growth goal.</span></li><li><span class="dot dot-green"></span><span>Adults in circles continues to climb — <strong>593 adults (67%)</strong> are in a circle, the strongest on record. The 70% goal is within reach.</span></li><li><span class="dot dot-amber"></span><span>The key watch areas are attendance growth (2%), regular serving (48%), and unique donors (22%) — each sits below its 2026 goal and is worth deliberate leadership attention this half of the year.</span></li><li><span class="dot dot-red"></span><span>Student ministry is the most concerning trend — average students has fallen from <strong>103 in 2024 to 74 in 2026</strong> (13% → 8% of attendance), consistently under the 10–15% goal and still declining.</span></li><li><span class="dot dot-amber"></span><span>Unique donors (231, 22%) remain well below the 40–60% goal and have contracted from 44% of attendance in 2022. Track this alongside the finance dashboard as a long-term giving-health signal.</span></li><li><span class="dot dot-blue"></span><span>Count-based metrics (visitors, baptisms, Connect Breakfast, giving) are year-to-date and should not be compared directly to prior full-year totals. Averages (attendance, serving, circles) are fully comparable.</span></li></ul>
+    <ul id="insights-list">__INSIGHTS__</ul>
   </div>
 
   <div class="section-label">Attendance trends</div>
   <div class="chart-card">
     <h2>Average weekly attendance — 2022 to 2026</h2>
-    <p class="chart-sub">In-person total and online attendance each year. 2026 figures are averages through Week 26.</p>
+    <p class="chart-sub">In-person total and online attendance each year. 2026 figures are averages through __THROUGH_SHORT__.</p>
     <div class="legend">
       <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>In-person (total)</span>
       <span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>Online</span>
@@ -142,11 +312,11 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
   </div>
 
   <div class="section-divider"><h2>Evangelism vitals</h2><span class="badge">Outreach &amp; growth</span></div>
-  <div class="ytd-note">⚠️ <strong>Note:</strong> Metrics marked † are cumulative counts (not averages). Their 2026 figures reflect year-to-date through Week 26 and should not be compared directly to prior full-year totals.</div>
+  <div class="ytd-note">⚠️ <strong>Note:</strong> Metrics marked † are cumulative counts (not averages). Their 2026 figures reflect year-to-date through __THROUGH_SHORT__ and should not be compared directly to prior full-year totals.</div>
   <div class="chart-card" style="padding: 0; overflow: hidden;"><table class="metrics-table" id="evangelismTable"></table></div>
 
   <div class="section-divider" style="margin-top: 36px;"><h2>Discipleship vitals</h2><span class="badge">Engagement &amp; generosity</span></div>
-  <div class="ytd-note">⚠️ <strong>Note:</strong> New donors, giving, and Starting Point figures (†) are YTD through Week 26. Per-person weekly giving reflects the YTD average and rises as the year progresses.</div>
+  <div class="ytd-note">⚠️ <strong>Note:</strong> New donors, giving, and Starting Point figures (†) are YTD through __THROUGH_SHORT__. Per-person weekly giving reflects the YTD average and rises as the year progresses.</div>
   <div class="chart-card" style="padding: 0; overflow: hidden;"><table class="metrics-table" id="discipleshipTable"></table></div>
 
   <div class="section-label" style="margin-top: 28px;">Discipleship trends</div>
@@ -165,13 +335,13 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
   <div class="section-label" style="margin-top: 28px;">Next steps funnel — 2026 YTD</div>
   <div class="chart-card">
     <h2>How people move from visitor to engaged disciple</h2>
-    <p class="chart-sub">Each stage shows the YTD count for 2026 and the conversion rate from the previous step. Count metrics are through Week 26.</p>
+    <p class="chart-sub">Each stage shows the YTD count for 2026 and the conversion rate from the previous step. Count metrics are through __THROUGH_SHORT__.</p>
     <div class="funnel-wrap" id="funnel-wrap"></div>
-    <p style="font-size:11px; color:var(--muted); margin-top:16px;">† YTD counts through Week 26. Adults in circles is a point-in-time average, not a cumulative count — conversion shown vs. Starting Point completers is directional only.</p>
+    <p style="font-size:11px; color:var(--muted); margin-top:16px;">† YTD counts through __THROUGH_SHORT__. Adults in circles is a point-in-time average, not a cumulative count — conversion shown vs. Starting Point completers is directional only.</p>
   </div>
 
   <div class="mcc-footer">
-    <p>Maple City Chapel &nbsp;·&nbsp; MCC Vitals Dashboard &nbsp;·&nbsp; Data through Week 26, June 2026</p>
+    <p>Maple City Chapel &nbsp;·&nbsp; MCC Vitals Dashboard &nbsp;·&nbsp; Data through __DATA_THROUGH_PLAIN__</p>
     <p style="margin-top:2px;">Source: Planning Center / internal tracking. Updated by the Operations team.</p>
   </div>
 </div>
@@ -277,3 +447,64 @@ new Chart(document.getElementById('discipleshipChart'), {
 </script>
 </body>
 </html>
+"""
+
+def render(metrics, through_week, month):
+    data = {"years": YEARS, "through_week": through_week, "month": month,
+            "generated": datetime.date.today().isoformat(), "metrics": metrics}
+    through_short = f"Week {through_week}" if through_week else month
+    data_through = f"Week {through_week} · {month} 2026" if through_week else f"{month} 2026"
+    last_updated = f"Week {through_week} ({month} 2026)" if through_week else f"{month} 2026"
+    insights = build_insights(metrics)
+    ins_html = "".join(
+        f'<li><span class="dot dot-{c}"></span><span>{t}</span></li>' for c, t in insights)
+    html = (TEMPLATE
+        .replace("__DATA__", json.dumps(data))
+        .replace("__LAST_UPDATED__", last_updated)
+        .replace("__DATA_THROUGH_PLAIN__", data_through.replace(" · ", ", "))
+        .replace("__DATA_THROUGH__", data_through)
+        .replace("__THROUGH_SHORT__", through_short)
+        .replace("__INSIGHTS__", ins_html))
+    os.makedirs(os.path.join(BASE, "data"), exist_ok=True)
+    with open(os.path.join(BASE, "data", "vitals.json"), "w") as f:
+        json.dump(data, f, indent=2)
+    with open(os.path.join(BASE, "vitals.html"), "w") as f:
+        f.write(html)
+    return data_through
+
+def apply_overlay(metrics, through_week, month):
+    """Merge data/2026-current.json (the monthly Planning Center pull) over the
+    current-year column. Leaves the frozen 2022-2025 history from the xlsx intact.
+    Overlay schema:
+      {"through_week": 30, "month": "July",
+       "metrics": {"<metric name>": {"value": <num>, "pct": <num|null>,
+                                     "total": <num, giving only>}, ...}}
+    Any metric not listed keeps its spreadsheet value (carry-forward)."""
+    path = os.path.join(BASE, "data", "2026-current.json")
+    if not os.path.exists(path):
+        return metrics, through_week, month, []
+    ov = json.load(open(path))
+    applied = []
+    for m in metrics:
+        o = ov.get("metrics", {}).get(m["name"])
+        if not o:
+            continue
+        if "value" in o and o["value"] is not None:
+            m["values"][-1] = o["value"]; applied.append(m["name"])
+        if "pct" in o and m.get("pcts") is not None:
+            m["pcts"][-1] = o["pct"]
+        if "total" in o and m.get("totals") is not None:
+            m["totals"][-1] = o["total"]
+    return metrics, ov.get("through_week", through_week), ov.get("month", month), applied
+
+def main():
+    metrics, tw, month = extract()
+    metrics, tw, month, applied = apply_overlay(metrics, tw, month)
+    if applied:
+        print(f"Applied monthly overlay to: {', '.join(applied)}")
+    dt = render(metrics, tw, month)
+    print(f"Built vitals.html + data/vitals.json — data through {dt}")
+    print(f"  {len(metrics)} metrics, through week {tw}, close of {month}")
+
+if __name__ == "__main__":
+    main()

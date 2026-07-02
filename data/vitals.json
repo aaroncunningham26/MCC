@@ -1,0 +1,329 @@
+{
+  "years": [
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "through_week": 26,
+  "month": "June",
+  "generated": "2026-07-02",
+  "metrics": [
+    {
+      "name": "Avg. attendance (in-person)",
+      "goal": "Min. 5% growth",
+      "group": "evangelism",
+      "type": "growth",
+      "goalMin": 5,
+      "isAvg": true,
+      "values": [
+        771,
+        928,
+        967,
+        1020,
+        1042
+      ],
+      "pcts": [
+        15,
+        20,
+        4,
+        5,
+        2
+      ]
+    },
+    {
+      "name": "Avg. adults (in-person)",
+      "goal": "Min. 5% growth",
+      "group": "evangelism",
+      "type": "growth",
+      "goalMin": 5,
+      "isAvg": true,
+      "values": [
+        635,
+        762,
+        802,
+        856,
+        880
+      ],
+      "pcts": [
+        16,
+        20,
+        5,
+        7,
+        3
+      ]
+    },
+    {
+      "name": "Avg. students (in-person)",
+      "goal": "10%\u201315% of attendance",
+      "group": "evangelism",
+      "type": "range",
+      "goalMin": 10,
+      "isAvg": true,
+      "values": [
+        100,
+        101,
+        103,
+        97,
+        74
+      ],
+      "pcts": [
+        16,
+        13,
+        13,
+        11,
+        8
+      ],
+      "goalMax": 15
+    },
+    {
+      "name": "Avg. kids (in-person)",
+      "goal": "15%\u201325% of attendance",
+      "group": "evangelism",
+      "type": "range",
+      "goalMin": 15,
+      "isAvg": true,
+      "values": [
+        134,
+        168,
+        164,
+        164,
+        162
+      ],
+      "pcts": [
+        21,
+        18,
+        17,
+        16,
+        16
+      ],
+      "goalMax": 25
+    },
+    {
+      "name": "Avg. online attendance",
+      "goal": "25%\u201330% of attendance",
+      "group": "evangelism",
+      "type": "range",
+      "goalMin": 25,
+      "isAvg": true,
+      "values": [
+        166,
+        154,
+        143,
+        214,
+        202
+      ],
+      "pcts": [
+        22,
+        17,
+        15,
+        21,
+        19
+      ],
+      "goalMax": 30
+    },
+    {
+      "name": "Baptisms / POF",
+      "goal": "10% of attendance",
+      "group": "evangelism",
+      "type": "min",
+      "goalMin": 10,
+      "isAvg": false,
+      "values": [
+        17,
+        29,
+        43,
+        34,
+        16
+      ],
+      "pcts": [
+        2,
+        3,
+        4,
+        3,
+        2
+      ]
+    },
+    {
+      "name": "Sunday visitors",
+      "goal": "100% of attendance",
+      "group": "evangelism",
+      "type": "min",
+      "goalMin": 100,
+      "isAvg": false,
+      "values": [
+        508,
+        645,
+        671,
+        586,
+        186
+      ],
+      "pcts": [
+        66,
+        70,
+        69,
+        57,
+        18
+      ]
+    },
+    {
+      "name": "Connect breakfast",
+      "goal": "10% of attendance",
+      "group": "evangelism",
+      "type": "min",
+      "goalMin": 10,
+      "isAvg": false,
+      "values": [
+        null,
+        86,
+        119,
+        111,
+        45
+      ],
+      "pcts": [
+        null,
+        9,
+        12,
+        11,
+        4
+      ]
+    },
+    {
+      "name": "Adults in circles",
+      "goal": "70% of adults",
+      "group": "discipleship",
+      "type": "min",
+      "goalMin": 70,
+      "isAvg": true,
+      "values": [
+        297,
+        396,
+        450,
+        536,
+        593
+      ],
+      "pcts": [
+        47,
+        52,
+        56,
+        63,
+        67
+      ]
+    },
+    {
+      "name": "Regular serving",
+      "goal": "50% of attendance",
+      "group": "discipleship",
+      "type": "min",
+      "goalMin": 50,
+      "isAvg": true,
+      "values": [
+        380,
+        408,
+        359,
+        434,
+        423
+      ],
+      "pcts": [
+        60,
+        54,
+        45,
+        51,
+        48
+      ]
+    },
+    {
+      "name": "Unique donors",
+      "goal": "40%\u201360% of attendance",
+      "group": "discipleship",
+      "type": "range",
+      "goalMin": 40,
+      "isAvg": true,
+      "values": [
+        342,
+        350,
+        371,
+        341,
+        231
+      ],
+      "pcts": [
+        44,
+        38,
+        38,
+        21,
+        22
+      ],
+      "goalMax": 60
+    },
+    {
+      "name": "New donors",
+      "goal": "5%\u201310% of unique donors",
+      "group": "discipleship",
+      "type": "range",
+      "goalMin": 5,
+      "isAvg": false,
+      "values": [
+        56,
+        70,
+        71,
+        49,
+        24
+      ],
+      "pcts": [
+        16,
+        20,
+        19,
+        22,
+        10
+      ],
+      "goalMax": 10
+    },
+    {
+      "name": "Giving / person / week",
+      "goal": "$25\u2013$35 per person/week",
+      "group": "discipleship",
+      "type": "dollar",
+      "goalMin": 25,
+      "isAvg": false,
+      "values": [
+        33,
+        31,
+        28,
+        29,
+        10
+      ],
+      "pcts": null,
+      "goalMax": 35,
+      "totals": [
+        1324989,
+        1488185,
+        1418298,
+        1553524,
+        532578
+      ]
+    },
+    {
+      "name": "Starting Point",
+      "goal": "10% of guests",
+      "group": "discipleship",
+      "type": "min",
+      "goalMin": 10,
+      "isAvg": false,
+      "values": [
+        35,
+        28,
+        30,
+        19,
+        15
+      ],
+      "pcts": [
+        7,
+        4,
+        4,
+        3,
+        8
+      ]
+    }
+  ]
+}
