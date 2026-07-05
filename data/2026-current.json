@@ -2,7 +2,7 @@
   "_note": "Current-year (2026) overlay for the Vitals dashboard. The monthly Planning Center pull rewrites this file, then build_vitals.py bakes it over the frozen 2022-2025 history from MCC VITALS.xlsx. 'value' = the number shown; 'pct' = the % column (growth for attendance rows, share of attendance/adults otherwise; null where none). Giving uses 'value'=per-person/week $ and 'total'=YTD dollars. Metrics omitted here keep their spreadsheet value.",
   "through_week": 26,
   "month": "June",
-  "source": "MCC VITALS.xlsx (Week 26 / close of June 2026)",
+  "source": "Planning Center pull 2026-07-05 (giving, donors, kids live; others carried forward) — Week 26 / close of June 2026",
   "metrics": {
     "Avg. attendance (in-person)": {"value": 1042, "pct": 2},
     "Avg. adults (in-person)": {"value": 880, "pct": 3},
@@ -14,9 +14,9 @@
     "Connect breakfast": {"value": 45, "pct": 4},
     "Adults in circles": {"value": 593, "pct": 67},
     "Regular serving": {"value": 423, "pct": 48},
-    "Unique donors": {"value": 231, "pct": 22},
-    "New donors": {"value": 24, "pct": 10},
-    "Giving / person / week": {"value": 10, "total": 532578},
+    "Unique donors": {"value": 296, "pct": 28},
+    "New donors": {"value": 43, "pct": 15},
+    "Giving / person / week": {"value": 27, "total": 726183},
     "Starting Point": {"value": 15, "pct": 8}
   }
 }
