@@ -1,14 +1,14 @@
 {
   "_note": "Live + historical data for the Connections dashboard. Refreshed weekly (Tue 7am). 'attendance' + 'pco' are the live/current layer; 'history' is monthly year-over-year data read from the 'MCC Connection KPMs' Google Sheet (file 1muehaLqYXOx3F4TE-el_9_26thBF49vF1ilf1Q1xUNg) via the Google Drive connector. build_connections.py renders connections.html from this file.",
   "meta": {
-    "run_date": "July 2, 2026",
-    "run_weekday": "Thursday",
+    "run_date": "July 7, 2026",
+    "run_weekday": "Tuesday",
     "data_through": "June 28, 2026",
     "prev_month_num": 6,
     "prev_month_label": "June 2026",
     "history_through_month": 6,
     "history_through_label": "June 2026",
-    "pco_pulled_at": "July 2, 2026"
+    "pco_pulled_at": "July 7, 2026"
   },
   "attendance": {
     "_source": "Google Sheet '2026' tab, weekly total attendance (col B).",
@@ -413,7 +413,7 @@
         268,
         300,
         311,
-        null,
+        318,
         273,
         null,
         null,
