@@ -1,4 +1,206 @@
-<!DOCTYPE html>
+#!/usr/bin/env python3
+"""
+MCC Financials (Leadership) Dashboard renderer.
+
+Data source: MCC Data Warehouse (see CLAUDE.md DATA ARCHITECTURE). Reads the
+`observations` and `config` tabs through warehouse_reader -- the same single
+source of truth build_vitals.py / build_connections.py use. NO numbers are
+hand-edited in financials.html anymore; re-run this after the monthly QBO pull:
+
+    python3 build_financials.py
+
+Writes:
+  MCC/data/financials.json  -- structured data (annual + YTD income/expense, budgets)
+  MCC/financials.html       -- the leadership financial-health dashboard, numbers baked in
+
+── Where each number comes from ─────────────────────────────────────────────
+  * Monthly income / expense (all years) ... warehouse metric_ids op_income /
+        op_expense  (QBO cron writes the current year on the 16th; 2022-2025 were
+        backfilled 2026-07-05 from the legacy static.json history arrays).
+  * Personnel run-rate (payroll-spike note) ... warehouse metric_id
+        personnel_expense.
+  * 2026 annual giving budget ................ warehouse config key `annual_budget`.
+  * Cash on hand ............................. live.json `bank` minus config
+        `restricted_offset` (bank balance is still a live-pull value, not a
+        registry metric yet -- see WAREHOUSE-RUNBOOK "Still read at build time").
+  * Historical annual budget GOALS 2022-2025 . frozen reference constants below.
+        These are closed-year targets that never change (they are goals, not
+        observations). Mirrors how build_vitals.py keeps its goal thresholds in
+        code. Move them into the config tab if you prefer strict single-source.
+
+The script is warehouse-first with a safety net: if a prior year has no monthly
+op_income/op_expense rows in the warehouse (i.e. the monthly backfill didn't
+land), it falls back to the frozen FALLBACK_* arrays and prints a loud WARNING
+telling you to backfill those months. When the warehouse has the data (the
+expected state) the fallback is never touched.
+"""
+import json, os, datetime, statistics
+import warehouse_reader as wh
+
+BASE = os.path.dirname(os.path.abspath(__file__))
+YEARS = [2022, 2023, 2024, 2025, 2026]
+CUR_YEAR = YEARS[-1]
+MONTHS12 = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+MONTH_FULL = ["January", "February", "March", "April", "May", "June", "July",
+              "August", "September", "October", "November", "December"]
+
+INCOME_MID = "op_income"       # QBO "Total Revenue" (4xxx). Displayed as "giving received".
+EXPENSE_MID = "op_expense"     # QBO "Total Expenditures" (5xxx+6xxx, excl 8xxx).
+PERSONNEL_MID = "personnel_expense"
+
+# Frozen closed-year budget GOALS (targets set at the start of each year; never
+# change once the year closes). 2026 comes from the warehouse config tab.
+BUDGET_INCOME_HISTORY = {2022: 1203775, 2023: 1220300, 2024: 1482025, 2025: 1604875}
+
+DATA_NOTE = ("2022–2023 actuals include General Fund + Missions Fund "
+             "(excl. Pit Road). 2024–2026: General Fund only. "
+             "Source: PowerChurch (2022–2025), QuickBooks Online (2026).")
+
+# ── Safety-net fallback: frozen monthly history for closed years (from the
+#    legacy static.json this warehouse was backfilled from). Used ONLY if the
+#    warehouse has no monthly rows for a given prior year. ──────────────────────
+FALLBACK_INCOME = {
+    2022: [87163, 95988, 109900, 150004, 113555, 110814, 95557, 87095, 118557, 104098, 107596, 225857],
+    2023: [64824, 89895, 119128, 130114, 90236, 125297, 138285, 105685, 167928, 128029, 112626, 243665],
+    2024: [76299, 86725, 138867, 114826, 97422, 121975, 111852, 101834, 129043, 97945, 99601, 242301],
+    2025: [65693, 97362, 161385, 130448, 132355, 132973, 100146, 145551, 117019, 123389, 123635, 223569],
+}
+FALLBACK_EXPENSE = {
+    2022: [94382, 100727, 141604, 97031, 111113, 157223, 94621, 108767, 128289, 96490, 139379, 104951],
+    2023: [100898, 112560, 110885, 112667, 145223, 94965, 122961, 99505, 103231, 104863, 137802, 103735],
+    2024: [102264, 118014, 91828, 96847, 134588, 121862, 96511, 100754, 102729, 147714, 104708, 171347],
+    2025: [121234, 119485, 120650, 142802, 124219, 149949, 112898, 128108, 120214, 160439, 129052, 145528],
+}
+
+_warnings = []
+
+
+def _monthly_list(mid, year, fallback):
+    """Return a 12-slot list (Jan..Dec) of monthly values for `mid`/`year`,
+    using warehouse observations; falling back to the frozen array (closed years
+    only) if the warehouse has nothing for that year."""
+    m = wh.monthly(mid, year)  # {month_index: value}
+    if m:
+        return [m.get(i + 1) for i in range(12)]
+    if fallback and year in fallback:
+        _warnings.append(
+            "WARNING: no monthly '%s' rows in the warehouse for %d -- used frozen "
+            "fallback. Backfill via POST /warehouse/append (source "
+            "'backfill:static.json') so the warehouse is complete." % (mid, year))
+        return list(fallback[year])
+    return [None] * 12
+
+
+def _sum(vals, upto=None):
+    xs = [v for v in (vals[:upto] if upto else vals) if v is not None]
+    return round(sum(xs), 2) if xs else None
+
+
+def extract():
+    inc = {y: _monthly_list(INCOME_MID, y, FALLBACK_INCOME) for y in YEARS}
+    exp = {y: _monthly_list(EXPENSE_MID, y, FALLBACK_EXPENSE) for y in YEARS}
+    per = {y: _monthly_list(PERSONNEL_MID, y, None) for y in YEARS}
+
+    # Reporting month = the last month with a current-year income observation.
+    present = [i + 1 for i, v in enumerate(inc[CUR_YEAR]) if v is not None]
+    if not present:
+        raise SystemExit(
+            "ERROR: the warehouse has no %s rows for %d yet. Run the QBO pull "
+            "(POST /warehouse/pull {job:'qbo', month:'%d-MM'}) first." %
+            (INCOME_MID, CUR_YEAR, CUR_YEAR))
+    rm = max(present)                      # 1-based reporting month index
+    months_lbl = MONTHS12[:rm]
+
+    # Full-year actuals for closed (prior) years; YTD sum for the current year.
+    annual_income = {y: _sum(inc[y]) for y in YEARS[:-1]}
+    annual_expense = {y: _sum(exp[y]) for y in YEARS[:-1]}
+
+    # Period-matched Jan..reporting-month totals across all five years.
+    jan_income = {y: _sum(inc[y], upto=rm) for y in YEARS}
+    jan_expense = {y: _sum(exp[y], upto=rm) for y in YEARS}
+
+    ytd_income = [inc[CUR_YEAR][i] for i in range(rm)]
+    ytd_expense = [exp[CUR_YEAR][i] for i in range(rm)]
+
+    # Budgets: current year from config, closed years from frozen goals.
+    cfg = wh.config()
+    budget_2026 = cfg.get("annual_budget")
+    if budget_2026 is None:
+        _warnings.append("WARNING: config key 'annual_budget' missing -- 2026 "
+                         "budget card/table will show a gap.")
+    budget_income = dict(BUDGET_INCOME_HISTORY)
+    if budget_2026 is not None:
+        budget_income[CUR_YEAR] = round(budget_2026)
+
+    # Cash on hand = live bank balance minus restricted offset (both still live
+    # values per the runbook; restricted_offset lives in config).
+    cash = None
+    try:
+        with open(os.path.join(BASE, "data", "live.json")) as f:
+            live = json.load(f)
+        bank = live.get("bank")
+        restr = cfg.get("restricted_offset")
+        if bank is not None and restr is not None:
+            cash = round(bank - restr, 2)
+        elif bank is not None:
+            cash = round(bank, 2)
+            _warnings.append("WARNING: config 'restricted_offset' missing -- cash "
+                             "on hand shows the TOTAL bank balance, not unrestricted.")
+    except (OSError, ValueError):
+        _warnings.append("WARNING: data/live.json unreadable -- cash-on-hand card omitted.")
+
+    # Payroll-spike note (the recurring 3rd-paycheck month on a bi-weekly cycle),
+    # detected from personnel_expense instead of hard-coding "April".
+    payroll_note = _payroll_note(per[CUR_YEAR], rm)
+
+    return dict(
+        reporting_month=rm, months=months_lbl,
+        annual_income=annual_income, annual_expense=annual_expense,
+        jan_income=jan_income, jan_expense=jan_expense,
+        ytd_income=ytd_income, ytd_expense=ytd_expense,
+        budget_income=budget_income, cash_on_hand=cash,
+        payroll_note=payroll_note,
+        last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
+        generated=datetime.date.today().isoformat(),
+    )
+
+
+def _payroll_note(personnel, rm):
+    vals = [v for v in personnel[:rm] if v is not None]
+    if len(vals) < 3:
+        return ("Personnel is the largest single cost each month; watch the "
+                "monthly run-rate as the main lever on total spending.")
+    med = statistics.median(vals)
+    spikes = [i for i, v in enumerate(personnel[:rm])
+              if v is not None and v > med * 1.2]
+    normal = [v for i, v in enumerate(personnel[:rm])
+              if v is not None and i not in spikes]
+    lo, hi = (min(normal), max(normal)) if normal else (med, med)
+    rng = "%s–%s" % (_k(lo), _k(hi))
+    if spikes:
+        names = [MONTH_FULL[i] for i in spikes]
+        joined = names[0] if len(names) == 1 else (
+            " and ".join(names) if len(names) == 2 else
+            ", ".join(names[:-1]) + ", and " + names[-1])
+        verb = "was" if len(names) == 1 else "were"
+        return ("%s's higher cost total %s driven by a <strong>third payroll in "
+                "the month</strong> — a calendar artifact that occurs 2–3 "
+                "times a year on a bi-weekly pay schedule, not a new permanent "
+                "cost level. The normal monthly personnel run rate is about "
+                "<strong>%s per month</strong>." % (joined, verb, rng))
+    return ("Personnel is the biggest monthly cost; the run rate has held steady "
+            "at about <strong>%s per month</strong> so far this year." % rng)
+
+
+def _k(v):
+    return "$%s" % format(int(round(v / 1000.0) * 1000), ",")
+
+
+# ── HTML template (structure/CSS/chart JS identical to the hand-built
+#    financials.html; only the DATA constants and the payroll insight are now
+#    generated). Placeholders: __DATA_BLOCK__, __PAYROLL_NOTE__. ───────────────
+TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -104,18 +306,7 @@
 //  DATA -- generated by build_financials.py from the MCC Data Warehouse.
 //  Do NOT hand-edit. Re-run:  python3 build_financials.py
 // ==============================================================
-const annualIncome  = {2022:1406184,2023:1515712,2024:1418690,2025:1553525};
-const annualExpense = {2022:1374577,2023:1349295,2024:1389166,2025:1574578};
-const annualBudgetIncome  = {2022:1203775,2023:1220300,2024:1482025,2025:1604875,2026:1839800};
-const ytd2026Income  = [107451.1,108714.84,129496.25,178529.59,124018.04,142456.37];
-const ytd2026Expense = [147212.47,152827.55,153449.52,189917.69,147390.06,145839.12];
-const ytd2026Months  = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-const janAprIncome  = {2022:667424,2023:619494,2024:636114,2025:720216,2026:790666.19};
-const janAprExpense = {2022:702080,2023:677198,2024:665403,2025:778339,2026:936636.41};
-const LAST_UPDATED = "June 2026";
-const DATA_NOTE    = "2022\u20132023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024\u20132026: General Fund only. Source: PowerChurch (2022\u20132025), QuickBooks Online (2026).";
-const CASH_ON_HAND = 361053.88;
-const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.";
+__DATA_BLOCK__
 </script>
 
 <header class="mcc-header">
@@ -277,3 +468,67 @@ document.getElementById('summaryTable').innerHTML=sh;
 </script>
 </body>
 </html>
+"""
+
+
+def _js_obj(d):
+    return "{" + ",".join("%d:%s" % (k, _js_num(v)) for k, v in sorted(d.items())) + "}"
+
+
+def _js_arr(xs):
+    return "[" + ",".join(_js_num(v) for v in xs) + "]"
+
+
+def _js_num(v):
+    if v is None:
+        return "null"
+    return repr(round(v, 2)) if isinstance(v, float) and v != int(v) else str(int(round(v)))
+
+
+def data_block(d):
+    lines = [
+        "const annualIncome  = %s;" % _js_obj(d["annual_income"]),
+        "const annualExpense = %s;" % _js_obj(d["annual_expense"]),
+        "const annualBudgetIncome  = %s;" % _js_obj(d["budget_income"]),
+        "const ytd2026Income  = %s;" % _js_arr(d["ytd_income"]),
+        "const ytd2026Expense = %s;" % _js_arr(d["ytd_expense"]),
+        "const ytd2026Months  = %s;" % json.dumps(d["months"]),
+        "const janAprIncome  = %s;" % _js_obj(d["jan_income"]),
+        "const janAprExpense = %s;" % _js_obj(d["jan_expense"]),
+        "const LAST_UPDATED = %s;" % json.dumps(d["last_updated"]),
+        "const DATA_NOTE    = %s;" % json.dumps(DATA_NOTE),
+        "const CASH_ON_HAND = %s;" % _js_num(d["cash_on_hand"]),
+        "const PAYROLL_NOTE = %s;" % json.dumps(d["payroll_note"]),
+    ]
+    return "\n".join(lines)
+
+
+def render(d):
+    html = TEMPLATE.replace("__DATA_BLOCK__", data_block(d))
+    os.makedirs(os.path.join(BASE, "data"), exist_ok=True)
+    with open(os.path.join(BASE, "data", "financials.json"), "w") as f:
+        json.dump(d, f, indent=2)
+    with open(os.path.join(BASE, "financials.html"), "w") as f:
+        f.write(html)
+
+
+def main():
+    d = extract()
+    render(d)
+    m = MONTH_FULL[d["reporting_month"] - 1]
+    ytd_inc = _sum(d["ytd_income"])
+    ytd_exp = _sum(d["ytd_expense"])
+    print("Built financials.html + data/financials.json — data through %s %d" % (m, CUR_YEAR))
+    print("  YTD giving %s / costs %s / net %s"
+          % (ytd_inc, ytd_exp, round((ytd_inc or 0) - (ytd_exp or 0), 2)))
+    print("  annual giving (actual): " +
+          ", ".join("%d=%s" % (y, d["annual_income"][y]) for y in YEARS[:-1]))
+    print("  cash on hand: %s" % d["cash_on_hand"])
+    for w in _warnings:
+        print("  " + w)
+    if not _warnings:
+        print("  all values sourced from the warehouse (no fallbacks used).")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,64 @@
+{
+  "reporting_month": 6,
+  "months": [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun"
+  ],
+  "annual_income": {
+    "2022": 1406184,
+    "2023": 1515712,
+    "2024": 1418690,
+    "2025": 1553525
+  },
+  "annual_expense": {
+    "2022": 1374577,
+    "2023": 1349295,
+    "2024": 1389166,
+    "2025": 1574578
+  },
+  "jan_income": {
+    "2022": 667424,
+    "2023": 619494,
+    "2024": 636114,
+    "2025": 720216,
+    "2026": 790666.19
+  },
+  "jan_expense": {
+    "2022": 702080,
+    "2023": 677198,
+    "2024": 665403,
+    "2025": 778339,
+    "2026": 936636.41
+  },
+  "ytd_income": [
+    107451.1,
+    108714.84,
+    129496.25,
+    178529.59,
+    124018.04,
+    142456.37
+  ],
+  "ytd_expense": [
+    147212.47,
+    152827.55,
+    153449.52,
+    189917.69,
+    147390.06,
+    145839.12
+  ],
+  "budget_income": {
+    "2022": 1203775,
+    "2023": 1220300,
+    "2024": 1482025,
+    "2025": 1604875,
+    "2026": 1839800
+  },
+  "cash_on_hand": 361053.88,
+  "payroll_note": "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.",
+  "last_updated": "June 2026",
+  "generated": "2026-07-14"
+}
