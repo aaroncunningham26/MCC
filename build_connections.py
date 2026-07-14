@@ -2,22 +2,159 @@
 """
 MCC Connections dashboard renderer.
 
-Reads data/connections.json and writes connections.html.
+Data source: MCC Data Warehouse (see CLAUDE.md DATA ARCHITECTURE)
 
-Data layers:
-  attendance (weekly)  -- Google Sheet '2026' tab, weekly total attendance.
-  pco (live current)   -- Planning Center saved Lists (open-month snapshot).
-  history (monthly YoY)-- 'MCC Connection KPMs' Google Sheet, read via the Drive
-                          connector by the weekly refresh job.
+Reads the warehouse (observations tab, via warehouse_reader) and writes
+connections.html. The in-memory dict D built below reproduces the exact
+structure the legacy data/connections.json provided, so all rendering code
+is unchanged:
+  attendance (weekly)  -- att_weekly_total observations (one row per Sunday).
+  pco (current)        -- latest monthly warehouse snapshot of each PCO metric.
+  history (monthly YoY)-- monthly/annual observations, 2021-2026.
 
-Weekly job: overwrite data/connections.json, then run: python3 build_connections.py
+Weekly job: the warehouse feeds refresh automatically; just run
+  python3 build_connections.py
 """
-import json, os
-from datetime import datetime
+import json, os, sys
+from datetime import datetime, timedelta, date
+
+import warehouse_reader as wh
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(BASE, "data", "connections.json")) as f:
-    D = json.load(f)
+
+# ══════════════════════════════════════════════════════════════════════════
+# Data loading
+# Data source: MCC Data Warehouse (see CLAUDE.md DATA ARCHITECTURE)
+# ══════════════════════════════════════════════════════════════════════════
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June",
+               "July", "August", "September", "October", "November", "December"]
+
+def _int(v):
+    """Warehouse values arrive as floats; render whole numbers as ints."""
+    if v is None:
+        return None
+    f = float(v)
+    return int(round(f)) if abs(f - round(f)) < 1e-9 else f
+
+def _fmt_date(dt):
+    return "%s %d, %d" % (MONTH_NAMES[dt.month - 1], dt.day, dt.year)
+
+def _mlist(mid, year):
+    """12-item Jan..Dec list of monthly observations (None = not recorded)."""
+    mo = wh.monthly(mid, year)
+    return [_int(mo.get(m)) for m in range(1, 13)]
+
+def _ymap(mid, years):
+    return {str(y): _mlist(mid, y) for y in years}
+
+def _by_year(mid):
+    return {str(y): _int(v) for y, v in sorted(wh.annual(mid).items())}
+
+# Weekly attendance (att_weekly_total: one observation per 2026 Sunday)
+_weekly = [[d, _int(v)] for d, v in wh.weekly("att_weekly_total", 2026)]
+if not _weekly:
+    sys.exit("Warehouse has no att_weekly_total observations for 2026.")
+_last_dt = datetime.strptime(_weekly[-1][0], "%Y-%m-%d")
+
+# Previous fully-recorded month: if the latest Sunday is the last one of its
+# month (the next Sunday rolls into a new month), that month is complete;
+# otherwise the previous calendar month is the last complete one.
+_next = _last_dt + timedelta(days=7)
+if (_next.year, _next.month) != (_last_dt.year, _last_dt.month):
+    _pm_y, _pm = _last_dt.year, _last_dt.month
+elif _last_dt.month > 1:
+    _pm_y, _pm = _last_dt.year, _last_dt.month - 1
+else:
+    _pm_y, _pm = _last_dt.year - 1, 12
+
+# History cut-off = latest month with a recorded PCO monthly snapshot
+_prof_mo = wh.monthly("pco_active", 2026)
+_hist_m = max(_prof_mo) if _prof_mo else _pm
+
+# Current PCO roster values = latest monthly warehouse snapshot of each
+# metric (the monthly PCO pull; replaces the old live pull at build time).
+_PCO_MIDS = {
+    "active_profiles":  "pco_active",
+    "student_profiles": "pco_students",
+    "kid_profiles":     "pco_kids",
+    "households":       "pco_households",
+    "group_members":    "group_members",
+    "serving_sundays":  "serving_sundays",
+    "serving_anywhere": "serving_anywhere",
+    "kids_checkins":    "kids_checkins",
+    "student_checkins": "student_checkins",
+    "new_guests_month": "guests_new",      # latest monthly guest count
+    "starting_point":   "starting_point",  # latest annual/YTD count
+}
+_pco = {k: _int(wh.latest(mid)) for k, mid in _PCO_MIDS.items()}
+_missing = sorted(mid for k, mid in _PCO_MIDS.items() if _pco[k] is None)
+if _missing:
+    sys.exit("Warehouse has no observations for: %s" % ", ".join(_missing))
+
+# Groups & serving, 2026 monthly, with pct columns.
+# The pct formulas mirror the legacy 'MCC Connection KPMs' sheet exactly
+# (reverse-engineered from data/connections.json and the sheet's formulas):
+#   pct_in_circle = group_members / ACTIVE adult profiles (same month)
+#   pct_serving   = serving_anywhere / PRIOR-YEAR (2025) monthly average
+#                   weekly attendance. The sheet's '% Serving' column
+#                   (=K39/C3 ...) points at the 2025 attendance column, and
+#                   the published dashboard has always shown that number, so
+#                   it is reproduced faithfully here rather than "fixed".
+_gs_group = _mlist("group_members", 2026)
+_gs_sun   = _mlist("serving_sundays", 2026)
+_gs_any   = _mlist("serving_anywhere", 2026)
+_adults26 = _mlist("pco_adults", 2026)
+_att_2025 = _mlist("att_avg_weekly", 2025)
+
+def _pct(nums, dens):
+    return [round(n / d * 100) if (n is not None and d) else None
+            for n, d in zip(nums, dens)]
+
+_today = date.today()
+D = {
+    "meta": {
+        "run_date": _fmt_date(_today),
+        "run_weekday": _today.strftime("%A"),
+        "data_through": _fmt_date(_last_dt),
+        "prev_month_num": _pm,
+        "prev_month_label": "%s %d" % (MONTH_NAMES[_pm - 1], _pm_y),
+        "history_through_month": _hist_m,
+        "history_through_label": "%s 2026" % MONTH_NAMES[_hist_m - 1],
+        "pco_pulled_at": _fmt_date(_today),
+    },
+    "attendance": {"weekly": _weekly},
+    "pco": _pco,
+    "history": {
+        "attendance_monthly":        _ymap("att_avg_weekly", range(2021, 2027)),
+        "guests_monthly":            _ymap("guests_new", range(2021, 2027)),
+        "connect_breakfast_monthly": _ymap("connect_breakfast", range(2022, 2027)),
+        "kids_checkins_monthly":     _ymap("kids_checkins", range(2023, 2027)),
+        "student_checkins_monthly":  _ymap("student_checkins", range(2023, 2027)),
+        "baptisms_by_year":          _by_year("baptisms"),
+        "starting_point_by_year":    _by_year("starting_point"),
+        "groups_serving_2026": {
+            "group_members":    _gs_group,
+            "serving_sundays":  _gs_sun,
+            "serving_anywhere": _gs_any,
+            "pct_in_circle":    _pct(_gs_group, _adults26),
+            "pct_serving":      _pct(_gs_any, _att_2025),
+        },
+        # 2025 monthly group/serving history was never backfilled into the
+        # warehouse (the legacy KPM sheet only kept the 2025 yearly averages),
+        # so the 2025 reference averages remain hardcoded constants here.
+        "groups_serving_prioryear_avg": {
+            "2025": {"group_members": 536, "serving_sundays": 367,
+                     "serving_anywhere": 434}
+        },
+        "profile_monthly_2026": {
+            "active":     _mlist("pco_active", 2026),
+            "adults":     _adults26,
+            "students":   _mlist("pco_students", 2026),
+            "kids":       _mlist("pco_kids", 2026),
+            "households": _mlist("pco_households", 2026),
+        },
+    },
+}
 
 M = D["meta"]; P = D["pco"]; A = D["attendance"]; H = D["history"]
 RUN_DATE = M["run_date"]; DATA_THROUGH = M["data_through"]
