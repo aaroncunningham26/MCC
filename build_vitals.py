@@ -2,107 +2,150 @@
 """
 MCC Vitals Dashboard renderer.
 
-Reads the source-of-truth spreadsheet ...
-  Data Sheets/Data Source Sheets/MCC VITALS.xlsx  (tab: VITALS)
-... and writes:
+Data source: MCC Data Warehouse (see CLAUDE.md DATA ARCHITECTURE). Reads the
+`observations`, `metric_registry` and `config` tabs through warehouse_reader --
+the same single source of truth build_connections.py and build_dashboard.py use.
+Writes:
   MCC/data/vitals.json   -- structured data (years, metrics, values, pcts, through-week)
   MCC/vitals.html        -- the leadership dashboard, numbers baked in
 
-The VITALS tab lays each year out as two columns: a value column and a
-second column (percent for most metrics, per-person $ for Giving, YoY growth %
-for the attendance rows). Column pairs:
-   2022 D/E   2023 F/G   2024 H/I   2025 J/K   2026 L/M
-Row 26 col C holds the current "Thru Week #".
+Each metric maps to one warehouse metric_id (see METRICS below). Prior-year
+(2022-2025) values are the annual Dec-31 observations; the current year is the
+year-to-date figure. The dashboard's second column (percent / YoY growth /
+per-person $) is NOT stored in the warehouse -- it is COMPUTED here using the
+exact denominators the legacy MCC VITALS.xlsx used (recovered from that sheet's
+formulas); see `denom` on each metric.
 
-Monthly refresh: update the spreadsheet (or run build_vitals_pull.py to pull the
-current numbers from Planning Center), then run:  python3 build_vitals.py
+Monthly refresh: the warehouse feeds refresh automatically (PCO cron on the 2nd,
+QBO cron on the 16th, weekly attendance Apps Script). Just re-run:
+    python3 build_vitals.py
 """
 import json, os, datetime
-import openpyxl
+import warehouse_reader as wh
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-XLSX = os.path.normpath(os.path.join(
-    BASE, "..", "Data Sheets", "Data Source Sheets", "MCC VITALS.xlsx"))
 YEARS = [2022, 2023, 2024, 2025, 2026]
-VAL_COLS = {2022: 4, 2023: 6, 2024: 8, 2025: 10, 2026: 12}   # D F H J L
-PCT_COLS = {2022: 5, 2023: 7, 2024: 9, 2025: 11, 2026: 13}   # E G I K M
+CUR_YEAR = YEARS[-1]
+MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July",
+               "August", "September", "October", "November", "December"]
 
-# row -> metric definition. `pct_is` tells us what the 2nd column means.
+# Metric definitions. Warehouse mapping fields:
+#   mid    -- warehouse metric_id for the displayed value
+#   agg    -- how the annual value is derived from observations:
+#               "annual"  = Dec-31 annual row (current year = its YTD row)
+#               "ytd_avg" = average of the current year's monthly rows
+#                           (attendance/adults are stored monthly, not as one
+#                            YTD figure); prior years still use the Dec-31 row
+#               "ytd_sum" = sum of each year's monthly rows (count metrics)
+#   denom  -- how the 2nd column is computed (mirrors the old xlsx formulas):
+#               "growth"     = YoY % change of this metric
+#               "attendance" = value / avg attendance      (row 2)
+#               "adults"     = value / avg adults           (row 3)
+#               "unique"     = value / unique donors        (row 18)
+#               "visitors"   = value / Sunday visitors      (row 8)
+#               "dollar"     = per-person/week $ (stored give_per_person_week);
+#                              `totals_mid` supplies the annual giving total
 METRICS = [
     # Evangelism
-    dict(row=2,  group="evangelism",  name="Avg. attendance (in-person)", goal="Min. 5% growth",
-         type="growth", goalMin=5, isAvg=True,  pct_is="growth"),
-    dict(row=3,  group="evangelism",  name="Avg. adults (in-person)",     goal="Min. 5% growth",
-         type="growth", goalMin=5, isAvg=True,  pct_is="growth"),
-    dict(row=4,  group="evangelism",  name="Avg. students (in-person)",   goal="10%–15% of attendance",
-         type="range",  goalMin=10, goalMax=15, isAvg=True, pct_is="share"),
-    dict(row=5,  group="evangelism",  name="Avg. kids (in-person)",       goal="15%–25% of attendance",
-         type="range",  goalMin=15, goalMax=25, isAvg=True, pct_is="share"),
-    dict(row=6,  group="evangelism",  name="Avg. online attendance",      goal="25%–30% of attendance",
-         type="range",  goalMin=25, goalMax=30, isAvg=True, pct_is="share"),
-    dict(row=7,  group="evangelism",  name="Baptisms / POF",              goal="10% of attendance",
-         type="min",    goalMin=10, isAvg=False, pct_is="share"),
-    dict(row=8,  group="evangelism",  name="Sunday visitors",             goal="100% of attendance",
-         type="min",    goalMin=100, isAvg=False, pct_is="share"),
-    dict(row=9,  group="evangelism",  name="Connect breakfast",           goal="10% of attendance",
-         type="min",    goalMin=10, isAvg=False, pct_is="share"),
+    dict(group="evangelism",  name="Avg. attendance (in-person)", goal="Min. 5% growth",
+         type="growth", goalMin=5, isAvg=True,  mid="att_avg_weekly",  agg="ytd_avg", denom="growth"),
+    dict(group="evangelism",  name="Avg. adults (in-person)",     goal="Min. 5% growth",
+         type="growth", goalMin=5, isAvg=True,  mid="att_adults_avg",  agg="ytd_avg", denom="growth"),
+    dict(group="evangelism",  name="Avg. students (in-person)",   goal="10%–15% of attendance",
+         type="range",  goalMin=10, goalMax=15, isAvg=True,  mid="att_students_avg", agg="annual", denom="adults"),
+    dict(group="evangelism",  name="Avg. kids (in-person)",       goal="15%–25% of attendance",
+         type="range",  goalMin=15, goalMax=25, isAvg=True,  mid="att_kids_avg",   agg="annual", denom="attendance"),
+    dict(group="evangelism",  name="Avg. online attendance",      goal="25%–30% of attendance",
+         type="range",  goalMin=25, goalMax=30, isAvg=True,  mid="att_online_avg", agg="annual", denom="attendance"),
+    dict(group="evangelism",  name="Baptisms / POF",              goal="10% of attendance",
+         type="min",    goalMin=10, isAvg=False, mid="baptisms",       agg="annual", denom="attendance"),
+    dict(group="evangelism",  name="Sunday visitors",             goal="100% of attendance",
+         type="min",    goalMin=100, isAvg=False, mid="guests_new",    agg="ytd_sum", denom="attendance"),
+    dict(group="evangelism",  name="Connect breakfast",           goal="10% of attendance",
+         type="min",    goalMin=10, isAvg=False, mid="connect_breakfast", agg="ytd_sum", denom="attendance"),
     # Discipleship
-    dict(row=16, group="discipleship", name="Adults in circles",      goal="70% of adults",
-         type="min",   goalMin=70, isAvg=True,  pct_is="share"),
-    dict(row=17, group="discipleship", name="Regular serving",        goal="50% of attendance",
-         type="min",   goalMin=50, isAvg=True,  pct_is="share"),
-    dict(row=18, group="discipleship", name="Unique donors",          goal="40%–60% of attendance",
-         type="range", goalMin=40, goalMax=60, isAvg=True, pct_is="share"),
-    dict(row=19, group="discipleship", name="New donors",             goal="5%–10% of unique donors",
-         type="range", goalMin=5, goalMax=10, isAvg=False, pct_is="share"),
-    dict(row=20, group="discipleship", name="Giving / person / week",  goal="$25–$35 per person/week",
-         type="dollar", goalMin=25, goalMax=35, isAvg=False, pct_is="dollar"),
-    dict(row=21, group="discipleship", name="Starting Point",         goal="10% of guests",
-         type="min",   goalMin=10, isAvg=False, pct_is="share"),
+    dict(group="discipleship", name="Adults in circles",      goal="70% of adults",
+         type="min",   goalMin=70, isAvg=True,  mid="adults_in_circles_avg", agg="annual", denom="adults"),
+    dict(group="discipleship", name="Regular serving",        goal="50% of attendance",
+         type="min",   goalMin=50, isAvg=True,  mid="serving_regular_avg", agg="annual", denom="adults"),
+    dict(group="discipleship", name="Unique donors",          goal="40%–60% of attendance",
+         type="range", goalMin=40, goalMax=60, isAvg=True,  mid="donors_unique", agg="annual", denom="attendance"),
+    dict(group="discipleship", name="New donors",             goal="5%–10% of unique donors",
+         type="range", goalMin=5, goalMax=10, isAvg=False, mid="donors_new",   agg="annual", denom="unique"),
+    dict(group="discipleship", name="Giving / person / week",  goal="$25–$35 per person/week",
+         type="dollar", goalMin=25, goalMax=35, isAvg=False, mid="give_per_person_week",
+         totals_mid="giving_total", agg="annual", denom="dollar"),
+    dict(group="discipleship", name="Starting Point",         goal="10% of guests",
+         type="min",   goalMin=10, isAvg=False, mid="starting_point", agg="annual", denom="visitors"),
 ]
 
-def num(v):
-    if v is None: return None
-    if isinstance(v, str):
-        try: return float(v)
-        except ValueError: return None
-    return float(v)
+def _val_series(m):
+    """Return {year: raw value} for YEARS, per the metric's `agg` rule."""
+    mid, agg = m["mid"], m["agg"]
+    if agg == "ytd_sum":
+        out = {}
+        for y in YEARS:
+            vals = [v for v in wh.monthly(mid, y).values() if v is not None]
+            out[y] = sum(vals) if vals else None
+        return out
+    ann = wh.annual(mid)                       # {year: Dec-31 / current-year row}
+    out = {y: ann.get(y) for y in YEARS}
+    if agg == "ytd_avg":                        # current year = mean of monthly rows
+        vals = [v for v in wh.monthly(mid, CUR_YEAR).values() if v is not None]
+        out[CUR_YEAR] = (sum(vals) / len(vals)) if vals else None
+    return out
+
+def _round(v):
+    return None if v is None else round(v)
+
+def _pct(n, d):
+    return None if (n is None or not d) else round(n / d * 100)
 
 def extract():
-    wb = openpyxl.load_workbook(XLSX, data_only=True)
-    ws = wb["VITALS"]
-    # through-week
-    through_week = None
-    for r in range(1, ws.max_row + 1):
-        if str(ws.cell(r, 2).value or "").strip().startswith("Thru Week"):
-            through_week = int(num(ws.cell(r, 3).value) or 0); break
-    # close-of month from KPM Format tab
-    month = None
-    kf = wb["KPM Format"]
-    for row in kf.iter_rows():
-        for c in row:
-            if c.value and "close of" in str(c.value).lower():
-                month = str(kf.cell(c.row, c.column + 1).value or "").strip()
+    # Raw (unrounded) value series per metric, keyed by display name.
+    raw = {m["name"]: _val_series(m) for m in METRICS}
+    ATT  = raw["Avg. attendance (in-person)"]   # denominators use raw values,
+    ADU  = raw["Avg. adults (in-person)"]       # exactly as the old xlsx did
+    UNIQ = raw["Unique donors"]
+    VIS  = raw["Sunday visitors"]
+    denom_series = {"attendance": ATT, "adults": ADU, "unique": UNIQ, "visitors": VIS}
+
+    # Prior-year anchors for the two growth rows (2022 needs 2021).
+    growth_prior = {m["name"]: wh.annual(m["mid"]).get(YEARS[0] - 1)
+                    for m in METRICS if m["denom"] == "growth"}
+
     out = []
     for m in METRICS:
-        r = m["row"]
-        raw_val = {y: num(ws.cell(r, VAL_COLS[y]).value) for y in YEARS}
-        raw_pct = {y: num(ws.cell(r, PCT_COLS[y]).value) for y in YEARS}
-        if m["pct_is"] == "dollar":
-            # display value = per-person $ (2nd col); keep the total separately
-            values = [round(raw_pct[y]) if raw_pct[y] is not None else None for y in YEARS]
+        vser = raw[m["name"]]
+        values = [_round(vser.get(y)) for y in YEARS]
+        totals = None
+        if m["denom"] == "dollar":
             pcts = None
-            totals = [round(raw_val[y]) if raw_val[y] is not None else None for y in YEARS]
+            tser = wh.annual(m["totals_mid"])
+            totals = [_round(tser.get(y)) for y in YEARS]
+        elif m["denom"] == "growth":
+            prev = dict(vser); prev[YEARS[0] - 1] = growth_prior[m["name"]]
+            pcts = []
+            for y in YEARS:
+                cv, pv = vser.get(y), prev.get(y - 1)
+                pcts.append(round((cv / pv - 1) * 100) if (cv and pv) else None)
         else:
-            values = [round(raw_val[y]) if raw_val[y] is not None else None for y in YEARS]
-            pcts = [round(raw_pct[y] * 100) if raw_pct[y] is not None else None for y in YEARS]
-            totals = None
+            dser = denom_series[m["denom"]]
+            pcts = [_pct(vser.get(y), dser.get(y)) for y in YEARS]
         rec = dict(name=m["name"], goal=m["goal"], group=m["group"], type=m["type"],
                    goalMin=m["goalMin"], isAvg=m["isAvg"], values=values, pcts=pcts)
         if "goalMax" in m: rec["goalMax"] = m["goalMax"]
         if totals is not None: rec["totals"] = totals
         out.append(rec)
-    wb.close()
+
+    # Reporting window: last complete month = latest monthly attendance row;
+    # through-week = Sundays recorded on/before that month's end.
+    att_months = wh.monthly("att_avg_weekly", CUR_YEAR)
+    last_month = max(att_months) if att_months else None
+    month = MONTH_NAMES[last_month - 1] if last_month else None
+    weekly = wh.weekly("att_weekly_total", CUR_YEAR)
+    through_week = (sum(1 for d, _ in weekly if int(d[5:7]) <= last_month)
+                    if last_month else None) or None
     return out, through_week, month
 
 def get(metrics, name):
@@ -120,6 +163,7 @@ def build_insights(metrics):
     circ  = get(metrics, "Adults in circles")
     serv  = get(metrics, "Regular serving")
     stu   = get(metrics, "Avg. students (in-person)")
+    kid   = get(metrics, "Avg. kids (in-person)")
     don   = get(metrics, "Unique donors")
     bullets = []
     # 1. Attendance
@@ -127,11 +171,17 @@ def build_insights(metrics):
     hi = cur(att) >= prev_max
     g = curpct(att)
     lead = "the highest on record" if hi else "steady"
-    tail = (f"comfortably above the 5% growth goal." if g >= 5
-            else f"positive but under the 5% growth goal.")
+    # Phrase the YoY move by sign, and describe it relative to the 5% goal.
+    move = (f"up {g}% over 2025" if g > 0
+            else "flat versus 2025" if g == 0
+            else f"down {abs(g)}% from 2025")
+    tail = ("comfortably above the 5% growth goal." if g >= 5
+            else "positive but under the 5% growth goal." if g > 0
+            else "essentially flat against the 5% growth goal." if g == 0
+            else "a decline against the 5% growth goal.")
     bullets.append(("green" if g >= 5 else "amber",
         f"Weekend attendance is {lead} — <strong>{cur(att):,} average</strong> through the "
-        f"reporting window, up {g}% over 2025. Growth is {tail}"))
+        f"reporting window, {move}. Growth is {tail}"))
     # 2. Circles
     bullets.append(("green" if curpct(circ) >= circ["goalMin"] else "green",
         f"Adults in circles continues to climb — <strong>{cur(circ):,} adults ({curpct(circ)}%)</strong> "
@@ -154,13 +204,26 @@ def build_insights(metrics):
         f"Student ministry is the most concerning trend — average students has fallen from "
         f"<strong>{s24} in 2024 to {s26} in 2026</strong> ({p24}% → {p26}% of attendance), "
         f"consistently under the 10–15% goal and still declining."))
-    # 5. Donors
+    # 5. Kids
+    kv, kp = cur(kid), curpct(kid)
+    kpeak = max(v for v in kid["values"] if v is not None)
+    in_goal = kp is not None and kid["goalMin"] <= kp <= kid["goalMax"]
+    low_edge = in_goal and kp <= kid["goalMin"] + 3
+    kcolor = "green" if in_goal else "amber"
+    edge_note = (" — near the lower edge of the 15–25% goal" if low_edge
+                 else " — comfortably inside the 15–25% goal" if in_goal
+                 else " — outside the 15–25% goal")
+    bullets.append((kcolor,
+        f"Kids attendance is holding steady{edge_note}. <strong>{kv:,} average "
+        f"({kp}% of attendance)</strong> in 2026, after peaking at {kpeak}; the trend has "
+        f"leveled off, giving children's ministry a stable base to build on."))
+    # 6. Donors
     d22 = don["pcts"][0]
     bullets.append(("amber",
         f"Unique donors ({cur(don):,}, {curpct(don)}%) remain well below the 40–60% goal and have "
         f"contracted from {d22}% of attendance in 2022. Track this alongside the finance dashboard "
         f"as a long-term giving-health signal."))
-    # 6. Methodology note
+    # 7. Methodology note
     bullets.append(("blue",
         "Count-based metrics (visitors, baptisms, Connect Breakfast, giving) are year-to-date and "
         "should not be compared directly to prior full-year totals. Averages (attendance, serving, "
@@ -256,7 +319,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <body>
 <script>
 // ══════════════════════════════════════════════════════════════
-//  DATA — generated by build_vitals.py from MCC VITALS.xlsx. Do not hand-edit.
+//  DATA — generated by build_vitals.py from the MCC Data Warehouse. Do not hand-edit.
 // ══════════════════════════════════════════════════════════════
 const VITALS = __DATA__;
 const LAST_UPDATED = "__LAST_UPDATED__";
@@ -369,6 +432,7 @@ const snap = [
   { m: find('Adults in circles'),           label: 'Adults in circles',      extra: 'Goal: 70%' },
   { m: find('Regular serving'),             label: 'Regular serving',        extra: 'Goal: 50%' },
   { m: find('Avg. students (in-person)'),   label: 'Avg. students',          extra: 'Goal: 10–15% of attendance' },
+  { m: find('Avg. kids (in-person)'),       label: 'Avg. kids',              extra: 'Goal: 15–25% of attendance' },
 ];
 document.getElementById('snapshot-cards').innerHTML = snap.map(({m,label,extra}) => {
   const s = statusFor(m), pct = m.pcts ? m.pcts[CUR] : null;
@@ -472,36 +536,10 @@ def render(metrics, through_week, month):
         f.write(html)
     return data_through
 
-def apply_overlay(metrics, through_week, month):
-    """Merge data/2026-current.json (the monthly Planning Center pull) over the
-    current-year column. Leaves the frozen 2022-2025 history from the xlsx intact.
-    Overlay schema:
-      {"through_week": 30, "month": "July",
-       "metrics": {"<metric name>": {"value": <num>, "pct": <num|null>,
-                                     "total": <num, giving only>}, ...}}
-    Any metric not listed keeps its spreadsheet value (carry-forward)."""
-    path = os.path.join(BASE, "data", "2026-current.json")
-    if not os.path.exists(path):
-        return metrics, through_week, month, []
-    ov = json.load(open(path))
-    applied = []
-    for m in metrics:
-        o = ov.get("metrics", {}).get(m["name"])
-        if not o:
-            continue
-        if "value" in o and o["value"] is not None:
-            m["values"][-1] = o["value"]; applied.append(m["name"])
-        if "pct" in o and m.get("pcts") is not None:
-            m["pcts"][-1] = o["pct"]
-        if "total" in o and m.get("totals") is not None:
-            m["totals"][-1] = o["total"]
-    return metrics, ov.get("through_week", through_week), ov.get("month", month), applied
-
 def main():
+    # Current-year values come straight from the warehouse (its PCO/QBO/weekly
+    # feeds refresh automatically), so no legacy monthly overlay is applied.
     metrics, tw, month = extract()
-    metrics, tw, month, applied = apply_overlay(metrics, tw, month)
-    if applied:
-        print(f"Applied monthly overlay to: {', '.join(applied)}")
     dt = render(metrics, tw, month)
     print(f"Built vitals.html + data/vitals.json — data through {dt}")
     print(f"  {len(metrics)} metrics, through week {tw}, close of {month}")

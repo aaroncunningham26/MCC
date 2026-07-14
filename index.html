@@ -102,7 +102,7 @@
         <div class="card-meta">
           <div>
             <span class="badge badge-live">Live</span>
-            <div class="card-updated" style="margin-top:6px;">Updated through <span>April 2026</span></div>
+            <div class="card-updated" style="margin-top:6px;">Updated through <span id="fin-updated">April 2026</span></div>
           </div>
           <span class="btn btn-slate">View →</span>
         </div>
@@ -118,7 +118,7 @@
         <div class="card-meta">
           <div>
             <span class="badge badge-live">Live</span>
-            <div class="card-updated" style="margin-top:6px;">Updated through <span>April 2026</span></div>
+            <div class="card-updated" style="margin-top:6px;">Updated through <span id="vitals-updated">June 2026</span></div>
           </div>
           <span class="btn btn-slate">View →</span>
         </div>
@@ -150,5 +150,33 @@
   </div>
 
 </div>
+
+<script>
+// Keep each card's "Updated through" label in sync with its own dashboard, so
+// the index never drifts. Vitals reads data/vitals.json (written by
+// build_vitals.py); Financials reads the LAST_UPDATED constant in
+// financials.html (updated whenever that dashboard is refreshed). Both fail
+// silently, leaving the baked-in fallback text if a fetch can't complete.
+(function () {
+  fetch('data/vitals.json', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function (d) {
+      var yr = (d.generated || '').slice(0, 4) || (d.years && d.years.slice(-1)[0]) || '';
+      var el = document.getElementById('vitals-updated');
+      if (el && d.month) el.textContent = (d.month + ' ' + yr).trim();
+    })
+    .catch(function () {});
+
+  fetch('financials.html', { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : Promise.reject(); })
+    .then(function (html) {
+      var m = html.match(/LAST_UPDATED\s*=\s*['"]([^'"]+)['"]/);
+      var el = document.getElementById('fin-updated');
+      if (el && m) el.textContent = m[1];
+    })
+    .catch(function () {});
+})();
+</script>
+
 </body>
 </html>
