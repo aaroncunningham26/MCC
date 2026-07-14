@@ -32,11 +32,13 @@ MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July",
 # Metric definitions. Warehouse mapping fields:
 #   mid    -- warehouse metric_id for the displayed value
 #   agg    -- how the annual value is derived from observations:
-#               "annual"  = Dec-31 annual row (current year = its YTD row)
-#               "ytd_avg" = average of the current year's monthly rows
-#                           (attendance/adults are stored monthly, not as one
-#                            YTD figure); prior years still use the Dec-31 row
-#               "ytd_sum" = sum of each year's monthly rows (count metrics)
+#               "annual"      = single Dec-31 / current-year row (last wins;
+#                               used by metrics stored as one row per year)
+#               "yearly_mean" = mean of the year's monthly rows (attendance &
+#                               adults are stored as monthly averages, so the
+#                               annual figure must be averaged, never read off
+#                               the Dec-31 row, which is only December)
+#               "ytd_sum"     = sum of each year's monthly rows (count metrics)
 #   denom  -- how the 2nd column is computed (mirrors the old xlsx formulas):
 #               "growth"     = YoY % change of this metric
 #               "attendance" = value / avg attendance      (row 2)
@@ -48,9 +50,9 @@ MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July",
 METRICS = [
     # Evangelism
     dict(group="evangelism",  name="Avg. attendance (in-person)", goal="Min. 5% growth",
-         type="growth", goalMin=5, isAvg=True,  mid="att_avg_weekly",  agg="ytd_avg", denom="growth"),
+         type="growth", goalMin=5, isAvg=True,  mid="att_avg_weekly",  agg="yearly_mean", denom="growth"),
     dict(group="evangelism",  name="Avg. adults (in-person)",     goal="Min. 5% growth",
-         type="growth", goalMin=5, isAvg=True,  mid="att_adults_avg",  agg="ytd_avg", denom="growth"),
+         type="growth", goalMin=5, isAvg=True,  mid="att_adults_avg",  agg="yearly_mean", denom="growth"),
     dict(group="evangelism",  name="Avg. students (in-person)",   goal="10%–15% of attendance",
          type="range",  goalMin=10, goalMax=15, isAvg=True,  mid="att_students_avg", agg="annual", denom="adults"),
     dict(group="evangelism",  name="Avg. kids (in-person)",       goal="15%–25% of attendance",
@@ -79,21 +81,40 @@ METRICS = [
          type="min",   goalMin=10, isAvg=False, mid="starting_point", agg="annual", denom="visitors"),
 ]
 
+def _yearly_mean(mid, y):
+    """True annual average = mean of that year's monthly observations. For
+    att_avg_weekly / att_adults_avg the warehouse stores month-end monthly
+    averages (the Dec-31 row is DECEMBER's average, not the year's), so the
+    annual figure must be averaged across the year, never read off one row.
+    Years stored as a single annual row (e.g. adults 2022-2024) mean-of-one =
+    that value. Returns None if the year has no data."""
+    vals = [v for v in wh.monthly(mid, y).values() if v is not None]
+    return (sum(vals) / len(vals)) if vals else None
+
+def _same_period_growth(mid, y):
+    """YoY growth for a partial (current) year, compared apples-to-apples:
+    mean of the months recorded this year vs the SAME months last year."""
+    cur, prev = wh.monthly(mid, y), wh.monthly(mid, y - 1)
+    common = [m for m in cur if cur[m] is not None and prev.get(m) is not None]
+    if not common:
+        return None
+    cm = sum(cur[m] for m in common) / len(common)
+    pm = sum(prev[m] for m in common) / len(common)
+    return round((cm / pm - 1) * 100) if pm else None
+
 def _val_series(m):
     """Return {year: raw value} for YEARS, per the metric's `agg` rule."""
     mid, agg = m["mid"], m["agg"]
-    if agg == "ytd_sum":
+    if agg == "ytd_sum":                        # count metrics: sum the year's months
         out = {}
         for y in YEARS:
             vals = [v for v in wh.monthly(mid, y).values() if v is not None]
             out[y] = sum(vals) if vals else None
         return out
-    ann = wh.annual(mid)                       # {year: Dec-31 / current-year row}
-    out = {y: ann.get(y) for y in YEARS}
-    if agg == "ytd_avg":                        # current year = mean of monthly rows
-        vals = [v for v in wh.monthly(mid, CUR_YEAR).values() if v is not None]
-        out[CUR_YEAR] = (sum(vals) / len(vals)) if vals else None
-    return out
+    if agg == "yearly_mean":                    # attendance/adults: average the year
+        return {y: _yearly_mean(mid, y) for y in YEARS}
+    ann = wh.annual(mid)                        # {year: Dec-31 / current-year row}
+    return {y: ann.get(y) for y in YEARS}
 
 def _round(v):
     return None if v is None else round(v)
@@ -110,8 +131,8 @@ def extract():
     VIS  = raw["Sunday visitors"]
     denom_series = {"attendance": ATT, "adults": ADU, "unique": UNIQ, "visitors": VIS}
 
-    # Prior-year anchors for the two growth rows (2022 needs 2021).
-    growth_prior = {m["name"]: wh.annual(m["mid"]).get(YEARS[0] - 1)
+    # Prior-year anchors for the two growth rows (2022 needs 2021 — averaged).
+    growth_prior = {m["name"]: _yearly_mean(m["mid"], YEARS[0] - 1)
                     for m in METRICS if m["denom"] == "growth"}
 
     out = []
@@ -124,11 +145,16 @@ def extract():
             tser = wh.annual(m["totals_mid"])
             totals = [_round(tser.get(y)) for y in YEARS]
         elif m["denom"] == "growth":
+            # Full years: YoY of annual averages. Current (partial) year:
+            # same-period comparison so it's not distorted by the summer dip.
             prev = dict(vser); prev[YEARS[0] - 1] = growth_prior[m["name"]]
             pcts = []
             for y in YEARS:
-                cv, pv = vser.get(y), prev.get(y - 1)
-                pcts.append(round((cv / pv - 1) * 100) if (cv and pv) else None)
+                if y == CUR_YEAR:
+                    pcts.append(_same_period_growth(m["mid"], y))
+                else:
+                    cv, pv = vser.get(y), prev.get(y - 1)
+                    pcts.append(round((cv / pv - 1) * 100) if (cv and pv) else None)
         else:
             dser = denom_series[m["denom"]]
             pcts = [_pct(vser.get(y), dser.get(y)) for y in YEARS]
@@ -146,7 +172,20 @@ def extract():
     weekly = wh.weekly("att_weekly_total", CUR_YEAR)
     through_week = (sum(1 for d, _ in weekly if int(d[5:7]) <= last_month)
                     if last_month else None) or None
-    return out, through_week, month
+
+    # Chart data: monthly weekly-attendance average by year (Jan..Dec, None =
+    # not yet recorded). Powers the seasonality curve + 12-month rolling avg.
+    hist_start = YEARS[0] - 2                    # a little pre-history for context
+    att_monthly = {str(y): [_round(wh.monthly("att_avg_weekly", y).get(mo))
+                            for mo in range(1, 13)]
+                   for y in range(hist_start, CUR_YEAR + 1)}
+    charts = {
+        "att_monthly": att_monthly,
+        "cur_year": CUR_YEAR,
+        "ytd_month_index": last_month,           # months of the current year in view
+        "ytd_label": ("Jan–%s" % month) if month else None,
+    }
+    return out, through_week, month, charts
 
 def get(metrics, name):
     for m in metrics:
@@ -355,7 +394,7 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
   <div class="section-label">Attendance trends</div>
   <div class="chart-card">
     <h2>Average weekly attendance — 2022 to 2026</h2>
-    <p class="chart-sub">In-person total and online attendance each year. 2026 figures are averages through __THROUGH_SHORT__.</p>
+    <p class="chart-sub">Full-year averages for 2022&ndash;2025; 2026 is the year-to-date average through __THROUGH_SHORT__. The growth % for 2026 compares __YTD_LABEL__ 2026 with the same months of 2025 (same-period, apples-to-apples) — not against the full prior year.</p>
     <div class="legend">
       <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>In-person (total)</span>
       <span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>Online</span>
@@ -364,14 +403,27 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
   </div>
 
   <div class="chart-card">
-    <h2>In-person breakdown by group</h2>
-    <p class="chart-sub">Average weekly adults, students, and kids — each group's contribution to in-person attendance over time.</p>
+    <h2>Seasonality — monthly attendance by year</h2>
+    <p class="chart-sub">Average weekly attendance in each month, one line per year. The overlay reveals the seasonal shape (spring peak, summer dip, fall recovery) and shows at a glance whether 2026 is tracking above or below recent years.</p>
+    <div class="chart-wrap" style="height:270px;"><canvas id="seasonalityChart" role="img" aria-label="Monthly attendance by year"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h2>Underlying trajectory — 12-month rolling average</h2>
+    <p class="chart-sub">Each point is the trailing 12-month average weekly attendance. Averaging a full year at every step cancels out seasonality and one-off weeks, leaving the true direction of travel.</p>
+    <div class="chart-wrap" style="height:220px;"><canvas id="rollingChart" role="img" aria-label="Trailing 12-month rolling average attendance"></canvas></div>
+  </div>
+
+  <div class="chart-card">
+    <h2>In-person composition by group</h2>
+    <p class="chart-sub">Average weekly adults, students, kids, and online — each group's contribution to total reach over time, so you can see where attendance is coming from.</p>
     <div class="legend">
       <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Adults</span>
       <span class="legend-item"><span class="legend-dot" style="background:#2F8F5B;"></span>Kids</span>
       <span class="legend-item"><span class="legend-dot" style="background:#DC2626;"></span>Students</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>Online</span>
     </div>
-    <div class="chart-wrap" style="height:220px;"><canvas id="breakdownChart" role="img" aria-label="In-person breakdown adults students kids 2022 to 2026"></canvas></div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="breakdownChart" role="img" aria-label="In-person composition adults students kids online 2022 to 2026"></canvas></div>
   </div>
 
   <div class="section-divider"><h2>Evangelism vitals</h2><span class="badge">Outreach &amp; growth</span></div>
@@ -492,11 +544,62 @@ new Chart(document.getElementById('breakdownChart'), {
   data: { labels, datasets: [
     { label: 'Adults',   data: vals('Avg. adults (in-person)'),   backgroundColor: '#343A44' },
     { label: 'Kids',     data: vals('Avg. kids (in-person)'),     backgroundColor: '#2F8F5B' },
-    { label: 'Students', data: vals('Avg. students (in-person)'), backgroundColor: '#DC2626', borderRadius: 4 } ] },
+    { label: 'Students', data: vals('Avg. students (in-person)'), backgroundColor: '#DC2626' },
+    { label: 'Online',   data: vals('Avg. online attendance'),    backgroundColor: '#8899AA', borderRadius: 4 } ] },
   options: { responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false }, tooltip: { mode: 'index' } },
     scales: { x: { stacked: true, grid: { display: false }, ticks: { color: '#9CA3AF' } }, y: { stacked: true, grid: { color: gc }, ticks: { color: '#9CA3AF' }, min: 0 } } }
 });
+
+// Seasonality — monthly average weekly attendance, one line per recent year.
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const attMonthly = (VITALS.charts && VITALS.charts.att_monthly) || {};
+const allYears = Object.keys(attMonthly).map(Number).sort((a,b) => a - b);
+const curYear = (VITALS.charts && VITALS.charts.cur_year) || YEARS[YEARS.length - 1];
+const recentYears = allYears.filter(y => y >= curYear - 3);
+const seasonShades = ['#C9CED6','#9AA3B0','#5B6472'];  // older → newer (non-current)
+const seasonDatasets = recentYears.map((y, i) => {
+  const isCur = (y === curYear);
+  return { label: String(y), data: attMonthly[String(y)],
+    borderColor: isCur ? '#2F8F5B' : (seasonShades[i] || '#9AA3B0'),
+    backgroundColor: 'transparent', borderWidth: isCur ? 3 : 2,
+    pointRadius: isCur ? 3 : 0, tension: 0.35, spanGaps: true };
+});
+new Chart(document.getElementById('seasonalityChart'), {
+  type: 'line',
+  data: { labels: MON, datasets: seasonDatasets },
+  options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 12, usePointStyle: true, color: '#6b7280' } },
+      tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + (ctx.raw == null ? '—' : ctx.raw) } } },
+    scales: { x: { grid: { display: false }, ticks: { color: '#9CA3AF' } },
+      y: { grid: { color: gc }, ticks: { color: '#9CA3AF' } } } }
+});
+
+// 12-month rolling average — trailing-12 mean over the full monthly timeline.
+(function () {
+  const flat = [];
+  allYears.forEach(y => (attMonthly[String(y)] || []).forEach((v, mi) => {
+    flat.push({ label: MON[mi] + " '" + String(y).slice(2), v: v });
+  }));
+  const pts = [], lbls = [];
+  for (let i = 11; i < flat.length; i++) {
+    const win = flat.slice(i - 11, i + 1);
+    if (win.every(p => p.v !== null && p.v !== undefined)) {
+      pts.push(Math.round(win.reduce((s, p) => s + p.v, 0) / 12));
+      lbls.push(flat[i].label);
+    }
+  }
+  new Chart(document.getElementById('rollingChart'), {
+    type: 'line',
+    data: { labels: lbls, datasets: [{ label: '12-mo rolling avg', data: pts,
+      borderColor: '#343A44', backgroundColor: 'rgba(52,58,68,0.06)', borderWidth: 2.5,
+      pointRadius: 0, tension: 0.3, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.raw } } },
+      scales: { x: { grid: { display: false }, ticks: { color: '#9CA3AF', maxTicksLimit: 8, autoSkip: true } },
+        y: { grid: { color: gc }, ticks: { color: '#9CA3AF' } } } }
+  });
+})();
 new Chart(document.getElementById('discipleshipChart'), {
   type: 'line',
   data: { labels, datasets: [
@@ -513,12 +616,14 @@ new Chart(document.getElementById('discipleshipChart'), {
 </html>
 """
 
-def render(metrics, through_week, month):
+def render(metrics, through_week, month, charts=None):
     data = {"years": YEARS, "through_week": through_week, "month": month,
-            "generated": datetime.date.today().isoformat(), "metrics": metrics}
+            "generated": datetime.date.today().isoformat(), "metrics": metrics,
+            "charts": charts or {}}
     through_short = f"Week {through_week}" if through_week else month
     data_through = f"Week {through_week} · {month} 2026" if through_week else f"{month} 2026"
     last_updated = f"Week {through_week} ({month} 2026)" if through_week else f"{month} 2026"
+    ytd_label = (charts or {}).get("ytd_label") or f"Jan–{month}"
     insights = build_insights(metrics)
     ins_html = "".join(
         f'<li><span class="dot dot-{c}"></span><span>{t}</span></li>' for c, t in insights)
@@ -528,6 +633,7 @@ def render(metrics, through_week, month):
         .replace("__DATA_THROUGH_PLAIN__", data_through.replace(" · ", ", "))
         .replace("__DATA_THROUGH__", data_through)
         .replace("__THROUGH_SHORT__", through_short)
+        .replace("__YTD_LABEL__", ytd_label)
         .replace("__INSIGHTS__", ins_html))
     os.makedirs(os.path.join(BASE, "data"), exist_ok=True)
     with open(os.path.join(BASE, "data", "vitals.json"), "w") as f:
@@ -539,8 +645,8 @@ def render(metrics, through_week, month):
 def main():
     # Current-year values come straight from the warehouse (its PCO/QBO/weekly
     # feeds refresh automatically), so no legacy monthly overlay is applied.
-    metrics, tw, month = extract()
-    dt = render(metrics, tw, month)
+    metrics, tw, month, charts = extract()
+    dt = render(metrics, tw, month, charts)
     print(f"Built vitals.html + data/vitals.json — data through {dt}")
     print(f"  {len(metrics)} metrics, through week {tw}, close of {month}")
 
