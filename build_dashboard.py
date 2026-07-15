@@ -163,16 +163,16 @@ else:
         "Operating expenses are %s vs 2025 (Jan&ndash;%s), in line with or below giving growth (%s) &mdash; costs are not outrunning receipts."
         % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
 
-# --- Personnel as % of annual budget (45-55% guideline) ---
+# --- Personnel as % of annual budget: 45-55% steady-state, 55-60% growth-investment band, >60% ceiling ---
 if pers_pct > 60:
-    add("red","Concern","Personnel well above guideline",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; well above the 45&ndash;55%% range, a structural pressure on the operating budget." % pers_pct)
+    add("red","Concern","Personnel above growth ceiling",
+        "Personnel annualizes to ~%.0f%% of budget &mdash; above the 60%% ceiling set for the growth season (steady-state guideline is 45&ndash;55%%). Even staffing ahead of growth, this is a structural pressure; watch that giving follows and reserves can fund the gap." % pers_pct)
 elif pers_pct > 55:
-    add("amber","Watch","Personnel above guideline",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; just above the 45&ndash;55%% range. Watch payroll/benefit-heavy months that lift the run-rate." % pers_pct)
+    add("amber","Watch","Personnel elevated &mdash; growth investment",
+        "Personnel annualizes to ~%.0f%% of budget &mdash; within the 55&ndash;60%% growth-investment band, above the 45&ndash;55%% steady-state guideline. Expected while staffing ahead of growth; watch that giving and attendance follow." % pers_pct)
 elif pers_pct >= 45:
     add("green","Strength","Personnel within guideline",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; inside the 45&ndash;55%% healthy range." % pers_pct)
+        "Personnel annualizes to ~%.0f%% of budget &mdash; inside the 45&ndash;55%% steady-state range." % pers_pct)
 else:
     add("green","Strength","Personnel below guideline",
         "Personnel annualizes to ~%.0f%% of budget &mdash; below the 45&ndash;55%% range, leaving room in the staffing envelope." % pers_pct)
