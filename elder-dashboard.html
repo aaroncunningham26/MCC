@@ -191,6 +191,8 @@ html { scroll-behavior: smooth; }
 .content .page { max-width: none; margin: 0; padding: 6px 0 24px; }
 .section-label, .section-divider, .group-anchor { scroll-margin-top: 16px; }
 .group-anchor { height: 0; overflow: hidden; }
+.dash-title { font-size: 30px; font-weight: 900; text-transform: uppercase; letter-spacing: -.02em; color: var(--slate); margin: 14px 0 2px; padding-bottom: 10px; border-bottom: 3px solid var(--slate); }
+.dash:first-child .dash-title { margin-top: 4px; }
 @media (max-width: 900px) {
   .shell { flex-direction: column; }
   .sidebar { position: static; width: auto; flex: none; height: auto; overflow: visible; border-right: none; border-bottom: 1px solid var(--line); padding: 14px 20px; }
@@ -240,6 +242,7 @@ html { scroll-behavior: smooth; }
   </nav>
   <main class="content">
     <section class="dash"><div class="group-anchor" id="grp-financials"></div><span id="hdr-date" style="display:none"></span>
+    <h2 class="dash-title">Financials</h2>
 <div class="page">
 
   <div class="section-label" id="fin-sec-1">2026 Year-to-Date Snapshot (January &ndash; <span class="hdr-month"></span>)</div>
@@ -340,6 +343,7 @@ html { scroll-behavior: smooth; }
 
     </section>
     <section class="dash"><div class="group-anchor" id="grp-vitals"></div>
+    <h2 class="dash-title">Vitals</h2>
 <div class="page">
   <div class="section-label" id="vit-sec-1">2026 at a glance</div>
   <div class="cards" id="vit-snapshot-cards"></div>
