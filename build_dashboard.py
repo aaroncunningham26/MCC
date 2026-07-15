@@ -274,10 +274,11 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 <div class="wrap">
 
 <section>
-  <div class="grid g4">
+  <div class="grid g5">
     <div class="card"><div class="kpi-l">Last Week's Giving</div><div class="kpi-n">{d(last_week_giving)}</div><div class="kpi-s">Week of {WEEK_LABEL} &middot; QBO 4100</div></div>
     <div class="card"><div class="kpi-l">{RMONTH} Giving</div><div class="kpi-n">{d(current_giving)}</div><div class="kpi-s">Month to date (through {DATA_THROUGH})</div></div>
     <div class="card"><div class="kpi-l">YTD Giving</div><div class="kpi-n">{d(ytd_giving)}</div><div class="kpi-s">Jan&ndash;{RMONTH} &middot; sum of 4100</div></div>
+    <div class="card"><div class="kpi-l">YTD Operating Income</div><div class="kpi-n">{d(ytd_opinc)}</div><div class="kpi-s">Jan&ndash;{RMONTH} &middot; total operating revenue</div></div>
     <div class="card"><div class="kpi-l">Bank Balance</div><div class="kpi-n">{d(bank)}</div><div class="kpi-s">Unrestricted: {d(unrestricted)} &middot; {months_cash:.1f} mo. cash</div></div>
   </div>
 </section>
