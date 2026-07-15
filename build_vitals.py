@@ -317,19 +317,14 @@ TEMPLATE = r"""<!DOCTYPE html>
   .insights ul li:last-child { border-bottom: none; }
   .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
   .dot-green { background: var(--green); } .dot-red { background: var(--red); } .dot-amber { background: var(--amber); } .dot-blue { background: var(--slate); }
-  .funnel-wrap { display: flex; align-items: stretch; gap: 0; }
+  .funnel-wrap { display: flex; align-items: stretch; gap: 12px; }
   .funnel-step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
-  .funnel-step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--line); z-index: 1; }
   .funnel-box { width: 100%; background: #F4F5F7; border: 1px solid var(--line); border-radius: 10px; padding: 16px 10px; }
-  .funnel-step:nth-child(2) .funnel-box { background: #F0FBF5; border-color: #B6DCCA; }
-  .funnel-step:nth-child(3) .funnel-box { background: #FDF5EC; border-color: #E8C99A; }
-  .funnel-step:nth-child(4) .funnel-box { background: #F4F5F7; border-color: var(--line); }
   .funnel-num { font-size: 26px; font-weight: 900; color: var(--slate); letter-spacing: -0.5px; }
   .funnel-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); margin-top: 4px; }
   .funnel-conv { font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
   .funnel-conv strong { color: var(--ink); }
-  @media (max-width: 600px) { .funnel-wrap { flex-direction: column; gap: 8px; }
-    .funnel-step:not(:last-child)::after { content: '↓'; right: auto; top: auto; bottom: -16px; left: 50%; transform: translateX(-50%); } }
+  @media (max-width: 600px) { .funnel-wrap { flex-direction: column; gap: 8px; } }
   .chart-card { background: var(--card); border-radius: 10px; padding: 22px 22px 18px; border: 1px solid var(--line); margin-bottom: 14px; box-shadow: 0 1px 4px rgba(20,30,60,.05); }
   .chart-card h2 { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; color: var(--slate); margin-bottom: 4px; }
   .chart-card .chart-sub { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
@@ -448,12 +443,12 @@ const discipleship = VITALS.metrics.filter(m => m.group === "discipleship");
     <div class="chart-wrap" style="height:220px;"><canvas id="discipleshipChart" role="img" aria-label="Adults in circles and regular serving percentage trend"></canvas></div>
   </div>
 
-  <div class="section-label" style="margin-top: 28px;">Next steps funnel — 2026 YTD</div>
+  <div class="section-label" style="margin-top: 28px;">Next steps milestones — 2026 YTD</div>
   <div class="chart-card">
-    <h2>How people move from visitor to engaged disciple</h2>
-    <p class="chart-sub">Each stage shows the YTD count for 2026 and the conversion rate from the previous step. Count metrics are through __THROUGH_SHORT__.</p>
+    <h2>Key next-steps milestones — each vs. its own goal</h2>
+    <p class="chart-sub">The stages of a disciple's journey — visitor, Connect Breakfast, Starting Point, a circle. Each card shows the 2026 figure and how it's tracking against <strong>its own goal</strong>. These milestones are related but measured independently; they don't convert directly one to the next.</p>
     <div class="funnel-wrap" id="funnel-wrap"></div>
-    <p style="font-size:11px; color:var(--muted); margin-top:16px;">† YTD counts through __THROUGH_SHORT__. Adults in circles is a point-in-time average, not a cumulative count — conversion shown vs. Starting Point completers is directional only.</p>
+    <p style="font-size:11px; color:var(--muted); margin-top:16px;">Visitors, Connect Breakfast, and Starting Point are YTD counts through __THROUGH_SHORT__; Adults in circles is a point-in-time average. Each percentage is measured against that metric's own goal (shown on the card), not against another stage.</p>
   </div>
 
   <div class="mcc-footer">
@@ -510,19 +505,29 @@ function buildTable(metrics, id) {
 buildTable(evangelism, 'evangelismTable');
 buildTable(discipleship, 'discipleshipTable');
 
-// Funnel
+// Next-steps milestones — each measured against its OWN goal, not as a
+// conversion from the previous step (these stages are related but tracked
+// independently and don't convert directly one to the next).
 (function() {
-  const v = n => find(n).values[CUR];
-  const visitors = v('Sunday visitors'), cb = v('Connect breakfast'), sp = v('Starting Point'), ic = v('Adults in circles');
-  const c1 = Math.round(cb / visitors * 100), c2 = Math.round(sp / cb * 100);
+  const STATUS_COLOR = { green: '#2F8F5B', yellow: '#C8842A', red: '#DC2626', gray: '#6b7280' };
   const steps = [
-    { num: visitors, label: 'Sunday Visitors', conv: 'Starting point — guests who attended a service', color: '#343A44' },
-    { num: cb, label: 'Connect Breakfast', conv: `<strong>${c1}%</strong> of visitors attended Connect Breakfast`, color: '#2F8F5B' },
-    { num: sp, label: 'Starting Point', conv: `<strong>${c2}%</strong> of Connect Breakfast attendees completed Starting Point`, color: '#C8842A' },
-    { num: ic, label: 'Adults in Circles', conv: `<strong>${ic.toLocaleString()}</strong> adults currently in a circle (avg) — the ultimate discipleship goal`, color: '#4C5564' }
+    { name: 'Sunday visitors',   label: 'Sunday Visitors' },
+    { name: 'Connect breakfast', label: 'Connect Breakfast' },
+    { name: 'Starting Point',    label: 'Starting Point' },
+    { name: 'Adults in circles', label: 'Adults in Circles' },
   ];
-  document.getElementById('funnel-wrap').innerHTML = steps.map(s =>
-    `<div class="funnel-step"><div class="funnel-box"><div class="funnel-num" style="color:${s.color}">${s.num.toLocaleString()}</div><div class="funnel-label">${s.label}</div><div class="funnel-conv">${s.conv}</div></div></div>`).join('');
+  document.getElementById('funnel-wrap').innerHTML = steps.map(({ name, label }) => {
+    const m = find(name), s = statusFor(m), col = STATUS_COLOR[s];
+    const pct = m.pcts ? m.pcts[CUR] : null;
+    const standing = (pct !== null && pct !== undefined)
+      ? `<strong style="color:${col}">${pct}%</strong> · ${statusLabel(s)}`
+      : statusLabel(s);
+    return `<div class="funnel-step"><div class="funnel-box" style="border-top:4px solid ${col}">`
+      + `<div class="funnel-num">${fmtVal(m, CUR)}</div>`
+      + `<div class="funnel-label">${label}</div>`
+      + `<div class="funnel-conv">${standing}<br><span style="color:#9CA3AF">Goal: ${m.goal}</span></div>`
+      + `</div></div>`;
+  }).join('');
 })();
 
 // Charts
