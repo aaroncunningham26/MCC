@@ -108,30 +108,130 @@ first2 = round(sum(net_closed[:2])/2,2) if n_closed>=2 else net_closed[0]
 last_closed_net = net_closed[-1]
 best_closed_net = max(net_closed)
 
-# ---- Insights (regenerated every run from this run's numbers) ----
-insights = [
- ("red","Concern","Expenses outpacing giving",
-  "Operating expenses are up ~%.0f%% vs 2025 (Jan&ndash;%s) while operating income is up only ~%.0f%% &mdash; the gap is driving a year-to-date operating deficit of about %s through %s."
-   % (exp_yoy, MONTHS12[n_closed-1], giv_yoy, d(ytd_net_closed), MONTHS12[n_closed-1])),
- ("amber","Watch","Giving running behind budget",
-  "Average weekly giving is %s vs the %s/week budget (%.0f%% of pace) &mdash; about %s/week behind. YTD giving %s vs a %s budgeted pace."
-   % (d(avg_wk_giving), d(WEEKLY_BUDGET), avg_wk_giving/WEEKLY_BUDGET*100, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget))),
- ("green","Strength","Operating deficit narrowed",
-  "The monthly operating shortfall improved from about %s early in the year to %s at its best; the most recent closed month was %s, so the trend is improving but not yet steady."
-   % (d(first2), d(best_closed_net), d(last_closed_net))),
- ("amber","Watch","Personnel above guideline",
-  "Personnel is tracking ~%.0f%% of the annual budget (annualized) &mdash; above the 45&ndash;55%% guideline. Watch for outsized payroll/benefits months that lift the run-rate." % pers_pct),
- ("green","Strength","Facilities in healthy range",
-  "Facilities costs annualize to ~%.0f%% of budget, squarely inside the 15&ndash;25%% guideline." % fac_pct),
- ("amber","Watch","Lean cash runway",
-  "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, under the 3-month target. Note total bank (%s) includes ~%s of designated/restricted funds."
-   % (d(unrestricted), months_cash, d(bank), d(RESTR))),
- ("amber","Watch","Committed base eased slightly",
-  "Retention is %.1f%% (%d of %d prior committed units retained), but %d lapsed vs %d newly committed &mdash; a net change of %d, easing the committed base from %d to %d. Participation is %.0f%% of households."
-   % (retention, retained, prior_committed, lapsed, newly, newly-lapsed, prior_committed, committed, participation)),
- ("green","Strength","Seasonality on track",
-  "Summer giving typically dips (Jun&ndash;Aug) before the December year-end surge &mdash; current softness is consistent with the normal calendar, not a structural decline."),
-]
+# ---- Insights engine: each rule reads THIS run's numbers, sets its own
+#      severity (green/amber/red) from thresholds, and only surfaces the
+#      framing the data supports. Sorted most-urgent first. ----
+net_committed = newly - lapsed
+def _dir(x, pos, neg):        # directional word by sign
+    return pos if x >= 0 else neg
+def _pct(x):                  # "up ~12%" / "down ~3%"
+    return ("up ~%.0f%%" % x) if x >= 0 else ("down ~%.0f%%" % abs(x))
+
+insights = []
+def add(sev, label, title, body):
+    insights.append((sev, label, title, body))
+
+# --- Giving vs budget pace ---
+if budget_pct >= 100:
+    add("green","Strength","Giving at or above budget",
+        "Average weekly giving is %s vs the %s/week budget (%.0f%% of pace) &mdash; about %s/week ahead. YTD giving %s vs a %s budgeted pace."
+        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget)))
+elif budget_pct >= 90:
+    add("amber","Watch","Giving slightly behind budget",
+        "Average weekly giving is %s vs the %s/week budget (%.0f%% of pace) &mdash; about %s/week behind. YTD giving %s vs a %s budgeted pace."
+        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget)))
+else:
+    add("red","Concern","Giving behind budget",
+        "Average weekly giving is %s vs the %s/week budget (only %.0f%% of pace) &mdash; about %s/week behind. YTD giving %s trails the %s budgeted pace by %s."
+        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget), d(abs(budget_var))))
+
+# --- Operating surplus / deficit (closed months, apples-to-apples) ---
+if ytd_net_closed >= 0:
+    add("green","Strength","Operating surplus year-to-date",
+        "Through %s, operating income exceeds expense by %s across closed months; the most recent closed month netted %s."
+        % (MONTHS12[n_closed-1], d(ytd_net_closed), d(last_closed_net)))
+elif last_closed_net >= first2:
+    add("amber","Watch","Operating deficit, narrowing",
+        "Closed months show a YTD operating deficit of %s, but the monthly shortfall improved from about %s early on to %s most recently &mdash; trending the right way, not yet in the black."
+        % (d(ytd_net_closed), d(first2), d(last_closed_net)))
+else:
+    add("red","Concern","Operating deficit widening",
+        "Closed months show a YTD operating deficit of %s, and the monthly shortfall has worsened from about %s early on to %s most recently."
+        % (d(ytd_net_closed), d(first2), d(last_closed_net)))
+
+# --- Expense growth vs giving growth (YoY, closed months) ---
+if exp_yoy - giv_yoy >= 8:
+    add("red","Concern","Expenses outpacing giving",
+        "Operating expenses are %s vs 2025 (Jan&ndash;%s) while giving is only %s &mdash; the widening gap is driving the operating shortfall."
+        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
+elif exp_yoy - giv_yoy >= 3:
+    add("amber","Watch","Expenses growing faster than giving",
+        "Operating expenses are %s vs 2025 (Jan&ndash;%s) while giving is %s &mdash; cost growth is running ahead of receipts."
+        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
+else:
+    add("green","Strength","Expense growth contained",
+        "Operating expenses are %s vs 2025 (Jan&ndash;%s), in line with or below giving growth (%s) &mdash; costs are not outrunning receipts."
+        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
+
+# --- Personnel as % of annual budget (45-55% guideline) ---
+if pers_pct > 60:
+    add("red","Concern","Personnel well above guideline",
+        "Personnel annualizes to ~%.0f%% of budget &mdash; well above the 45&ndash;55%% range, a structural pressure on the operating budget." % pers_pct)
+elif pers_pct > 55:
+    add("amber","Watch","Personnel above guideline",
+        "Personnel annualizes to ~%.0f%% of budget &mdash; just above the 45&ndash;55%% range. Watch payroll/benefit-heavy months that lift the run-rate." % pers_pct)
+elif pers_pct >= 45:
+    add("green","Strength","Personnel within guideline",
+        "Personnel annualizes to ~%.0f%% of budget &mdash; inside the 45&ndash;55%% healthy range." % pers_pct)
+else:
+    add("green","Strength","Personnel below guideline",
+        "Personnel annualizes to ~%.0f%% of budget &mdash; below the 45&ndash;55%% range, leaving room in the staffing envelope." % pers_pct)
+
+# --- Facilities as % of annual budget (15-25% guideline) ---
+if fac_pct > 30:
+    add("red","Concern","Facilities well above guideline",
+        "Facilities annualize to ~%.0f%% of budget &mdash; well above the 15&ndash;25%% guideline." % fac_pct)
+elif fac_pct > 25:
+    add("amber","Watch","Facilities above guideline",
+        "Facilities annualize to ~%.0f%% of budget &mdash; above the 15&ndash;25%% guideline; watch upcoming repair/utility cycles." % fac_pct)
+elif fac_pct >= 15:
+    add("green","Strength","Facilities in healthy range",
+        "Facilities annualize to ~%.0f%% of budget &mdash; squarely inside the 15&ndash;25%% guideline." % fac_pct)
+else:
+    add("green","Strength","Facilities below guideline",
+        "Facilities annualize to ~%.0f%% of budget &mdash; below the 15&ndash;25%% guideline." % fac_pct)
+
+# --- Cash runway (months of unrestricted operating cash; 3-mo target) ---
+if months_cash >= 3:
+    add("green","Strength","Healthy cash runway",
+        "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, at or above the 3-month target. Total bank %s includes ~%s designated/restricted."
+        % (d(unrestricted), months_cash, d(bank), d(RESTR)))
+elif months_cash >= 1:
+    add("amber","Watch","Lean cash runway",
+        "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, under the 3-month target. Total bank %s includes ~%s designated/restricted."
+        % (d(unrestricted), months_cash, d(bank), d(RESTR)))
+else:
+    add("red","Concern","Critically low cash runway",
+        "Unrestricted cash is about %s &mdash; under one month of operating expense (%.1f mo). Total bank %s is mostly designated/restricted (~%s)."
+        % (d(unrestricted), months_cash, d(bank), d(RESTR)))
+
+# --- Donor retention & committed base ---
+if retention >= 80 and net_committed >= 0:
+    add("green","Strength","Committed base holding",
+        "Retention is %.1f%% (%d of %d prior committed units), with %d newly committed vs %d lapsed &mdash; a net change of %+d. Participation is %.0f%% of households."
+        % (retention, retained, prior_committed, newly, lapsed, net_committed, participation))
+elif retention >= 65:
+    add("amber","Watch","Committed base eased",
+        "Retention is %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed &mdash; a net change of %+d, moving the base from %d to %d. Participation is %.0f%% of households."
+        % (retention, retained, prior_committed, lapsed, newly, net_committed, prior_committed, committed, participation))
+else:
+    add("red","Concern","Committed base declining",
+        "Retention has slipped to %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed (net %+d). Participation is %.0f%% of households."
+        % (retention, retained, prior_committed, lapsed, newly, net_committed, participation))
+
+# --- New givers (positive signal, only when there is activity) ---
+if new_donors_week > 0:
+    add("green","Strength","New givers this week",
+        "%d first-time giver(s) in the last 7 days; %d new donors to 4100 year-to-date." % (new_donors_week, new_donors_year))
+
+# --- Seasonality context — only during the summer dip (Jun-Aug) ---
+if RMI in (6,7,8):
+    add("green","Strength","Summer seasonality",
+        "Summer giving typically dips (Jun&ndash;Aug) before the December year-end surge &mdash; some softness now is consistent with the normal calendar.")
+
+# Most urgent first
+_sev_order = {"red":0,"amber":1,"green":2}
+insights.sort(key=lambda x: _sev_order[x[0]])
 
 # ---- table/insight builders ----
 def cmp_table(arr2026, hist):
@@ -156,12 +256,19 @@ def insight_items():
 
 def insight_budget():
     py25 = sum(inc[2025][:RMI]); yoy = (ytd_giving/py25-1)*100; gap = ytd_opexp-ytd_opinc
+    dir_b = "ahead of" if budget_var >= 0 else "behind"
+    dir_y = "above" if yoy >= 0 else "below"
+    if gap > 0:
+        gap_txt = "YTD operating expenses (%s) exceed operating income (%s) by %s &mdash; spending is running ahead of receipts." % (d(ytd_opexp), d(ytd_opinc), d(gap))
+    else:
+        gap_txt = "YTD operating income (%s) covers operating expenses (%s) with %s to spare &mdash; receipts are ahead of spending." % (d(ytd_opinc), d(ytd_opexp), d(abs(gap)))
+    tone = "amber" if budget_var < 0 else "green"
     items=[
-      "Giving (4100) of %s is %s behind the %s budgeted pace (%d weeks &times; %s/wk) &mdash; %.0f%% of YTD budget." % (d(ytd_giving), d(abs(budget_var)), d(ytd_budget), WEEKS_YTD, d(WEEKLY_BUDGET), budget_pct),
-      "That is ~%.0f%% above the same Jan&ndash;%s period in 2025 (%s), though %s 2026 is still partial (through %s)." % (yoy, RMONTH, d(py25), RMONTH, DATA_THROUGH),
-      "YTD operating expenses (%s) still exceed operating income (%s) by %s &mdash; spending is running ahead of receipts." % (d(ytd_opexp), d(ytd_opinc), d(gap)),
+      "Giving (4100) of %s is %s %s the %s budgeted pace (%d weeks &times; %s/wk) &mdash; %.0f%% of YTD budget." % (d(ytd_giving), d(abs(budget_var)), dir_b, d(ytd_budget), WEEKS_YTD, d(WEEKLY_BUDGET), budget_pct),
+      "That is ~%.0f%% %s the same Jan&ndash;%s period in 2025 (%s), though %s 2026 is still partial (through %s)." % (abs(yoy), dir_y, RMONTH, d(py25), RMONTH, DATA_THROUGH),
+      gap_txt,
     ]
-    return "<div style='margin-top:6px'>" + "".join("<div class='ins ins-amber' style='background:#fafbfc'><div class='ins-b' style='margin-top:0'>%s</div></div>"%x for x in items) + "</div>"
+    return "<div style='margin-top:6px'>" + "".join("<div class='ins ins-%s' style='background:#fafbfc'><div class='ins-b' style='margin-top:0'>%s</div></div>"%(tone,x) for x in items) + "</div>"
 
 def card_over_rows():
     if not card_over: return "<tr><td colspan='5' class='none'>None over $500 this week</td></tr>"
