@@ -69,10 +69,10 @@ rt = live["retention"]
 retained = rt["retained"]; lapsed = rt["lapsed"]; newly = rt["new"]; retention = rt["rate"]; prior_committed = rt["prior"]
 
 ytd_budget = WEEKLY_BUDGET*WEEKS_YTD
-budget_var = round(ytd_opinc - ytd_budget,2)
-budget_pct = ytd_opinc/ytd_budget*100
+budget_var = round(ytd_giving - ytd_budget,2)
+budget_pct = ytd_giving/ytd_budget*100
 avg_wk_giving = ytd_giving/WEEKS_YTD
-inc_bar = ytd_opinc/ANNUAL_BUDGET*100
+inc_bar = ytd_giving/ANNUAL_BUDGET*100
 exp_bar = ytd_opexp/ANNUAL_BUDGET*100
 pace = WEEKS_YTD/52*100
 pers_ann = ytd_pers*52/WEEKS_YTD; pers_pct = pers_ann/ANNUAL_BUDGET*100
@@ -155,9 +155,9 @@ def insight_items():
     return out
 
 def insight_budget():
-    py25 = sum(inc[2025][:RMI]); yoy = (ytd_opinc/py25-1)*100; gap = ytd_opexp-ytd_opinc
+    py25 = sum(inc[2025][:RMI]); yoy = (ytd_giving/py25-1)*100; gap = ytd_opexp-ytd_opinc
     items=[
-      "Operating income of %s is %s behind the %s budgeted pace (%d weeks &times; %s/wk) &mdash; %.0f%% of YTD budget." % (d(ytd_opinc), d(abs(budget_var)), d(ytd_budget), WEEKS_YTD, d(WEEKLY_BUDGET), budget_pct),
+      "Giving (4100) of %s is %s behind the %s budgeted pace (%d weeks &times; %s/wk) &mdash; %.0f%% of YTD budget." % (d(ytd_giving), d(abs(budget_var)), d(ytd_budget), WEEKS_YTD, d(WEEKLY_BUDGET), budget_pct),
       "That is ~%.0f%% above the same Jan&ndash;%s period in 2025 (%s), though %s 2026 is still partial (through %s)." % (yoy, RMONTH, d(py25), RMONTH, DATA_THROUGH),
       "YTD operating expenses (%s) still exceed operating income (%s) by %s &mdash; spending is running ahead of receipts." % (d(ytd_opexp), d(ytd_opinc), d(gap)),
     ]
@@ -313,16 +313,16 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 </section>
 
 <section>
-  <h2>YTD Operating Income vs Budget</h2>
+  <h2>YTD Giving vs Budget</h2>
   <div class="panel">
     <div class="stat4">
-      <div><div class="stat-l">YTD Actual Income</div><div class="stat-n">{d(ytd_opinc)}</div></div>
+      <div><div class="stat-l">YTD Actual Giving</div><div class="stat-n">{d(ytd_giving)}</div></div>
       <div><div class="stat-l">YTD Budget ({WEEKS_YTD} wks)</div><div class="stat-n">{d(ytd_budget)}</div></div>
       <div><div class="stat-l">Variance</div><div class="stat-n neg">{d(budget_var)}</div></div>
       <div><div class="stat-l">% of YTD Budget</div><div class="stat-n">{budget_pct:.0f}%</div></div>
     </div>
     <div class="bar-wrap">
-      <div class="bar-row"><div class="bar-lab">Income vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{inc_bar:.1f}%;background:var(--green)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opinc)} &middot; {inc_bar:.0f}%</div></div>
+      <div class="bar-row"><div class="bar-lab">Giving vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{inc_bar:.1f}%;background:var(--green)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_giving)} &middot; {inc_bar:.0f}%</div></div>
       <div class="bar-row"><div class="bar-lab">Expense vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{exp_bar:.1f}%;background:var(--chart)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opexp)} &middot; {exp_bar:.0f}%</div></div>
     </div>
     {insight_budget()}
