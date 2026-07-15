@@ -93,6 +93,22 @@
 
   <div class="cards-grid">
 
+    <a href="elder-dashboard.html" class="metric-card">
+      <div class="card-accent accent-slate"></div>
+      <div class="card-body">
+        <div class="card-icon">🧭</div>
+        <div class="card-title">Elder Dashboard</div>
+        <p class="card-desc">Financials and Vitals combined into one scrollable view with a sticky jump-to sidebar — built for elder team review in a single page.</p>
+        <div class="card-meta">
+          <div>
+            <span class="badge badge-live">Live</span>
+            <div class="card-updated" style="margin-top:6px;">Updated through <span id="elder-updated">June 2026</span></div>
+          </div>
+          <span class="btn btn-slate">View →</span>
+        </div>
+      </div>
+    </a>
+
     <a href="financials.html" class="metric-card">
       <div class="card-accent accent-slate"></div>
       <div class="card-body">
@@ -173,6 +189,8 @@
       var m = html.match(/LAST_UPDATED\s*=\s*['"]([^'"]+)['"]/);
       var el = document.getElementById('fin-updated');
       if (el && m) el.textContent = m[1];
+      var ed = document.getElementById('elder-updated');
+      if (ed && m) ed.textContent = m[1];
     })
     .catch(function () {});
 })();
