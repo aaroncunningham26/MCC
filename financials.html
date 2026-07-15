@@ -117,6 +117,7 @@ const DATA_NOTE    = "2022\u20132023 actuals include General Fund + Missions Fun
 const CASH_ON_HAND = 341339.1;
 const YTD_GIVING = 736940.71;
 const LOAN = {"lender": "First State Bank", "rate": "6.67%", "payment": 12830.83, "principal": 4806.51, "interest": 8024.32, "balance": 1456698.06, "as_of": "July 12, 2026"};
+const MONTHLY = {"months12": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "giving_chart": {"y2024": [76299.0, 86725.0, 138867.0, 114826.0, 97422.0, 121975.0, 111852.0, 101834.0, 129043.0, 97945.0, 99601.0, 242301.0], "y2025": [65693.0, 97362.0, 161385.0, 130448.0, 132355.0, 132973.0, 100146.0, 145551.0, 117019.0, 123389.0, 123635.0, 223569.0], "y2026": [96872.49, 101828.06, 121537.32, 171822.96, 107732.8, 137147.08, null, null, null, null, null, null]}, "expense_chart": {"y2024": [102264.0, 118014.0, 91828.0, 96847.0, 134588.0, 121862.0, 96511.0, 100754.0, 102729.0, 147714.0, 104708.0, 171347.0], "y2025": [121234.0, 119485.0, 120650.0, 142802.0, 124219.0, 149949.0, 112898.0, 128108.0, 120214.0, 160439.0, 129052.0, 145528.0], "y2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, null, null, null, null, null, null]}, "income_table": {"2022": [87163.0, 95988.0, 109900.0, 150004.0, 113555.0, 110814.0], "2023": [64824.0, 89895.0, 119128.0, 130114.0, 90236.0, 125297.0], "2024": [76299.0, 86725.0, 138867.0, 114826.0, 97422.0, 121975.0], "2025": [65693.0, 97362.0, 161385.0, 130448.0, 132355.0, 132973.0], "2026": [107451.1, 108714.84, 129496.25, 178529.59, 124018.04, 144174.37]}, "expense_table": {"2022": [94382.0, 100727.0, 141604.0, 97031.0, 111113.0, 157223.0], "2023": [100898.0, 112560.0, 110885.0, 112667.0, 145223.0, 94965.0], "2024": [102264.0, 118014.0, 91828.0, 96847.0, 134588.0, 121862.0], "2025": [121234.0, 119485.0, 120650.0, 142802.0, 124219.0, 149949.0], "2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9]}, "giving_prior_is_income": true};
 const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.";
 </script>
 
@@ -179,6 +180,34 @@ const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third pa
     <h2>Giving budget vs actual &mdash; year by year</h2>
     <p class="chart-sub">Budget is the target set at the start of each year. Variance shows whether we came in above or below the goal.</p>
     <table class="data-table" id="budgetTable"></table>
+  </div>
+
+  <div class="section-label">Monthly Giving &mdash; 2026 vs Prior Years</div>
+  <div class="chart-card">
+    <h2>Monthly giving &mdash; 2026 vs 2024&ndash;2025</h2>
+    <p class="chart-sub">2026 bars against prior-year lines. <span id="giving-metric-note"></span></p>
+    <div class="chart-wrap" style="height:230px;"><canvas id="givingMonthlyChart" role="img" aria-label="Monthly giving 2026 vs prior years"></canvas></div>
+  </div>
+
+  <div class="section-label">Operating Income Comparison</div>
+  <div class="chart-card">
+    <h2>Operating income by month &mdash; year over year</h2>
+    <p class="chart-sub">Total operating revenue each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
+    <table class="data-table" id="incomeCmpTable"></table>
+  </div>
+
+  <div class="section-label">Operating Expense &mdash; 2026 vs Prior Years</div>
+  <div class="chart-card">
+    <h2>Monthly operating expense &mdash; 2026 vs 2024&ndash;2025</h2>
+    <p class="chart-sub">2026 bars against prior-year lines.</p>
+    <div class="chart-wrap" style="height:230px;"><canvas id="expenseMonthlyChart" role="img" aria-label="Monthly operating expense 2026 vs prior years"></canvas></div>
+  </div>
+
+  <div class="section-label">Operating Expense Comparison</div>
+  <div class="chart-card">
+    <h2>Operating expense by month &mdash; year over year</h2>
+    <p class="chart-sub">Total operating expenditures each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
+    <table class="data-table" id="expenseCmpTable"></table>
   </div>
 
   <div class="section-label">Full summary</div>
@@ -285,6 +314,43 @@ let sh=`<thead><tr><th>Year</th><th>Giving received</th><th>Operating costs</th>
 priorYears.forEach((y,i)=>{const inc=annualIncome[y],exp=annualExpense[y],net=(inc==null||exp==null)?null:inc-exp,prev=i>0?annualIncome[priorYears[i-1]]:null,cs=(prev&&inc!=null)?((inc-prev)/prev*100).toFixed(1)+'%':'—',cc=(prev&&inc!=null)?(inc>=prev?'pos':'neg'):'';sh+=`<tr><td>${y}</td><td>${fmt(inc)}</td><td>${fmt(exp)}</td><td class="${net!=null&&net>=0?'pos':'neg'}">${net!=null&&net>=0?'+':''}${fmt(net)}</td><td class="${cc}">${(prev&&inc!=null)?(inc>=prev?'+':'')+cs:cs}</td></tr>`;});
 sh+=`<tr><td>2026 (Jan–${lastMonth})</td><td class="ytd-col">${fmt(ytdInc)}</td><td class="ytd-col">${fmt(ytdExp)}</td><td class="${ytdNet>=0?'pos':'neg'}">${fmt(ytdNet)}</td><td class="ytd-col">${incChg>=0?'+':''}${incChg}% vs 2025 same period</td></tr></tbody>`;
 document.getElementById('summaryTable').innerHTML=sh;
+
+// Monthly comparison charts + tables (ported from the Finance Team Dashboard)
+(function(){
+  if (typeof MONTHLY === 'undefined' || !MONTHLY) return;
+  const M = MONTHLY, m12 = M.months12;
+  const m0 = v => (v==null ? '—' : fmt(Math.round(v)));
+  function mkChart(id, s, lab){
+    const el = document.getElementById(id); if(!el) return;
+    new Chart(el,{ data:{labels:m12,datasets:[
+        {type:'line',label:'2024 '+lab,data:s.y2024,borderColor:'#C8842A',backgroundColor:'#C8842A',borderDash:[6,4],borderWidth:2,pointRadius:0,tension:.3,order:1},
+        {type:'line',label:'2025 '+lab,data:s.y2025,borderColor:'#2F8F5B',backgroundColor:'#2F8F5B',borderWidth:2,pointRadius:0,tension:.3,order:2},
+        {type:'bar',label:'2026 '+lab,data:s.y2026,backgroundColor:'#343A44',order:3}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8,font:{size:12,weight:'700'}}},
+          tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y==null?'—':fmt(c.parsed.y))}}},
+        scales:{y:{ticks:{callback:v=>'$'+Math.round(v/1000)+'K',color:'#9CA3AF'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:'#9CA3AF'}}}}
+    });
+  }
+  mkChart('givingMonthlyChart', M.giving_chart, 'Giving');
+  mkChart('expenseMonthlyChart', M.expense_chart, 'Expense');
+  function tbl(id, data){
+    const el=document.getElementById(id); if(!el) return;
+    let h='<thead><tr><th>Year</th>'+ytd2026Months.map(m=>`<th>${m}</th>`).join('')+'<th>Total</th></tr></thead><tbody>';
+    ['2022','2023','2024','2025','2026'].forEach(y=>{const a=data[y]||[];
+      const cells=ytd2026Months.map((mm,i)=>`<td>${m0(a[i])}</td>`).join('');
+      const tot=a.reduce((s,v)=>s+(v||0),0);
+      h+=`<tr><td>${y}</td>${cells}<td class="ytd-col">${m0(tot)}</td></tr>`;});
+    el.innerHTML=h+'</tbody>';
+  }
+  tbl('incomeCmpTable', M.income_table);
+  tbl('expenseCmpTable', M.expense_table);
+  const note=document.getElementById('giving-metric-note');
+  if(note) note.textContent = M.giving_prior_is_income
+    ? 'The 2026 bars are the 4100 giving line; prior-year lines reflect total operating income (a monthly 4100 giving history is not in the warehouse yet).'
+    : '4100 giving line, all years.';
+})();
 
 // Campaign loan section (balance live; terms frozen reference)
 if (typeof LOAN !== 'undefined' && LOAN && LOAN.balance != null) {

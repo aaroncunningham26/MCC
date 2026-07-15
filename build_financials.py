@@ -168,13 +168,31 @@ def extract():
     # detected from personnel_expense instead of hard-coding "April".
     payroll_note = _payroll_note(per[CUR_YEAR], rm)
 
+    # Monthly comparison sections (charts + period-matched tables), ported from
+    # the Finance Team Dashboard. Charts show 2024/2025 lines + 2026 bars; tables
+    # show 2022-2026, Jan..reporting-month. The giving chart prefers the 4100
+    # giving line but falls back to operating income for any year lacking a 4100
+    # monthly history in the warehouse (prior years were backfilled income-only).
+    giv_hist = {y: _monthly_list("give_4100", y, None) for y in YEARS}
+    def _giv_line(y):
+        return giv_hist[y] if any(v is not None for v in giv_hist[y]) else inc[y]
+    monthly = dict(
+        months12=MONTHS12,
+        giving_chart={"y2024": _giv_line(2024), "y2025": _giv_line(2025),
+                      "y2026": giv_hist[CUR_YEAR]},
+        expense_chart={"y2024": exp[2024], "y2025": exp[2025], "y2026": exp[CUR_YEAR]},
+        income_table={str(y): inc[y][:rm] for y in YEARS},
+        expense_table={str(y): exp[y][:rm] for y in YEARS},
+        giving_prior_is_income=not any(v is not None for v in giv_hist[2025]),
+    )
+
     return dict(
         reporting_month=rm, months=months_lbl,
         annual_income=annual_income, annual_expense=annual_expense,
         jan_income=jan_income, jan_expense=jan_expense,
         ytd_income=ytd_income, ytd_expense=ytd_expense, ytd_giving=ytd_giving,
         budget_income=budget_income, cash_on_hand=cash, loan=loan,
-        payroll_note=payroll_note,
+        monthly=monthly, payroll_note=payroll_note,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
     )
@@ -384,6 +402,34 @@ __DATA_BLOCK__
     <table class="data-table" id="budgetTable"></table>
   </div>
 
+  <div class="section-label">Monthly Giving &mdash; 2026 vs Prior Years</div>
+  <div class="chart-card">
+    <h2>Monthly giving &mdash; 2026 vs 2024&ndash;2025</h2>
+    <p class="chart-sub">2026 bars against prior-year lines. <span id="giving-metric-note"></span></p>
+    <div class="chart-wrap" style="height:230px;"><canvas id="givingMonthlyChart" role="img" aria-label="Monthly giving 2026 vs prior years"></canvas></div>
+  </div>
+
+  <div class="section-label">Operating Income Comparison</div>
+  <div class="chart-card">
+    <h2>Operating income by month &mdash; year over year</h2>
+    <p class="chart-sub">Total operating revenue each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
+    <table class="data-table" id="incomeCmpTable"></table>
+  </div>
+
+  <div class="section-label">Operating Expense &mdash; 2026 vs Prior Years</div>
+  <div class="chart-card">
+    <h2>Monthly operating expense &mdash; 2026 vs 2024&ndash;2025</h2>
+    <p class="chart-sub">2026 bars against prior-year lines.</p>
+    <div class="chart-wrap" style="height:230px;"><canvas id="expenseMonthlyChart" role="img" aria-label="Monthly operating expense 2026 vs prior years"></canvas></div>
+  </div>
+
+  <div class="section-label">Operating Expense Comparison</div>
+  <div class="chart-card">
+    <h2>Operating expense by month &mdash; year over year</h2>
+    <p class="chart-sub">Total operating expenditures each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
+    <table class="data-table" id="expenseCmpTable"></table>
+  </div>
+
   <div class="section-label">Full summary</div>
   <div class="chart-card">
     <h2>General Fund &mdash; year-by-year totals</h2>
@@ -489,6 +535,43 @@ priorYears.forEach((y,i)=>{const inc=annualIncome[y],exp=annualExpense[y],net=(i
 sh+=`<tr><td>2026 (Jan–${lastMonth})</td><td class="ytd-col">${fmt(ytdInc)}</td><td class="ytd-col">${fmt(ytdExp)}</td><td class="${ytdNet>=0?'pos':'neg'}">${fmt(ytdNet)}</td><td class="ytd-col">${incChg>=0?'+':''}${incChg}% vs 2025 same period</td></tr></tbody>`;
 document.getElementById('summaryTable').innerHTML=sh;
 
+// Monthly comparison charts + tables (ported from the Finance Team Dashboard)
+(function(){
+  if (typeof MONTHLY === 'undefined' || !MONTHLY) return;
+  const M = MONTHLY, m12 = M.months12;
+  const m0 = v => (v==null ? '—' : fmt(Math.round(v)));
+  function mkChart(id, s, lab){
+    const el = document.getElementById(id); if(!el) return;
+    new Chart(el,{ data:{labels:m12,datasets:[
+        {type:'line',label:'2024 '+lab,data:s.y2024,borderColor:'#C8842A',backgroundColor:'#C8842A',borderDash:[6,4],borderWidth:2,pointRadius:0,tension:.3,order:1},
+        {type:'line',label:'2025 '+lab,data:s.y2025,borderColor:'#2F8F5B',backgroundColor:'#2F8F5B',borderWidth:2,pointRadius:0,tension:.3,order:2},
+        {type:'bar',label:'2026 '+lab,data:s.y2026,backgroundColor:'#343A44',order:3}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+        plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8,font:{size:12,weight:'700'}}},
+          tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y==null?'—':fmt(c.parsed.y))}}},
+        scales:{y:{ticks:{callback:v=>'$'+Math.round(v/1000)+'K',color:'#9CA3AF'},grid:{color:gc}},x:{grid:{display:false},ticks:{color:'#9CA3AF'}}}}
+    });
+  }
+  mkChart('givingMonthlyChart', M.giving_chart, 'Giving');
+  mkChart('expenseMonthlyChart', M.expense_chart, 'Expense');
+  function tbl(id, data){
+    const el=document.getElementById(id); if(!el) return;
+    let h='<thead><tr><th>Year</th>'+ytd2026Months.map(m=>`<th>${m}</th>`).join('')+'<th>Total</th></tr></thead><tbody>';
+    ['2022','2023','2024','2025','2026'].forEach(y=>{const a=data[y]||[];
+      const cells=ytd2026Months.map((mm,i)=>`<td>${m0(a[i])}</td>`).join('');
+      const tot=a.reduce((s,v)=>s+(v||0),0);
+      h+=`<tr><td>${y}</td>${cells}<td class="ytd-col">${m0(tot)}</td></tr>`;});
+    el.innerHTML=h+'</tbody>';
+  }
+  tbl('incomeCmpTable', M.income_table);
+  tbl('expenseCmpTable', M.expense_table);
+  const note=document.getElementById('giving-metric-note');
+  if(note) note.textContent = M.giving_prior_is_income
+    ? 'The 2026 bars are the 4100 giving line; prior-year lines reflect total operating income (a monthly 4100 giving history is not in the warehouse yet).'
+    : '4100 giving line, all years.';
+})();
+
 // Campaign loan section (balance live; terms frozen reference)
 if (typeof LOAN !== 'undefined' && LOAN && LOAN.balance != null) {
   document.getElementById('loan-cards').innerHTML = [
@@ -536,6 +619,7 @@ def data_block(d):
         "const CASH_ON_HAND = %s;" % _js_num(d["cash_on_hand"]),
         "const YTD_GIVING = %s;" % _js_num(d["ytd_giving"]),
         "const LOAN = %s;" % json.dumps(d["loan"]),
+        "const MONTHLY = %s;" % json.dumps(d["monthly"]),
         "const PAYROLL_NOTE = %s;" % json.dumps(d["payroll_note"]),
     ]
     return "\n".join(lines)
