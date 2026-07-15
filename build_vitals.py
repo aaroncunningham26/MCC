@@ -175,10 +175,11 @@ def extract():
 
     # Chart data: monthly weekly-attendance average by year (Jan..Dec, None =
     # not yet recorded). Powers the seasonality curve + 12-month rolling avg.
-    hist_start = YEARS[0] - 2                    # a little pre-history for context
+    # Kept to the dashboard's standard window (2022+) so every view is
+    # consistent; the rolling average's first full point is therefore Dec 2022.
     att_monthly = {str(y): [_round(wh.monthly("att_avg_weekly", y).get(mo))
                             for mo in range(1, 13)]
-                   for y in range(hist_start, CUR_YEAR + 1)}
+                   for y in range(YEARS[0], CUR_YEAR + 1)}
     charts = {
         "att_monthly": att_monthly,
         "cur_year": CUR_YEAR,
@@ -556,9 +557,9 @@ const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','
 const attMonthly = (VITALS.charts && VITALS.charts.att_monthly) || {};
 const allYears = Object.keys(attMonthly).map(Number).sort((a,b) => a - b);
 const curYear = (VITALS.charts && VITALS.charts.cur_year) || YEARS[YEARS.length - 1];
-const recentYears = allYears.filter(y => y >= curYear - 3);
-const seasonShades = ['#C9CED6','#9AA3B0','#5B6472'];  // older → newer (non-current)
-const seasonDatasets = recentYears.map((y, i) => {
+const seasonYears = allYears.filter(y => y >= YEARS[0]);   // 2022-on, consistent with the rest of the dashboard
+const seasonShades = ['#D3D8DF','#AEB6C1','#7C8595','#5B6472','#454C58'];  // older → newer (non-current)
+const seasonDatasets = seasonYears.map((y, i) => {
   const isCur = (y === curYear);
   return { label: String(y), data: attMonthly[String(y)],
     borderColor: isCur ? '#2F8F5B' : (seasonShades[i] || '#9AA3B0'),
