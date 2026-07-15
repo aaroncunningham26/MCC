@@ -53,6 +53,12 @@ PERSONNEL_MID = "personnel_expense"
 # change once the year closes). 2026 comes from the warehouse config tab.
 BUDGET_INCOME_HISTORY = {2022: 1203775, 2023: 1220300, 2024: 1482025, 2025: 1604875}
 
+# Campaign loan terms — frozen reference (First State Bank; ONE Campaign Loan Info
+# sheet). These change only on re-amortization. The loan BALANCE is pulled live
+# (data/live.json → loan_balance), mirroring the Finance Team Dashboard.
+LOAN_TERMS = {"lender": "First State Bank", "rate": "6.67%",
+              "payment": 12830.83, "principal": 4806.51, "interest": 8024.32}
+
 DATA_NOTE = ("2022–2023 actuals include General Fund + Missions Fund "
              "(excl. Pit Road). 2024–2026: General Fund only. "
              "Source: PowerChurch (2022–2025), QuickBooks Online (2026).")
@@ -141,6 +147,7 @@ def extract():
     # Cash on hand = live bank balance minus restricted offset (both still live
     # values per the runbook; restricted_offset lives in config).
     cash = None
+    loan = dict(LOAN_TERMS); loan["balance"] = None; loan["as_of"] = None
     try:
         with open(os.path.join(BASE, "data", "live.json")) as f:
             live = json.load(f)
@@ -152,8 +159,10 @@ def extract():
             cash = round(bank, 2)
             _warnings.append("WARNING: config 'restricted_offset' missing -- cash "
                              "on hand shows the TOTAL bank balance, not unrestricted.")
+        loan["balance"] = live.get("loan_balance")   # QBO 2100 First State Loan (live pull)
+        loan["as_of"] = live.get("data_through")
     except (OSError, ValueError):
-        _warnings.append("WARNING: data/live.json unreadable -- cash-on-hand card omitted.")
+        _warnings.append("WARNING: data/live.json unreadable -- cash-on-hand and loan cards omitted.")
 
     # Payroll-spike note (the recurring 3rd-paycheck month on a bi-weekly cycle),
     # detected from personnel_expense instead of hard-coding "April".
@@ -164,7 +173,7 @@ def extract():
         annual_income=annual_income, annual_expense=annual_expense,
         jan_income=jan_income, jan_expense=jan_expense,
         ytd_income=ytd_income, ytd_expense=ytd_expense, ytd_giving=ytd_giving,
-        budget_income=budget_income, cash_on_hand=cash,
+        budget_income=budget_income, cash_on_hand=cash, loan=loan,
         payroll_note=payroll_note,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
@@ -382,6 +391,14 @@ __DATA_BLOCK__
     <table class="data-table" id="summaryTable"></table>
   </div>
 
+  <div id="loan-section">
+    <div class="section-label">Campaign loan &mdash; First State Bank</div>
+    <div class="chart-card">
+      <div class="cards" id="loan-cards" style="margin-bottom:0;"></div>
+      <p class="chart-sub" style="margin:16px 0 0;">Balance is live from QuickBooks (2100 First State Loan); rate, payment, principal &amp; interest are from the ONE Campaign Loan Info sheet. Loan service is a designated / capital obligation, separate from the operating figures above.</p>
+    </div>
+  </div>
+
   <div class="mcc-footer">
     <p>Maple City Chapel &nbsp;&middot;&nbsp; Financials Dashboard &nbsp;&middot;&nbsp; Updated through <span id="ftr-date"></span></p>
     <p id="ftr-note" style="margin-top:2px;"></p>
@@ -471,6 +488,19 @@ let sh=`<thead><tr><th>Year</th><th>Giving received</th><th>Operating costs</th>
 priorYears.forEach((y,i)=>{const inc=annualIncome[y],exp=annualExpense[y],net=(inc==null||exp==null)?null:inc-exp,prev=i>0?annualIncome[priorYears[i-1]]:null,cs=(prev&&inc!=null)?((inc-prev)/prev*100).toFixed(1)+'%':'—',cc=(prev&&inc!=null)?(inc>=prev?'pos':'neg'):'';sh+=`<tr><td>${y}</td><td>${fmt(inc)}</td><td>${fmt(exp)}</td><td class="${net!=null&&net>=0?'pos':'neg'}">${net!=null&&net>=0?'+':''}${fmt(net)}</td><td class="${cc}">${(prev&&inc!=null)?(inc>=prev?'+':'')+cs:cs}</td></tr>`;});
 sh+=`<tr><td>2026 (Jan–${lastMonth})</td><td class="ytd-col">${fmt(ytdInc)}</td><td class="ytd-col">${fmt(ytdExp)}</td><td class="${ytdNet>=0?'pos':'neg'}">${fmt(ytdNet)}</td><td class="ytd-col">${incChg>=0?'+':''}${incChg}% vs 2025 same period</td></tr></tbody>`;
 document.getElementById('summaryTable').innerHTML=sh;
+
+// Campaign loan section (balance live; terms frozen reference)
+if (typeof LOAN !== 'undefined' && LOAN && LOAN.balance != null) {
+  document.getElementById('loan-cards').innerHTML = [
+    { label:'Loan balance',      value:fmt(LOAN.balance),               sub:'Principal remaining · as of '+(LOAN.as_of||'latest'), accent:'accent-blue' },
+    { label:'Interest rate',     value:LOAN.rate,                       sub:'Fixed', accent:'accent-blue' },
+    { label:'Monthly payment',   value:fmt(Math.round(LOAN.payment)),   sub:'Principal + interest', accent:'accent-blue' },
+    { label:'Monthly principal', value:fmt(Math.round(LOAN.principal)), sub:'Reduces balance', accent:'accent-green' },
+    { label:'Monthly interest',  value:fmt(Math.round(LOAN.interest)),  sub:'Cost of debt', accent:'accent-amber' }
+  ].map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub">${c.sub}</div></div>`).join('');
+} else {
+  const ls = document.getElementById('loan-section'); if (ls) ls.style.display = 'none';
+}
 </script>
 </body>
 </html>
@@ -505,6 +535,7 @@ def data_block(d):
         "const DATA_NOTE    = %s;" % json.dumps(DATA_NOTE),
         "const CASH_ON_HAND = %s;" % _js_num(d["cash_on_hand"]),
         "const YTD_GIVING = %s;" % _js_num(d["ytd_giving"]),
+        "const LOAN = %s;" % json.dumps(d["loan"]),
         "const PAYROLL_NOTE = %s;" % json.dumps(d["payroll_note"]),
     ]
     return "\n".join(lines)

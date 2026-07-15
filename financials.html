@@ -116,6 +116,7 @@ const LAST_UPDATED = "June 2026";
 const DATA_NOTE    = "2022\u20132023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024\u20132026: General Fund only. Source: PowerChurch (2022\u20132025), QuickBooks Online (2026).";
 const CASH_ON_HAND = 341339.1;
 const YTD_GIVING = 736940.71;
+const LOAN = {"lender": "First State Bank", "rate": "6.67%", "payment": 12830.83, "principal": 4806.51, "interest": 8024.32, "balance": 1456698.06, "as_of": "July 12, 2026"};
 const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.";
 </script>
 
@@ -185,6 +186,14 @@ const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third pa
     <h2>General Fund &mdash; year-by-year totals</h2>
     <p class="chart-sub">All figures are full-year actuals except 2026, which reflects January through <span class="hdr-month"></span> only.</p>
     <table class="data-table" id="summaryTable"></table>
+  </div>
+
+  <div id="loan-section">
+    <div class="section-label">Campaign loan &mdash; First State Bank</div>
+    <div class="chart-card">
+      <div class="cards" id="loan-cards" style="margin-bottom:0;"></div>
+      <p class="chart-sub" style="margin:16px 0 0;">Balance is live from QuickBooks (2100 First State Loan); rate, payment, principal &amp; interest are from the ONE Campaign Loan Info sheet. Loan service is a designated / capital obligation, separate from the operating figures above.</p>
+    </div>
   </div>
 
   <div class="mcc-footer">
@@ -276,6 +285,19 @@ let sh=`<thead><tr><th>Year</th><th>Giving received</th><th>Operating costs</th>
 priorYears.forEach((y,i)=>{const inc=annualIncome[y],exp=annualExpense[y],net=(inc==null||exp==null)?null:inc-exp,prev=i>0?annualIncome[priorYears[i-1]]:null,cs=(prev&&inc!=null)?((inc-prev)/prev*100).toFixed(1)+'%':'—',cc=(prev&&inc!=null)?(inc>=prev?'pos':'neg'):'';sh+=`<tr><td>${y}</td><td>${fmt(inc)}</td><td>${fmt(exp)}</td><td class="${net!=null&&net>=0?'pos':'neg'}">${net!=null&&net>=0?'+':''}${fmt(net)}</td><td class="${cc}">${(prev&&inc!=null)?(inc>=prev?'+':'')+cs:cs}</td></tr>`;});
 sh+=`<tr><td>2026 (Jan–${lastMonth})</td><td class="ytd-col">${fmt(ytdInc)}</td><td class="ytd-col">${fmt(ytdExp)}</td><td class="${ytdNet>=0?'pos':'neg'}">${fmt(ytdNet)}</td><td class="ytd-col">${incChg>=0?'+':''}${incChg}% vs 2025 same period</td></tr></tbody>`;
 document.getElementById('summaryTable').innerHTML=sh;
+
+// Campaign loan section (balance live; terms frozen reference)
+if (typeof LOAN !== 'undefined' && LOAN && LOAN.balance != null) {
+  document.getElementById('loan-cards').innerHTML = [
+    { label:'Loan balance',      value:fmt(LOAN.balance),               sub:'Principal remaining · as of '+(LOAN.as_of||'latest'), accent:'accent-blue' },
+    { label:'Interest rate',     value:LOAN.rate,                       sub:'Fixed', accent:'accent-blue' },
+    { label:'Monthly payment',   value:fmt(Math.round(LOAN.payment)),   sub:'Principal + interest', accent:'accent-blue' },
+    { label:'Monthly principal', value:fmt(Math.round(LOAN.principal)), sub:'Reduces balance', accent:'accent-green' },
+    { label:'Monthly interest',  value:fmt(Math.round(LOAN.interest)),  sub:'Cost of debt', accent:'accent-amber' }
+  ].map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub">${c.sub}</div></div>`).join('');
+} else {
+  const ls = document.getElementById('loan-section'); if (ls) ls.style.display = 'none';
+}
 </script>
 </body>
 </html>
