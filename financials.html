@@ -115,6 +115,7 @@ const janAprExpense = {2022:702080,2023:677198,2024:665403,2025:778339,2026:9332
 const LAST_UPDATED = "June 2026";
 const DATA_NOTE    = "2022\u20132023 actuals include General Fund + Missions Fund (excl. Pit Road). 2024\u20132026: General Fund only. Source: PowerChurch (2022\u20132025), QuickBooks Online (2026).";
 const CASH_ON_HAND = 341339.1;
+const YTD_GIVING = 736940.71;
 const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.";
 </script>
 
@@ -220,10 +221,11 @@ const expChg = ((ytdExp-janAprExpense[2025])/janAprExpense[2025]*100).toFixed(1)
 const budget2026 = annualBudgetIncome[2026] || null;
 
 const cards = [
-  { label:'Giving received (Jan–'+lastMonth+')', value:fmt(ytdInc), sub:(incChg>=0?'▲ ':'▼ ')+Math.abs(incChg)+'% vs same period last year', cls:incChg>=0?'up':'down', accent:'accent-blue' },
+  { label:'Operating Income Received (Jan–'+lastMonth+')', value:fmt(ytdInc), sub:(incChg>=0?'▲ ':'▼ ')+Math.abs(incChg)+'% vs same period last year', cls:incChg>=0?'up':'down', accent:'accent-blue' },
   { label:'Operating costs (Jan–'+lastMonth+')', value:fmt(ytdExp), sub:(expChg>=0?'▲ ':'▼ ')+Math.abs(expChg)+'% vs same period last year', cls:Number(expChg)<=3?'up':'down', accent:'accent-amber' },
-  { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — giving is covering costs':'Deficit — costs exceeding giving', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' }
+  { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — income is covering costs':'Deficit — costs exceeding income', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' }
 ];
+if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', value:fmt(YTD_GIVING), sub:Math.round(YTD_GIVING/ytdInc*100)+'% of operating income · 4100 tithes & offerings', cls:'neutral', accent:'accent-blue' });
 if (budget2026) cards.push({ label:'2026 annual budget', value:fmt(budget2026), sub:'Received '+Math.round(ytdInc/budget2026*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' });
 if (monthsCash !== null) cards.push({ label:'Months of cash on hand', value:monthsCash + ' mo.', sub: monthsCash >= 3 ? 'Healthy — target is 3–6 months' : monthsCash >= 1.5 ? 'Caution — below the 3-month target' : 'Low — under 1.5 months of runway', cls:cashCls, accent:cashAccent });
 document.getElementById('snapshot-cards').innerHTML = cards.map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub ${c.cls}">${c.sub}</div></div>`).join('');
@@ -236,9 +238,9 @@ const deficitLead = ytdNet <= worstPrior
   : `The January–${lastMonth} net of <strong>${fmt(ytdNet)}</strong> sits within the five-year range`;
 const insights = [
   { dot: ytdInc >= Math.max(...[2022,2023,2024,2025].map(y=>janAprIncome[y])) ? 'dot-green' : 'dot-blue',
-    text:`Giving in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025. ${ytdInc >= Math.max(...[2022,2023,2024,2025].map(y=>janAprIncome[y])) ? 'That is the strongest start on record.' : 'Momentum is tracking with recent years.'}` },
+    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025. ${ytdInc >= Math.max(...[2022,2023,2024,2025].map(y=>janAprIncome[y])) ? 'That is the strongest start on record.' : 'Momentum is tracking with recent years.'}` },
   { dot: Number(expChg) > Number(incChg) ? 'dot-red' : 'dot-green',
-    text:`Operating costs are ${expChg>=0?'up':'down'} <strong>${Math.abs(expChg)}%</strong> year-over-year vs ${incChg}% giving growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>.${Number(expChg) > Number(incChg) ? ' Costs outpacing giving is the key financial challenge right now.' : ''}` },
+    text:`Operating costs are ${expChg>=0?'up':'down'} <strong>${Math.abs(expChg)}%</strong> year-over-year vs ${incChg}% income growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>.${Number(expChg) > Number(incChg) ? ' Costs outpacing income is the key financial challenge right now.' : ''}` },
   { dot: ytdNet >= 0 ? 'dot-green' : 'dot-amber',
     text:`${deficitLead}${ytdNet < 0 && ytdNet <= worstPrior ? `, more than the deficit in the same period of 2025 (${netVsLastYear})` : ''}. This warrants monitoring as seasonal giving patterns play out.` },
   { dot:'dot-blue', text: PAYROLL_NOTE }
