@@ -1,31 +1,31 @@
 {
-  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with static.json + 2026-actuals.json.",
-  "run_date": "July 8, 2026",
+  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
+  "run_date": "July 15, 2026",
   "run_weekday": "Wednesday",
-  "data_through": "July 5, 2026",
-  "weeks_ytd": 27,
+  "data_through": "July 12, 2026",
+  "weeks_ytd": 28,
   "reporting_month_index": 7,
   "reporting_month_name": "July",
-  "current_month": {"giving4100": 28433.53, "op_income": 28647.07, "op_expense": 4263.07, "personnel": 0, "facilities": 3502.00, "partial": true},
-  "last_week_giving": 28433.53,
-  "bank": 803414.88,
-  "loan_balance": 1458014.84,
-  "giving_health": {"committed": 311, "households": 470, "new_donors_year": 36, "new_donors_week": 2},
-  "retention": {"retained": 243, "lapsed": 79, "new": 68, "rate": 75.5, "prior": 322},
+  "current_month": {"giving4100": 52599.23, "op_income": 56356.27, "op_expense": 54616.18, "personnel": 45626.02, "facilities": 5605.65, "partial": true},
+  "last_week_giving": 24165.70,
+  "bank": 783700.10,
+  "loan_balance": 1456698.06,
+  "giving_health": {"committed": 312, "households": 470, "new_donors_year": 36, "new_donors_week": 0},
+  "retention": {"retained": 243, "lapsed": 79, "new": 69, "rate": 75.5, "prior": 322},
   "ramp": {
-    "card_mtd": 6369.08, "card_mtd_n": 30, "card_7d": 6369.08, "card_7d_n": 30,
-    "ap_paid_mtd": 4007.89, "ap_paid_n": 6, "ap_out": 7046.33, "ap_open_n": 11,
+    "card_mtd": 13813.95, "card_mtd_n": 59, "card_7d": 7654.79, "card_7d_n": 31,
+    "ap_paid_mtd": 9297.37, "ap_paid_n": 12, "ap_out": 2616.51, "ap_open_n": 6,
     "card_over": [
-      ["07/01", "Church Finance", "Aaron Cunningham", "AC - Outsourced accounting subscription", 1780.00],
-      ["07/02", "Grass Guru", "Aaron Cunningham", "", 1320.00]
+      ["07/13", "Paypal", "Aaron Cunningham", "", 3298.17],
+      ["07/11", "Leadingsmart Llc", "Ryan Graham", "RG - 2027 XP Conference", 1995.00]
     ],
     "bills_paid": [
-      ["07/07", "Glendon and Lorna Bender", "Missionary Support", 800.00],
-      ["07/07", "Bestone Tire Service", "Four tires and state tire fee for a 2012 Honda", 389.00],
-      ["07/02", "Students International", "Eric Miller Missionary Support", 800.00],
-      ["07/01", "Missionary Ventures", "Josh & Jennifer Hire", 1100.00],
-      ["07/01", "Wycliffe Bible Translators", "Rick & Susan Nivens Support", 800.00],
-      ["07/01", "Cintas", "Hard surface disinfection and first aid supplies replenishment", 118.89]
+      ["07/15", "Bontrager Security Solutions", "Annual fire and security system maintenance inspection and battery replacement", 2276.00],
+      ["07/14", "Heart & Hand International", "Pauline Yoder", 750.00],
+      ["07/14", "Cintas", "AED automatic agreement for ZOLL 3 equipment", 133.00],
+      ["07/08", "Bill Heating Inc", "HVAC maintenance agreement services and replacement air filters", 1093.00],
+      ["07/08", "Mission Aviation Fellowship", "Dan and Stephanie Kramer Support", 616.48],
+      ["07/08", "Party Starters LLC", "Multi color bouncer and dunk tank rental for an event", 421.00]
     ]
   }
 }
