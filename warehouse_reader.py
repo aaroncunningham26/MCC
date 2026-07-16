@@ -33,9 +33,17 @@ import sys
 import urllib.error
 import urllib.request
 
-ENDPOINT = "https://pco-mcp-server.aaroncunningham.workers.dev/warehouse/read"
+# Dedicated warehouse worker (2026-07-16; split off the unstable pco-mcp-server).
+ENDPOINT = "https://mcc-warehouse.aaroncunningham.workers.dev/warehouse/read"
 SECRETS_PATH = os.path.expanduser("~/.mcc/pco-mcp-secrets.json")
 TIMEOUT = 60
+
+# Fallback: hourly JSON export written by the warehouse Apps Script into the
+# Drive-synced "Data Sheets" folder. Used only when the Worker is unreachable,
+# and only if fresh enough. A Worker outage can no longer block a publish.
+CACHE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "..", "Data Sheets", "warehouse-cache.json")
+CACHE_MAX_AGE_HOURS = 48
 
 _tab_cache = {}   # tab name -> list of row dicts
 _obs_cache = None  # deduped, date-sorted observations
@@ -92,17 +100,47 @@ def fetch_tab(tab):
             # Cloudflare blocks the default "Python-urllib" user agent with a 403.
             "User-Agent": "mcc-warehouse-reader/1.0",
         })
+    payload = None
+    err = None
     try:
         with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
             payload = json.loads(resp.read().decode("utf-8"))
+        if not payload.get("ok"):
+            err = "warehouse returned not-ok for tab '%s': %r" % (tab, payload)
+            payload = None
     except (urllib.error.URLError, OSError, ValueError) as e:
-        _die("request for tab '%s' failed (%s)" % (tab, e))
-    if not payload.get("ok"):
-        _die("warehouse returned not-ok for tab '%s': %r" % (tab, payload))
+        err = "request for tab '%s' failed (%s)" % (tab, e)
+    if payload is None:
+        payload = _cache_fallback(tab, err)
     header = payload["header"]
     rows = [dict(zip(header, r)) for r in payload["rows"]]
     _tab_cache[tab] = rows
     return rows
+
+
+def _cache_fallback(tab, err):
+    """Worker unreachable: serve the tab from the hourly Apps Script export in
+    'Data Sheets/warehouse-cache.json' if it is fresh enough; otherwise die."""
+    try:
+        with open(CACHE_PATH) as f:
+            cache = json.load(f)
+        exported = cache.get("exported_at", "1970-01-01T00:00:00")
+        age_h = (datetime.datetime.now(datetime.timezone.utc)
+                 - datetime.datetime.fromisoformat(exported.replace("Z", "+00:00"))
+                 ).total_seconds() / 3600.0
+        tabs = cache.get("tabs", {})
+        if tab not in tabs:
+            raise KeyError("tab '%s' not in cache" % tab)
+        if age_h > CACHE_MAX_AGE_HOURS:
+            _die("%s; local cache exists but is %.0fh old (max %dh)"
+                 % (err, age_h, CACHE_MAX_AGE_HOURS))
+        sys.stderr.write(
+            "WARNING: warehouse endpoint unavailable (%s) — using local cache "
+            "from %s (%.1fh old). Data may lag slightly; the Worker needs "
+            "attention (see MCC/WAREHOUSE-RUNBOOK.md).\n" % (err, exported, age_h))
+        return tabs[tab]
+    except (OSError, ValueError, KeyError) as e:
+        _die("%s; cache fallback also failed (%s at %s)" % (err, e, CACHE_PATH))
 
 
 def observations():
