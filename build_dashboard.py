@@ -74,6 +74,9 @@ budget_pct = ytd_giving/ytd_budget*100
 avg_wk_giving = ytd_giving/WEEKS_YTD
 inc_bar = ytd_giving/ANNUAL_BUDGET*100
 exp_bar = ytd_opexp/ANNUAL_BUDGET*100
+opinc_bar = ytd_opinc/ANNUAL_BUDGET*100
+op_net = round(ytd_opinc - ytd_opexp, 2)          # >0 surplus, <0 deficit
+op_ratio = ytd_opexp/ytd_opinc*100 if ytd_opinc else 0
 pace = WEEKS_YTD/52*100
 pers_ann = ytd_pers*52/WEEKS_YTD; pers_pct = pers_ann/ANNUAL_BUDGET*100
 fac_ann  = ytd_fac*52/WEEKS_YTD;  fac_pct  = fac_ann/ANNUAL_BUDGET*100
@@ -255,19 +258,24 @@ def insight_items():
     return out
 
 def insight_budget():
-    py25 = sum(inc[2025][:RMI]); yoy = (ytd_giving/py25-1)*100; gap = ytd_opexp-ytd_opinc
+    py25 = sum(inc[2025][:RMI]); yoy = (ytd_giving/py25-1)*100
     dir_b = "ahead of" if budget_var >= 0 else "behind"
     dir_y = "above" if yoy >= 0 else "below"
-    if gap > 0:
-        gap_txt = "YTD operating expenses (%s) exceed operating income (%s) by %s &mdash; spending is running ahead of receipts." % (d(ytd_opexp), d(ytd_opinc), d(gap))
-    else:
-        gap_txt = "YTD operating income (%s) covers operating expenses (%s) with %s to spare &mdash; receipts are ahead of spending." % (d(ytd_opinc), d(ytd_opexp), d(abs(gap)))
     tone = "amber" if budget_var < 0 else "green"
     items=[
       "Giving (4100) of %s is %s %s the %s budgeted pace (%d weeks &times; %s/wk) &mdash; %.0f%% of YTD budget." % (d(ytd_giving), d(abs(budget_var)), dir_b, d(ytd_budget), WEEKS_YTD, d(WEEKLY_BUDGET), budget_pct),
       "That is ~%.0f%% %s the same Jan&ndash;%s period in 2025 (%s), though %s 2026 is still partial (through %s)." % (abs(yoy), dir_y, RMONTH, d(py25), RMONTH, DATA_THROUGH),
-      gap_txt,
     ]
+    return "<div style='margin-top:6px'>" + "".join("<div class='ins ins-%s' style='background:#fafbfc'><div class='ins-b' style='margin-top:0'>%s</div></div>"%(tone,x) for x in items) + "</div>"
+
+def insight_opex():
+    tone = "green" if op_net >= 0 else "amber"
+    if op_net >= 0:
+        head = "YTD operating income (%s) exceeds expense (%s) &mdash; an operating surplus of %s. Expenses run %.0f%% of income." % (d(ytd_opinc), d(ytd_opexp), d(op_net), op_ratio)
+    else:
+        head = "YTD operating expense (%s) exceeds income (%s) &mdash; an operating deficit of %s. Expenses run %.0f%% of income." % (d(ytd_opexp), d(ytd_opinc), d(abs(op_net)), op_ratio)
+    ctx = "Against the %s annual budget, income is at %.0f%% and expense at %.0f%% with the year %.0f%% elapsed. Operating figures only (excl. designated); %s 2026 partial through %s." % (d(ANNUAL_BUDGET), opinc_bar, exp_bar, pace, RMONTH, DATA_THROUGH)
+    items=[head, ctx]
     return "<div style='margin-top:6px'>" + "".join("<div class='ins ins-%s' style='background:#fafbfc'><div class='ins-b' style='margin-top:0'>%s</div></div>"%(tone,x) for x in items) + "</div>"
 
 def card_over_rows():
@@ -443,6 +451,24 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
     <div class="card"><div class="kpi-l">Retention Rate</div><div class="kpi-n" style="color:var(--green)">{retention:.1f}%</div><div class="kpi-s">of {prior_committed} prior committed units</div></div>
   </div>
   <div class="cap">Committed giving unit = gave &gt;$200 cumulatively to Tithe/Offering (trailing 12 mo). Rolling 12 months vs. the prior 12; net committed change {newly-lapsed}. Live from Planning Center Giving.</div>
+</section>
+
+<section>
+  <h2>Operating Income vs Expense</h2>
+  <div class="panel">
+    <div class="stat4">
+      <div><div class="stat-l">YTD Operating Income</div><div class="stat-n">{d(ytd_opinc)}</div></div>
+      <div><div class="stat-l">YTD Operating Expense</div><div class="stat-n">{d(ytd_opexp)}</div></div>
+      <div><div class="stat-l">Operating Surplus / (Deficit)</div><div class="stat-n {'neg' if op_net<0 else ''}">{d(op_net)}</div></div>
+      <div><div class="stat-l">Expense-to-Income</div><div class="stat-n">{op_ratio:.0f}%</div></div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-row"><div class="bar-lab">Income vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{opinc_bar:.1f}%;background:var(--green)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opinc)} &middot; {opinc_bar:.0f}%</div></div>
+      <div class="bar-row"><div class="bar-lab">Expense vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{exp_bar:.1f}%;background:var(--chart)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opexp)} &middot; {exp_bar:.0f}%</div></div>
+    </div>
+    {insight_opex()}
+    <div class="cap">Operating income = total operating revenue (4000s); operating expense = total expenditures (5000&ndash;6000s). Excludes designated/restricted funds and loan service. Year pace marker shows {WEEKS_YTD} of 52 weeks elapsed.</div>
+  </div>
 </section>
 
 <section>
