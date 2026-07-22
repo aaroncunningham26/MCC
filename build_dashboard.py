@@ -121,120 +121,123 @@ def _pct(x):                  # "up ~12%" / "down ~3%"
     return ("up ~%.0f%%" % x) if x >= 0 else ("down ~%.0f%%" % abs(x))
 
 insights = []
-def add(sev, label, title, body):
-    insights.append((sev, label, title, body))
+def add(sev, label, title, body, sec):
+    # sec = home section id; used to place non-headline items back into their section
+    insights.append((sev, label, title, body, sec))
 
-# --- Giving vs budget pace ---
+# --- Giving vs budget pace ---  [home: budget]
 if budget_pct >= 100:
     add("green","Strength","Giving at or above budget",
         "Average weekly giving is %s vs the %s/week budget (%.0f%% of pace) &mdash; about %s/week ahead. YTD giving %s vs a %s budgeted pace."
-        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget)))
+        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget)), "budget")
 elif budget_pct >= 90:
     add("amber","Watch","Giving slightly behind budget",
         "Average weekly giving is %s vs the %s/week budget (%.0f%% of pace) &mdash; about %s/week behind. YTD giving %s vs a %s budgeted pace."
-        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget)))
+        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget)), "budget")
 else:
     add("red","Concern","Giving behind budget",
         "Average weekly giving is %s vs the %s/week budget (only %.0f%% of pace) &mdash; about %s/week behind. YTD giving %s trails the %s budgeted pace by %s."
-        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget), d(abs(budget_var))))
+        % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget), d(abs(budget_var))), "budget")
 
-# --- Operating surplus / deficit (closed months, apples-to-apples) ---
+# --- Operating surplus / deficit (closed months, apples-to-apples) ---  [home: opex]
 if ytd_net_closed >= 0:
     add("green","Strength","Operating surplus year-to-date",
         "Through %s, operating income exceeds expense by %s across closed months; the most recent closed month netted %s."
-        % (MONTHS12[n_closed-1], d(ytd_net_closed), d(last_closed_net)))
+        % (MONTHS12[n_closed-1], d(ytd_net_closed), d(last_closed_net)), "opex")
 elif last_closed_net >= first2:
     add("amber","Watch","Operating deficit, narrowing",
         "Closed months show a YTD operating deficit of %s, but the monthly shortfall improved from about %s early on to %s most recently &mdash; trending the right way, not yet in the black."
-        % (d(ytd_net_closed), d(first2), d(last_closed_net)))
+        % (d(ytd_net_closed), d(first2), d(last_closed_net)), "opex")
 else:
     add("red","Concern","Operating deficit widening",
         "Closed months show a YTD operating deficit of %s, and the monthly shortfall has worsened from about %s early on to %s most recently."
-        % (d(ytd_net_closed), d(first2), d(last_closed_net)))
+        % (d(ytd_net_closed), d(first2), d(last_closed_net)), "opex")
 
-# --- Expense growth vs giving growth (YoY, closed months) ---
+# --- Expense growth vs giving growth (YoY, closed months) ---  [home: opex]
 if exp_yoy - giv_yoy >= 8:
     add("red","Concern","Expenses outpacing giving",
         "Operating expenses are %s vs 2025 (Jan&ndash;%s) while giving is only %s &mdash; the widening gap is driving the operating shortfall."
-        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
+        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)), "opex")
 elif exp_yoy - giv_yoy >= 3:
     add("amber","Watch","Expenses growing faster than giving",
         "Operating expenses are %s vs 2025 (Jan&ndash;%s) while giving is %s &mdash; cost growth is running ahead of receipts."
-        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
+        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)), "opex")
 else:
     add("green","Strength","Expense growth contained",
         "Operating expenses are %s vs 2025 (Jan&ndash;%s), in line with or below giving growth (%s) &mdash; costs are not outrunning receipts."
-        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)))
+        % (_pct(exp_yoy), MONTHS12[n_closed-1], _pct(giv_yoy)), "opex")
 
-# --- Personnel as % of annual budget: 45-55% steady-state, 55-60% growth-investment band, >60% ceiling ---
+# --- Personnel as % of annual budget: 45-55% steady-state, 55-60% growth-investment band, >60% ceiling ---  [home: expense]
 if pers_pct > 60:
     add("red","Concern","Personnel above growth ceiling",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; above the 60%% ceiling set for the growth season (steady-state guideline is 45&ndash;55%%). Even staffing ahead of growth, this is a structural pressure; watch that giving follows and reserves can fund the gap." % pers_pct)
+        "Personnel annualizes to ~%.0f%% of budget &mdash; above the 60%% ceiling set for the growth season (steady-state guideline is 45&ndash;55%%). Even staffing ahead of growth, this is a structural pressure; watch that giving follows and reserves can fund the gap." % pers_pct, "expense")
 elif pers_pct > 55:
     add("amber","Watch","Personnel elevated &mdash; growth investment",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; within the 55&ndash;60%% growth-investment band, above the 45&ndash;55%% steady-state guideline. Expected while staffing ahead of growth; watch that giving and attendance follow." % pers_pct)
+        "Personnel annualizes to ~%.0f%% of budget &mdash; within the 55&ndash;60%% growth-investment band, above the 45&ndash;55%% steady-state guideline. Expected while staffing ahead of growth; watch that giving and attendance follow." % pers_pct, "expense")
 elif pers_pct >= 45:
     add("green","Strength","Personnel within guideline",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; inside the 45&ndash;55%% steady-state range." % pers_pct)
+        "Personnel annualizes to ~%.0f%% of budget &mdash; inside the 45&ndash;55%% steady-state range." % pers_pct, "expense")
 else:
     add("green","Strength","Personnel below guideline",
-        "Personnel annualizes to ~%.0f%% of budget &mdash; below the 45&ndash;55%% range, leaving room in the staffing envelope." % pers_pct)
+        "Personnel annualizes to ~%.0f%% of budget &mdash; below the 45&ndash;55%% range, leaving room in the staffing envelope." % pers_pct, "expense")
 
-# --- Facilities as % of annual budget (15-25% guideline) ---
+# --- Facilities as % of annual budget (15-25% guideline) ---  [home: expense]
 if fac_pct > 30:
     add("red","Concern","Facilities well above guideline",
-        "Facilities annualize to ~%.0f%% of budget &mdash; well above the 15&ndash;25%% guideline." % fac_pct)
+        "Facilities annualize to ~%.0f%% of budget &mdash; well above the 15&ndash;25%% guideline." % fac_pct, "expense")
 elif fac_pct > 25:
     add("amber","Watch","Facilities above guideline",
-        "Facilities annualize to ~%.0f%% of budget &mdash; above the 15&ndash;25%% guideline; watch upcoming repair/utility cycles." % fac_pct)
+        "Facilities annualize to ~%.0f%% of budget &mdash; above the 15&ndash;25%% guideline; watch upcoming repair/utility cycles." % fac_pct, "expense")
 elif fac_pct >= 15:
     add("green","Strength","Facilities in healthy range",
-        "Facilities annualize to ~%.0f%% of budget &mdash; squarely inside the 15&ndash;25%% guideline." % fac_pct)
+        "Facilities annualize to ~%.0f%% of budget &mdash; squarely inside the 15&ndash;25%% guideline." % fac_pct, "expense")
 else:
     add("green","Strength","Facilities below guideline",
-        "Facilities annualize to ~%.0f%% of budget &mdash; below the 15&ndash;25%% guideline." % fac_pct)
+        "Facilities annualize to ~%.0f%% of budget &mdash; below the 15&ndash;25%% guideline." % fac_pct, "expense")
 
-# --- Cash runway (months of unrestricted operating cash; 3-mo target) ---
+# --- Cash runway (months of unrestricted operating cash; 3-mo target) ---  [home: bank]
 if months_cash >= 3:
     add("green","Strength","Healthy cash runway",
         "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, at or above the 3-month target. Total bank %s includes ~%s designated/restricted."
-        % (d(unrestricted), months_cash, d(bank), d(RESTR)))
+        % (d(unrestricted), months_cash, d(bank), d(RESTR)), "bank")
 elif months_cash >= 1:
     add("amber","Watch","Lean cash runway",
         "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, under the 3-month target. Total bank %s includes ~%s designated/restricted."
-        % (d(unrestricted), months_cash, d(bank), d(RESTR)))
+        % (d(unrestricted), months_cash, d(bank), d(RESTR)), "bank")
 else:
     add("red","Concern","Critically low cash runway",
         "Unrestricted cash is about %s &mdash; under one month of operating expense (%.1f mo). Total bank %s is mostly designated/restricted (~%s)."
-        % (d(unrestricted), months_cash, d(bank), d(RESTR)))
+        % (d(unrestricted), months_cash, d(bank), d(RESTR)), "bank")
 
-# --- Donor retention & committed base ---
+# --- Donor retention & committed base ---  [home: retention]
 if retention >= 80 and net_committed >= 0:
     add("green","Strength","Committed base holding",
         "Retention is %.1f%% (%d of %d prior committed units), with %d newly committed vs %d lapsed &mdash; a net change of %+d. Participation is %.0f%% of households."
-        % (retention, retained, prior_committed, newly, lapsed, net_committed, participation))
+        % (retention, retained, prior_committed, newly, lapsed, net_committed, participation), "retention")
 elif retention >= 65:
     add("amber","Watch","Committed base eased",
         "Retention is %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed &mdash; a net change of %+d, moving the base from %d to %d. Participation is %.0f%% of households."
-        % (retention, retained, prior_committed, lapsed, newly, net_committed, prior_committed, committed, participation))
+        % (retention, retained, prior_committed, lapsed, newly, net_committed, prior_committed, committed, participation), "retention")
 else:
     add("red","Concern","Committed base declining",
         "Retention has slipped to %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed (net %+d). Participation is %.0f%% of households."
-        % (retention, retained, prior_committed, lapsed, newly, net_committed, participation))
+        % (retention, retained, prior_committed, lapsed, newly, net_committed, participation), "retention")
 
-# --- New givers (positive signal, only when there is activity) ---
+# --- New givers (positive signal, only when there is activity) ---  [home: giving_health]
 if new_donors_week > 0:
     add("green","Strength","New givers this week",
-        "%d first-time giver(s) in the last 7 days; %d new donors to 4100 year-to-date." % (new_donors_week, new_donors_year))
+        "%d first-time giver(s) in the last 7 days; %d new donors to 4100 year-to-date." % (new_donors_week, new_donors_year), "giving_health")
 
-# --- Seasonality context — only during the summer dip (Jun-Aug) ---
+# --- Seasonality context — only during the summer dip (Jun-Aug) ---  [home: monthly]
 if RMI in (6,7,8):
     add("green","Strength","Summer seasonality",
-        "Summer giving typically dips (Jun&ndash;Aug) before the December year-end surge &mdash; some softness now is consistent with the normal calendar.")
+        "Summer giving typically dips (Jun&ndash;Aug) before the December year-end surge &mdash; some softness now is consistent with the normal calendar.", "monthly")
 
-# Most urgent first
+# Rank most-urgent first; the 3 most important headline Key Insights, the rest fall to their home sections
 _sev_order = {"red":0,"amber":1,"green":2}
 insights.sort(key=lambda x: _sev_order[x[0]])
+key_insights = insights[:3]
+rest_insights = insights[3:]
 
 # ---- table/insight builders ----
 def cmp_table(arr2026, hist):
@@ -249,34 +252,19 @@ def cmp_table(arr2026, hist):
 def th_months():
     return "".join("<th>%s</th>"%MONTHS12[i] for i in range(RMI))
 
-def insight_items():
+def insight_items(items):
     out=""
-    for sev,label,title,body in insights:
+    for sev,label,title,body,sec in items:
         out+=("<div class='ins ins-%s'><div class='ins-h'><span class='dot dot-%s'></span>"
               "<span class='ins-t'>%s</span><span class='ins-tag tag-%s'>%s</span></div>"
               "<div class='ins-b'>%s</div></div>")%(sev,sev,title,sev,label,body)
     return out
 
-def insight_budget():
-    py25 = sum(inc[2025][:RMI]); yoy = (ytd_giving/py25-1)*100
-    dir_b = "ahead of" if budget_var >= 0 else "behind"
-    dir_y = "above" if yoy >= 0 else "below"
-    tone = "amber" if budget_var < 0 else "green"
-    items=[
-      "Giving (4100) of %s is %s %s the %s budgeted pace (%d weeks &times; %s/wk) &mdash; %.0f%% of YTD budget." % (d(ytd_giving), d(abs(budget_var)), dir_b, d(ytd_budget), WEEKS_YTD, d(WEEKLY_BUDGET), budget_pct),
-      "That is ~%.0f%% %s the same Jan&ndash;%s period in 2025 (%s), though %s 2026 is still partial (through %s)." % (abs(yoy), dir_y, RMONTH, d(py25), RMONTH, DATA_THROUGH),
-    ]
-    return "<div style='margin-top:6px'>" + "".join("<div class='ins ins-%s' style='background:#fafbfc'><div class='ins-b' style='margin-top:0'>%s</div></div>"%(tone,x) for x in items) + "</div>"
-
-def insight_opex():
-    tone = "green" if op_net >= 0 else "amber"
-    if op_net >= 0:
-        head = "YTD operating income (%s) exceeds expense (%s) &mdash; an operating surplus of %s. Expenses run %.0f%% of income." % (d(ytd_opinc), d(ytd_opexp), d(op_net), op_ratio)
-    else:
-        head = "YTD operating expense (%s) exceeds income (%s) &mdash; an operating deficit of %s. Expenses run %.0f%% of income." % (d(ytd_opexp), d(ytd_opinc), d(abs(op_net)), op_ratio)
-    ctx = "Against the %s annual budget, income is at %.0f%% and expense at %.0f%% with the year %.0f%% elapsed. Operating figures only (excl. designated); %s 2026 partial through %s." % (d(ANNUAL_BUDGET), opinc_bar, exp_bar, pace, RMONTH, DATA_THROUGH)
-    items=[head, ctx]
-    return "<div style='margin-top:6px'>" + "".join("<div class='ins ins-%s' style='background:#fafbfc'><div class='ins-b' style='margin-top:0'>%s</div></div>"%(tone,x) for x in items) + "</div>"
+def section_insights(sec):
+    # Render the non-headline insights whose home is this section (empty if none / all headlined)
+    items=[i for i in rest_insights if i[4]==sec]
+    if not items: return ""
+    return "<div style='margin-top:6px'>%s</div>" % insight_items(items)
 
 def card_over_rows():
     if not card_over: return "<tr><td colspan='5' class='none'>None over $500 this week</td></tr>"
@@ -403,8 +391,8 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h2>Key Insights &amp; Watch Items</h2>
   <div class="panel">
     <div class="legend"><span><span class="sw" style="background:var(--green)"></span>Strength</span><span><span class="sw" style="background:var(--amber)"></span>Watch</span><span><span class="sw" style="background:var(--red)"></span>Concern</span></div>
-    {insight_items()}
-    <div class="cap">Internal trend analysis from QBO, Planning Center &amp; Ramp through {DATA_THROUGH}. Benchmarks (personnel 45&ndash;55%, facilities 15&ndash;25%, 1&ndash;3 months cash) are general guidelines &mdash; confirm major decisions with your CPA or finance committee.</div>
+    {insight_items(key_insights)}
+    <div class="cap">The three most important items this week, ranked by urgency; the rest appear within their own sections below. Internal trend analysis from QBO, Planning Center &amp; Ramp through {DATA_THROUGH}. Benchmarks (personnel 45&ndash;55%, facilities 15&ndash;25%, 1&ndash;3 months cash) are general guidelines &mdash; confirm major decisions with your CPA or finance committee.</div>
   </div>
 </section>
 
@@ -421,7 +409,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
       <div class="bar-row"><div class="bar-lab">Giving vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{inc_bar:.1f}%;background:var(--green)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_giving)} &middot; {inc_bar:.0f}%</div></div>
       <div class="bar-row"><div class="bar-lab">Expense vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{exp_bar:.1f}%;background:var(--chart)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opexp)} &middot; {exp_bar:.0f}%</div></div>
     </div>
-    {insight_budget()}
+    {section_insights('budget')}
   </div>
 </section>
 
@@ -429,6 +417,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h2>Monthly Giving &mdash; 2026 vs Prior Years</h2>
   <div class="callout">Giving Jan&ndash;{MONTHS12[n_closed-1]} is up ~{giv_yoy:.0f}% vs 2025; {RMONTH} shown partial (through {DATA_THROUGH}).</div>
   <div class="chartbox"><canvas id="givingChart" height="120"></canvas></div>
+  {section_insights('monthly')}
 </section>
 
 <section>
@@ -439,6 +428,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
     <div class="card"><div class="kpi-l">New Donors to 4100</div><div class="kpi-n">{new_donors_year}</div><div class="kpi-s">This year</div></div>
     <div class="card"><div class="kpi-l">New Donors This Week</div><div class="kpi-n">{new_donors_week}</div><div class="kpi-s">First-time givers, last 7 days</div></div>
   </div>
+  {section_insights('giving_health')}
 </section>
 
 <section>
@@ -449,6 +439,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
     <div class="card"><div class="kpi-l">Newly Committed</div><div class="kpi-n">{newly}</div><div class="kpi-s">New committed this window</div></div>
     <div class="card"><div class="kpi-l">Retention Rate</div><div class="kpi-n" style="color:var(--green)">{retention:.1f}%</div><div class="kpi-s">of {prior_committed} prior committed units</div></div>
   </div>
+  {section_insights('retention')}
   <div class="cap">Committed giving unit = gave &gt;$200 cumulatively to Tithe/Offering (trailing 12 mo). Rolling 12 months vs. the prior 12; net committed change {newly-lapsed}. Live from Planning Center Giving.</div>
 </section>
 
@@ -465,7 +456,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
       <div class="bar-row"><div class="bar-lab">Income vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{opinc_bar:.1f}%;background:var(--green)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opinc)} &middot; {opinc_bar:.0f}%</div></div>
       <div class="bar-row"><div class="bar-lab">Expense vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{exp_bar:.1f}%;background:var(--chart)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opexp)} &middot; {exp_bar:.0f}%</div></div>
     </div>
-    {insight_opex()}
+    {section_insights('opex')}
     <div class="cap">Operating income = total operating revenue (4000s); operating expense = total expenditures (5000&ndash;6000s). Excludes designated/restricted funds and loan service. Year pace marker shows {WEEKS_YTD} of 52 weeks elapsed.</div>
   </div>
 </section>
@@ -481,6 +472,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h2>Operating Expense &mdash; 2026 vs Prior Years</h2>
   <div class="callout">Operating expenses Jan&ndash;{MONTHS12[n_closed-1]} are up ~{exp_yoy:.0f}% vs 2025; {RMONTH} shown partial (through {DATA_THROUGH}).</div>
   <div class="chartbox"><canvas id="expenseChart" height="120"></canvas></div>
+  {section_insights('expense')}
 </section>
 
 <section>
@@ -498,6 +490,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
     <div class="card"><div class="kpi-l">Unrestricted</div><div class="kpi-n">{d(unrestricted)}</div><div class="kpi-s">Available for operating use</div></div>
     <div class="card"><div class="kpi-l">Operating Reserve</div><div class="kpi-n">{months_cash:.1f} mo</div><div class="kpi-s">Unrestricted &divide; avg monthly expense &middot; 3-mo target</div></div>
   </div>
+  {section_insights('bank')}
   <div class="cap">Total bank live from QuickBooks (cash across all accounts). Designated/restricted (~{d(RESTR)}) is reserved for capital and designated funds; unrestricted is what remains available for operations. Reserve months = unrestricted cash &divide; average monthly operating expense.</div>
 </section>
 
