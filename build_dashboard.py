@@ -393,27 +393,6 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 </section>
 
 <section>
-  <h2>Giving Health</h2>
-  <div class="grid g4">
-    <div class="card"><div class="kpi-l">Committed Giving Units</div><div class="kpi-n">{committed}</div><div class="kpi-s">Gave &gt;$200 to 4100 &middot; trailing 12 mo</div></div>
-    <div class="card"><div class="kpi-l">Participation</div><div class="kpi-n">{participation:.0f}%</div><div class="kpi-s">{committed} of {households} active households</div></div>
-    <div class="card"><div class="kpi-l">New Donors to 4100</div><div class="kpi-n">{new_donors_year}</div><div class="kpi-s">This year</div></div>
-    <div class="card"><div class="kpi-l">New Donors This Week</div><div class="kpi-n">{new_donors_week}</div><div class="kpi-s">First-time givers, last 7 days</div></div>
-  </div>
-</section>
-
-<section>
-  <h2>Donor Retention</h2>
-  <div class="grid g4">
-    <div class="card"><div class="kpi-l">Retained</div><div class="kpi-n" style="color:var(--green)">{retained}</div><div class="kpi-s">Committed both 12-mo windows</div></div>
-    <div class="card"><div class="kpi-l">Lapsed</div><div class="kpi-n" style="color:var(--red)">{lapsed}</div><div class="kpi-s">Committed prior, not now</div></div>
-    <div class="card"><div class="kpi-l">Newly Committed</div><div class="kpi-n">{newly}</div><div class="kpi-s">New committed this window</div></div>
-    <div class="card"><div class="kpi-l">Retention Rate</div><div class="kpi-n" style="color:var(--green)">{retention:.1f}%</div><div class="kpi-s">of {prior_committed} prior committed units</div></div>
-  </div>
-  <div class="cap">Committed giving unit = gave &gt;$200 cumulatively to Tithe/Offering (trailing 12 mo). Rolling 12 months vs. the prior 12; net committed change {newly-lapsed}. Live from Planning Center Giving.</div>
-</section>
-
-<section>
   <h2>Key Insights &amp; Watch Items</h2>
   <div class="panel">
     <div class="legend"><span><span class="sw" style="background:var(--green)"></span>Strength</span><span><span class="sw" style="background:var(--amber)"></span>Watch</span><span><span class="sw" style="background:var(--red)"></span>Concern</span></div>
@@ -443,6 +422,27 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h2>Monthly Giving &mdash; 2026 vs Prior Years</h2>
   <div class="callout">Giving Jan&ndash;{MONTHS12[n_closed-1]} is up ~{giv_yoy:.0f}% vs 2025; {RMONTH} shown partial (through {DATA_THROUGH}).</div>
   <div class="chartbox"><canvas id="givingChart" height="120"></canvas></div>
+</section>
+
+<section>
+  <h2>Giving Health</h2>
+  <div class="grid g4">
+    <div class="card"><div class="kpi-l">Committed Giving Units</div><div class="kpi-n">{committed}</div><div class="kpi-s">Gave &gt;$200 to 4100 &middot; trailing 12 mo</div></div>
+    <div class="card"><div class="kpi-l">Participation</div><div class="kpi-n">{participation:.0f}%</div><div class="kpi-s">{committed} of {households} active households</div></div>
+    <div class="card"><div class="kpi-l">New Donors to 4100</div><div class="kpi-n">{new_donors_year}</div><div class="kpi-s">This year</div></div>
+    <div class="card"><div class="kpi-l">New Donors This Week</div><div class="kpi-n">{new_donors_week}</div><div class="kpi-s">First-time givers, last 7 days</div></div>
+  </div>
+</section>
+
+<section>
+  <h2>Donor Retention</h2>
+  <div class="grid g4">
+    <div class="card"><div class="kpi-l">Retained</div><div class="kpi-n" style="color:var(--green)">{retained}</div><div class="kpi-s">Committed both 12-mo windows</div></div>
+    <div class="card"><div class="kpi-l">Lapsed</div><div class="kpi-n" style="color:var(--red)">{lapsed}</div><div class="kpi-s">Committed prior, not now</div></div>
+    <div class="card"><div class="kpi-l">Newly Committed</div><div class="kpi-n">{newly}</div><div class="kpi-s">New committed this window</div></div>
+    <div class="card"><div class="kpi-l">Retention Rate</div><div class="kpi-n" style="color:var(--green)">{retention:.1f}%</div><div class="kpi-s">of {prior_committed} prior committed units</div></div>
+  </div>
+  <div class="cap">Committed giving unit = gave &gt;$200 cumulatively to Tithe/Offering (trailing 12 mo). Rolling 12 months vs. the prior 12; net committed change {newly-lapsed}. Live from Planning Center Giving.</div>
 </section>
 
 <section>
