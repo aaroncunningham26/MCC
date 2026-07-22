@@ -1,31 +1,28 @@
 {
   "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
-  "run_date": "July 15, 2026",
+  "run_date": "July 22, 2026",
   "run_weekday": "Wednesday",
-  "data_through": "July 12, 2026",
-  "weeks_ytd": 28,
+  "data_through": "July 19, 2026",
+  "weeks_ytd": 29,
   "reporting_month_index": 7,
   "reporting_month_name": "July",
-  "current_month": {"giving4100": 52599.23, "op_income": 56356.27, "op_expense": 54616.18, "personnel": 45626.02, "facilities": 5605.65, "partial": true},
-  "last_week_giving": 24165.70,
-  "bank": 783700.10,
-  "loan_balance": 1456698.06,
-  "giving_health": {"committed": 312, "households": 470, "new_donors_year": 36, "new_donors_week": 0},
-  "retention": {"retained": 243, "lapsed": 79, "new": 69, "rate": 75.5, "prior": 322},
+  "current_month": {"giving4100": 77554.56, "op_income": 79069.60, "op_expense": 89696.08, "personnel": 45626.02, "facilities": 14848.81, "partial": true},
+  "last_week_giving": 24955.33,
+  "bank": 744370.90,
+  "loan_balance": 1455379.56,
+  "giving_health": {"committed": 316, "households": 470, "new_donors_year": 36, "new_donors_week": 0},
+  "retention": {"retained": 244, "lapsed": 78, "new": 72, "rate": 75.8, "prior": 322},
   "ramp": {
-    "card_mtd": 13813.95, "card_mtd_n": 59, "card_7d": 7654.79, "card_7d_n": 31,
-    "ap_paid_mtd": 9297.37, "ap_paid_n": 12, "ap_out": 2616.51, "ap_open_n": 6,
+    "card_mtd": 20186.54, "card_mtd_n": 116, "card_7d": 6372.91, "card_7d_n": 57,
+    "ap_paid_mtd": 9924.39, "ap_paid_n": 14, "ap_out": 9070.75, "ap_open_n": 17,
     "card_over": [
-      ["07/13", "Paypal", "Aaron Cunningham", "", 3298.17],
-      ["07/11", "Leadingsmart Llc", "Ryan Graham", "RG - 2027 XP Conference", 1995.00]
+      ["07/18", "Church Media Squad", "Ryan Graham", "Communications Outsourcing", 1597.00],
+      ["07/16", "Planning Center", "Aaron Cunningham", "AC - Planning Center Subscription", 728.00]
     ],
     "bills_paid": [
-      ["07/15", "Bontrager Security Solutions", "Annual fire and security system maintenance inspection and battery replacement", 2276.00],
-      ["07/14", "Heart & Hand International", "Pauline Yoder", 750.00],
-      ["07/14", "Cintas", "AED automatic agreement for ZOLL 3 equipment", 133.00],
-      ["07/08", "Bill Heating Inc", "HVAC maintenance agreement services and replacement air filters", 1093.00],
-      ["07/08", "Mission Aviation Fellowship", "Dan and Stephanie Kramer Support", 616.48],
-      ["07/08", "Party Starters LLC", "Multi color bouncer and dunk tank rental for an event", 421.00]
+      ["07/17", "Wildman Uniform  Linen", "floor mats and delivery services", 210.98],
+      ["07/16", "Economy Offset Print and Digital Services", "Printing of various ministry cards for church programs", 416.04],
+      ["07/15", "Bontrager Security Solutions", "Annual fire and security system maintenance inspection and battery replacement", 2276.00]
     ]
   }
 }
