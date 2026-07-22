@@ -313,8 +313,9 @@ h2{{font-weight:900;text-transform:uppercase;letter-spacing:.01em;color:var(--sl
 .grid{{display:grid;gap:16px;}}
 .g4{{grid-template-columns:repeat(4,1fr);}}
 .g5{{grid-template-columns:repeat(5,1fr);}}
-@media(max-width:900px){{.g4,.g5{{grid-template-columns:repeat(2,1fr);}}}}
-@media(max-width:560px){{.g4,.g5{{grid-template-columns:1fr;}}}}
+.g6{{grid-template-columns:repeat(6,1fr);}}
+@media(max-width:900px){{.g4,.g5,.g6{{grid-template-columns:repeat(2,1fr);}}}}
+@media(max-width:560px){{.g4,.g5,.g6{{grid-template-columns:1fr;}}}}
 .card{{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(20,24,31,.04);}}
 .kpi-l{{font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-size:11px;margin-bottom:8px;}}
 .kpi-n{{font-weight:900;color:var(--slate);font-size:30px;line-height:1;}}
@@ -381,11 +382,12 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 <div class="wrap">
 
 <section>
-  <div class="grid g5">
+  <div class="grid g6">
     <div class="card"><div class="kpi-l">Last Week's Giving</div><div class="kpi-n">{d(last_week_giving)}</div><div class="kpi-s">Week of {WEEK_LABEL} &middot; QBO 4100</div></div>
     <div class="card"><div class="kpi-l">{RMONTH} Giving</div><div class="kpi-n">{d(current_giving)}</div><div class="kpi-s">Month to date (through {DATA_THROUGH})</div></div>
     <div class="card"><div class="kpi-l">YTD Giving</div><div class="kpi-n">{d(ytd_giving)}</div><div class="kpi-s">Jan&ndash;{RMONTH} &middot; sum of 4100</div></div>
     <div class="card"><div class="kpi-l">YTD Operating Income</div><div class="kpi-n">{d(ytd_opinc)}</div><div class="kpi-s">Jan&ndash;{RMONTH} &middot; total operating revenue</div></div>
+    <div class="card"><div class="kpi-l">YTD Operating Expense</div><div class="kpi-n">{d(ytd_opexp)}</div><div class="kpi-s">Jan&ndash;{RMONTH} &middot; total operating expense</div></div>
     <div class="card"><div class="kpi-l">Bank Balance</div><div class="kpi-n">{d(bank)}</div><div class="kpi-s">Unrestricted: {d(unrestricted)} &middot; {months_cash:.1f} mo. cash</div></div>
   </div>
 </section>
