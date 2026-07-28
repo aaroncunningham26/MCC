@@ -79,7 +79,7 @@
       <div class="sub">Attendance, Guests, Groups &amp; Next Steps</div>
     </div>
   </div>
-  <div class="right">Attendance through July 19, 2026<br>Profiles &amp; groups: live &middot; history to June 2026</div>
+  <div class="right">Attendance through July 26, 2026<br>Profiles &amp; groups: live &middot; history to June 2026</div>
   </div>
 </header>
 
@@ -87,10 +87,10 @@
 
   <div class="section-label">Weekend attendance &mdash; updated weekly</div>
   <div class="cards">
-    <div class="card top-blue"><div class="label">Weekend Attendance</div><div class="value">898</div><div class="sub">Week of Jul 19</div><span class="delta down">&#9660; &minus;41 vs prior week</span></div>
-    <div class="card top-blue"><div class="label">6-Week Moving Avg</div><div class="value">906</div><div class="sub">Rolling 6-week average</div></div>
-    <div class="card top-green"><div class="label">Avg Weekly Att. YTD</div><div class="value">1,025</div><div class="sub green">Year-to-date average</div></div>
-    <div class="card top-blue"><div class="label">Avg Weekly Att. &mdash; June</div><div class="value">956</div><div class="sub">Close of June</div><span class="delta down">&#9660; &minus;118 vs prior month</span></div>
+    <div class="card top-blue"><div class="label">Weekend Attendance</div><div class="value">830</div><div class="sub">Week of Jul 26</div><span class="delta down">&#9660; &minus;68 vs prior week</span></div>
+    <div class="card top-blue"><div class="label">6-Week Moving Avg</div><div class="value">883</div><div class="sub">Rolling 6-week average</div></div>
+    <div class="card top-green"><div class="label">Avg Weekly Att. YTD</div><div class="value">1,019</div><div class="sub green">Year-to-date average</div></div>
+    <div class="card top-blue"><div class="label">Avg Weekly Att. &mdash; July</div><div class="value">870</div><div class="sub">Close of July</div><span class="delta down">&#9660; &minus;86 vs prior month</span></div>
   </div>
 
   <div class="section-label">Weekly attendance trend &mdash; 2026</div>
@@ -114,7 +114,7 @@
   </div>
 
   <div class="section-label">Key takeaways</div>
-  <div class="insights"><h2>What this data is telling us</h2><ul><li><span class="dot dot-green"></span><span>Weekend attendance is healthy &mdash; the YTD weekly average is <strong>1,025</strong> (6-week moving average <strong>906</strong>). Mar 29 was the year's strongest week at 1,421.</span></li><li><span class="dot dot-blue"></span><span>Year over year, the 2026 monthly attendance is tracking <strong>above</strong> 2025 (2025 averaged 1,025/week) and well above 2021&ndash;2023.</span></li><li><span class="dot dot-green"></span><span>Discipleship base is strong &mdash; <strong>612 adults</strong> are in a group (~59% of adults) and <strong>387</strong> serve on Sundays.</span></li><li><span class="dot dot-blue"></span><span>So far in 2026: <strong>16</strong> baptisms, <strong>15</strong> through Starting Point, and <strong>255</strong> new Sunday guests (YTD).</span></li></ul></div>
+  <div class="insights"><h2>What this data is telling us</h2><ul><li><span class="dot dot-green"></span><span>Weekend attendance is healthy &mdash; the YTD weekly average is <strong>1,019</strong> (6-week moving average <strong>883</strong>). Mar 29 was the year's strongest week at 1,421.</span></li><li><span class="dot dot-blue"></span><span>Year over year, the 2026 monthly attendance is tracking <strong>above</strong> 2025 (2025 averaged 1,025/week) and well above 2021&ndash;2023.</span></li><li><span class="dot dot-green"></span><span>Discipleship base is strong &mdash; <strong>612 adults</strong> are in a group (~59% of adults) and <strong>387</strong> serve on Sundays.</span></li><li><span class="dot dot-blue"></span><span>So far in 2026: <strong>16</strong> baptisms, <strong>15</strong> through Starting Point, and <strong>255</strong> new Sunday guests (YTD).</span></li></ul></div>
 
   <div class="section-divider"><h2>Groups &amp; serving</h2><span class="badge">Live &middot; vs June</span></div>
   <div class="cards">
@@ -192,7 +192,7 @@
   </div>
 
   <div class="mcc-footer">
-    <p>Maple City Chapel &nbsp;&middot;&nbsp; MCC Connections Dashboard &nbsp;&middot;&nbsp; Prepared July 21, 2026</p>
+    <p>Maple City Chapel &nbsp;&middot;&nbsp; MCC Connections Dashboard &nbsp;&middot;&nbsp; Prepared July 28, 2026</p>
     <p style="margin-top:2px;">Attendance: weekly tracking sheet. Live roster/groups/serving/check-ins: Planning Center. Trends &amp; history: MCC Connection KPMs sheet. Refreshed weekly.</p>
   </div>
 </div>
@@ -207,10 +207,10 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 
 // Weekly attendance + moving average
 new Chart(document.getElementById('attWeekly'), {
-  data: { labels: ["1/4", "1/11", "1/18", "1/25", "2/1", "2/8", "2/15", "2/22", "3/1", "3/8", "3/15", "3/22", "3/29", "4/5", "4/12", "4/19", "4/26", "5/3", "5/10", "5/17", "5/24", "5/31", "6/7", "6/14", "6/21", "6/28", "7/5", "7/12", "7/19"],
+  data: { labels: ["1/4", "1/11", "1/18", "1/25", "2/1", "2/8", "2/15", "2/22", "3/1", "3/8", "3/15", "3/22", "3/29", "4/5", "4/12", "4/19", "4/26", "5/3", "5/10", "5/17", "5/24", "5/31", "6/7", "6/14", "6/21", "6/28", "7/5", "7/12", "7/19", "7/26"],
     datasets: [
-      { type:'bar', label:'Weekly attendance', data:[1015, 1009, 1056, 687, 1024, 1080, 965, 839, 1009, 1032, 1050, 1096, 1421, 1373, 1028, 1114, 1087, 1085, 1209, 1015, 1041, 1022, 1041, 967, 967, 847, 815, 939, 898], backgroundColor:'#8899AA', borderRadius:3, order:2 },
-      { type:'line', label:'6-week moving average', data:[1015, 1012, 1027, 942, 958, 978, 970, 942, 934, 992, 996, 998, 1074, 1164, 1167, 1180, 1186, 1185, 1149, 1090, 1092, 1076, 1069, 1049, 1009, 981, 943, 929, 906], borderColor:'#343A44', borderWidth:2.5, pointRadius:0, tension:.3, order:1 }
+      { type:'bar', label:'Weekly attendance', data:[1015, 1009, 1056, 687, 1024, 1080, 965, 839, 1009, 1032, 1050, 1096, 1421, 1373, 1028, 1114, 1087, 1085, 1209, 1015, 1041, 1022, 1041, 967, 967, 847, 815, 939, 898, 830], backgroundColor:'#8899AA', borderRadius:3, order:2 },
+      { type:'line', label:'6-week moving average', data:[1015, 1012, 1027, 942, 958, 978, 970, 942, 934, 992, 996, 998, 1074, 1164, 1167, 1180, 1186, 1185, 1149, 1090, 1092, 1076, 1069, 1049, 1009, 981, 943, 929, 906, 883], borderColor:'#343A44', borderWidth:2.5, pointRadius:0, tension:.3, order:1 }
     ] },
   options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
     plugins:{legend:{display:false}, tooltip:{callbacks:{label:(c)=>' '+c.dataset.label+': '+c.parsed.y.toLocaleString()}}},
