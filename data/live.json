@@ -1,28 +1,33 @@
 {
   "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
-  "run_date": "July 22, 2026",
+  "run_date": "July 29, 2026",
   "run_weekday": "Wednesday",
-  "data_through": "July 19, 2026",
-  "weeks_ytd": 29,
+  "data_through": "July 26, 2026",
+  "weeks_ytd": 30,
   "reporting_month_index": 7,
   "reporting_month_name": "July",
-  "current_month": {"giving4100": 77554.56, "op_income": 79069.60, "op_expense": 89696.08, "personnel": 45626.02, "facilities": 14848.81, "partial": true},
-  "last_week_giving": 24955.33,
-  "bank": 744370.90,
-  "loan_balance": 1455379.56,
-  "giving_health": {"committed": 316, "households": 470, "new_donors_year": 36, "new_donors_week": 0},
-  "retention": {"retained": 244, "lapsed": 78, "new": 72, "rate": 75.8, "prior": 322},
+  "current_month": {"giving4100": 106684.38, "op_income": 108502.92, "op_expense": 138289.07, "personnel": 84359.80, "facilities": 17373.33, "partial": true},
+  "last_week_giving": 29129.82,
+  "bank": 727526.72,
+  "loan_balance": 1454059.36,
+  "giving_health": {"committed": 318, "households": 470, "new_donors_year": 36, "new_donors_week": 2},
+  "retention": {"retained": 244, "lapsed": 78, "new": 74, "rate": 75.8, "prior": 322},
   "ramp": {
-    "card_mtd": 20186.54, "card_mtd_n": 116, "card_7d": 6372.91, "card_7d_n": 57,
-    "ap_paid_mtd": 9924.39, "ap_paid_n": 14, "ap_out": 9070.75, "ap_open_n": 17,
+    "card_mtd": 27161.01, "card_mtd_n": 169, "card_7d": 7036.51, "card_7d_n": 55,
+    "ap_paid_mtd": 11534.05, "ap_paid_n": 19, "ap_out": 8206.60, "ap_open_n": 15,
     "card_over": [
-      ["07/18", "Church Media Squad", "Ryan Graham", "Communications Outsourcing", 1597.00],
-      ["07/16", "Planning Center", "Aaron Cunningham", "AC - Planning Center Subscription", 728.00]
+      ["07/27", "Best Buy", "Chris Reed", "New Mac mini for Kid's Worship", 999.99],
+      ["07/27", "Best Buy", "Jesse Maurer", "", 920.18],
+      ["07/22", "Mechanical Man Inc", "Aaron Cunningham", "AC - Unit 18 HVAC Repair", 719.00],
+      ["07/24", "TechKnowledgey Inc", "Wrennie Howard", "Monthly copier lease and usage", 583.68],
+      ["07/22", "Menards", "Jesse Maurer", "Equipment Chest for Studio", 561.79]
     ],
     "bills_paid": [
-      ["07/17", "Wildman Uniform  Linen", "floor mats and delivery services", 210.98],
-      ["07/16", "Economy Offset Print and Digital Services", "Printing of various ministry cards for church programs", 416.04],
-      ["07/15", "Bontrager Security Solutions", "Annual fire and security system maintenance inspection and battery replacement", 2276.00]
+      ["07/28", "Tanya Wieland", "Psychotherapy services for Jenn & Chase Borden", 300.00],
+      ["07/27", "Cintas", "First aid supplies, disinfect services, and cabinet organization", 130.93],
+      ["07/24", "Global Gates", "Jayne Delegrange Missionary Support", 750.00],
+      ["07/22", "Economy Offset Print and Digital Services", "Printing of anniversary and birthday cards on white card stock", 132.73],
+      ["07/22", "Best Sweeping Specialist", "Parking lot sweeping including full sweep and fire lanes", 296.00]
     ]
   }
 }
