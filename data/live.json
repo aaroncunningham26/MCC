@@ -10,7 +10,7 @@
   "last_week_giving": 29129.82,
   "bank": 727526.72,
   "loan_balance": 1454059.36,
-  "giving_health": {"committed": 318, "households": 470, "new_donors_year": 36, "new_donors_week": 2},
+  "giving_health": {"committed": 318, "households": 470, "new_donors_year": 47, "new_donors_week": 2},
   "retention": {"retained": 244, "lapsed": 78, "new": 74, "rate": 75.8, "prior": 322},
   "ramp": {
     "card_mtd": 27161.01, "card_mtd_n": 169, "card_7d": 7036.51, "card_7d_n": 55,
