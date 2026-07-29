@@ -222,16 +222,16 @@ else:
 # --- Donor retention & committed base ---  [home: retention]
 if retention >= 80 and net_committed >= 0:
     add("green","Strength","Committed base holding",
-        "Retention is %.1f%% (%d of %d prior committed units), with %d newly committed vs %d lapsed &mdash; a net change of %+d. Participation is %.0f%% of households."
-        % (retention, retained, prior_committed, newly, lapsed, net_committed, participation), "retention")
+        "Retention is %.1f%% (%d of %d prior committed units), with %d newly committed vs %d lapsed &mdash; a net change of %+d."
+        % (retention, retained, prior_committed, newly, lapsed, net_committed), "retention")
 elif retention >= 65:
     add("amber","Watch","Committed base eased",
-        "Retention is %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed &mdash; a net change of %+d, moving the base from %d to %d. Participation is %.0f%% of households."
-        % (retention, retained, prior_committed, lapsed, newly, net_committed, prior_committed, committed, participation), "retention")
+        "Retention is %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed &mdash; a net change of %+d, moving the base from %d to %d."
+        % (retention, retained, prior_committed, lapsed, newly, net_committed, prior_committed, committed), "retention")
 else:
     add("red","Concern","Committed base declining",
-        "Retention has slipped to %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed (net %+d). Participation is %.0f%% of households."
-        % (retention, retained, prior_committed, lapsed, newly, net_committed, participation), "retention")
+        "Retention has slipped to %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed (net %+d)."
+        % (retention, retained, prior_committed, lapsed, newly, net_committed), "retention")
 
 # --- New givers (positive signal, only when there is activity) ---  [home: giving_health]
 if new_donors_week > 0:
