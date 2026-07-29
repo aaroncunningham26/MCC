@@ -65,6 +65,16 @@ loan_rate = LT["rate"]; loan_pay = LT["payment"]; loan_prin = LT["principal"]; l
 gh = live["giving_health"]
 committed = gh["committed"]; households = gh["households"]; participation = committed/households*100
 new_donors_year = gh["new_donors_year"]; new_donors_week = gh["new_donors_week"]
+# Previous-month participation: distinct donors to 4100 last complete month / active households
+prev_month_participants = gh.get("prev_month_participants")
+prev_month_name = gh.get("prev_month_name", "last month")
+if prev_month_participants:
+    mo_participation = prev_month_participants/households*100
+    part_n = "%.0f%%" % mo_participation
+    part_s = "%d of %d households gave in %s" % (prev_month_participants, households, prev_month_name)
+else:
+    part_n = "%.0f%%" % participation
+    part_s = "%d of %d active households" % (committed, households)
 rt = live["retention"]
 retained = rt["retained"]; lapsed = rt["lapsed"]; newly = rt["new"]; retention = rt["rate"]; prior_committed = rt["prior"]
 
@@ -424,7 +434,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h2>Giving Health</h2>
   <div class="grid g4">
     <div class="card"><div class="kpi-l">Committed Giving Units</div><div class="kpi-n">{committed}</div><div class="kpi-s">Gave &gt;$200 to 4100 &middot; trailing 12 mo</div></div>
-    <div class="card"><div class="kpi-l">Participation</div><div class="kpi-n">{participation:.0f}%</div><div class="kpi-s">{committed} of {households} active households</div></div>
+    <div class="card"><div class="kpi-l">Participation</div><div class="kpi-n">{part_n}</div><div class="kpi-s">{part_s}</div></div>
     <div class="card"><div class="kpi-l">New Donors to 4100</div><div class="kpi-n">{new_donors_year}</div><div class="kpi-s">This year</div></div>
     <div class="card"><div class="kpi-l">New Donors This Week</div><div class="kpi-n">{new_donors_week}</div><div class="kpi-s">First-time givers, last 7 days</div></div>
   </div>
