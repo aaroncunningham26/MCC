@@ -233,6 +233,20 @@ else:
         "Retention has slipped to %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed (net %+d)."
         % (retention, retained, prior_committed, lapsed, newly, net_committed), "retention")
 
+# --- Healthy retention benchmark for a church ---  [home: retention]
+if retention >= 70:
+    add("green","Benchmark","Retention in the healthy range",
+        "For a church our size, a healthy band for committed-giver retention runs about 70&ndash;80%%+. The broader nonprofit sector averages ~69%% repeat-donor retention, and congregations typically run higher given recurring, rhythm-based giving. MCC's %.1f%% sits inside that healthy range; sustained readings below ~65%% would be the line to watch."
+        % retention, "retention")
+elif retention >= 65:
+    add("amber","Benchmark","Retention near the low end of healthy",
+        "A healthy band for a church's committed-giver retention is roughly 70&ndash;80%%+ (the nonprofit sector averages ~69%% repeat-donor retention, and congregations usually run higher). MCC's %.1f%% is at the low end of healthy &mdash; still workable, but worth watching that it doesn't drift below ~65%%."
+        % retention, "retention")
+else:
+    add("red","Benchmark","Retention below the healthy range",
+        "A healthy band for a church's committed-giver retention is roughly 70&ndash;80%%+ (the nonprofit sector averages ~69%% repeat-donor retention). MCC's %.1f%% is below that range, which points to committed households lapsing faster than a healthy base should &mdash; worth a focused re-engagement effort."
+        % retention, "retention")
+
 # --- New givers (positive signal, only when there is activity) ---  [home: giving_health]
 if new_donors_week > 0:
     add("green","Strength","New givers this week",
