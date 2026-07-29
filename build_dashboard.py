@@ -149,19 +149,15 @@ else:
         "Average weekly giving is %s vs the %s/week budget (only %.0f%% of pace) &mdash; about %s/week behind. YTD giving %s trails the %s budgeted pace by %s."
         % (d(avg_wk_giving), d(WEEKLY_BUDGET), budget_pct, d(avg_wk_giving-WEEKLY_BUDGET), d(ytd_giving), d(ytd_budget), d(abs(budget_var))), "budget")
 
-# --- Operating surplus / deficit (closed months, apples-to-apples) ---  [home: opex]
-if ytd_net_closed >= 0:
+# --- Operating surplus / deficit (YTD Jan-RMONTH, matches section stat cards) ---  [home: opex]
+if op_net >= 0:
     add("green","Strength","Operating surplus year-to-date",
-        "Through %s, operating income exceeds expense by %s across closed months; the most recent closed month netted %s."
-        % (MONTHS12[n_closed-1], d(ytd_net_closed), d(last_closed_net)), "opex")
-elif last_closed_net >= first2:
-    add("amber","Watch","Operating deficit, narrowing",
-        "Closed months show a YTD operating deficit of %s, but the monthly shortfall improved from about %s early on to %s most recently &mdash; trending the right way, not yet in the black."
-        % (d(ytd_net_closed), d(first2), d(last_closed_net)), "opex")
+        "Year-to-date (Jan&ndash;%s, %s partial through %s), operating income of %s exceeds expense of %s &mdash; a surplus of %s. Income sits at %.0f%% of the annual plan with %.0f%% of the year elapsed."
+        % (RMONTH, RMONTH, DATA_THROUGH, d(ytd_opinc), d(ytd_opexp), d(op_net), opinc_bar, pace), "opex")
 else:
-    add("red","Concern","Operating deficit widening",
-        "Closed months show a YTD operating deficit of %s, and the monthly shortfall has worsened from about %s early on to %s most recently."
-        % (d(ytd_net_closed), d(first2), d(last_closed_net)), "opex")
+    add("amber","Watch","Operating deficit year-to-date",
+        "Year-to-date (Jan&ndash;%s, %s partial through %s), operating expense of %s exceeds income of %s &mdash; a deficit of %s. Income sits at %.0f%% of the annual plan with %.0f%% of the year elapsed, so receipts are trailing the spending pace."
+        % (RMONTH, RMONTH, DATA_THROUGH, d(ytd_opexp), d(ytd_opinc), d(abs(op_net)), opinc_bar, pace), "opex")
 
 # --- Expense growth vs giving growth (YoY, closed months) ---  [home: opex]
 if exp_yoy - giv_yoy >= 8:
