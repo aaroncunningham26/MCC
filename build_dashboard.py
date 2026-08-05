@@ -2,35 +2,121 @@
 """
 MCC Finance Team Dashboard renderer.
 
-Merges three data layers and writes finance-team.html:
-  data/static.json       -- frozen: 2022-2025 history, budget constants, loan terms
-  data/2026-actuals.json -- cached: finalized (closed) 2026 months
-  data/live.json         -- dynamic: this week's open month, KPIs, PCO, Ramp, balances
+Data source: MCC Data Warehouse (see CLAUDE.md DATA ARCHITECTURE)
 
-Weekly job only needs to: refresh live.json (and, when a month closes, append it to
-2026-actuals.json), then run:  python3 build_dashboard.py
+Merges two data layers and writes finance-team.html:
+  MCC Data Warehouse -- budget constants & loan terms (config tab), 2022-2025
+                        monthly operating history and closed 2026 months
+                        (observations tab). Replaces the retired
+                        data/static.json + data/2026-actuals.json.
+  data/live.json     -- dynamic: this week's open month, KPIs, PCO, Ramp, balances.
 
-The template/CSS/chart config below is stable; numbers come entirely from the JSON.
+Weekly job only needs to: refresh live.json (closed months flow into the
+warehouse automatically), then run:  python3 build_dashboard.py
+
+The template/CSS/chart config below is stable; numbers come entirely from the
+warehouse + live.json.
 """
 import json, os, sys
 from datetime import datetime, timedelta
+
+import warehouse_reader as wh
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 def load(p):
     with open(os.path.join(BASE, "data", p)) as f:
         return json.load(f)
 
-static = load("static.json")
-actuals = load("2026-actuals.json")
+MONTHS12 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+# ══════════════════════════════════════════════════════════════════════════
+# Data loading
+# Data source: MCC Data Warehouse (see CLAUDE.md DATA ARCHITECTURE)
+#
+# The warehouse replaces the retired data/static.json + data/2026-actuals.json:
+#   constants / loan_terms   <- config tab (weekly_budget, annual_budget,
+#                               restricted_offset, loan_*)
+#   history_income/_expense  <- monthly op_income / op_expense observations
+#   closed 2026 months       <- monthly 2026 observations (give_4100,
+#                               op_income, op_expense, personnel_expense,
+#                               facilities_expense)
+#
+# data/live.json is KEPT intentionally: it carries the truly-live layer the
+# warehouse does not hold -- bank & loan balances, Ramp activity, PCO
+# committed/retention & giving-health, last-week giving, the open month's
+# partial figures, and the run/reporting dates. The weekly job still
+# refreshes live.json each run.
+# ══════════════════════════════════════════════════════════════════════════
 live = load("live.json")
 
-MONTHS12 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+_cfg = wh.config()
+def _cfgval(key):
+    if key not in _cfg or _cfg[key] in (None, ""):
+        sys.exit("Warehouse config tab is missing key '%s' -- add it before building." % key)
+    return _cfg[key]
+
+_rate = _cfgval("loan_rate")
+if isinstance(_rate, (int, float)):  # stored numeric; display like legacy "6.67%"
+    _rate = "%.2f%%" % (_rate * 100 if _rate <= 1 else _rate)
+
+def _year_series(mid, year):
+    """Complete Jan..Dec list of monthly observations for a closed year."""
+    mo = wh.monthly(mid, year)
+    out = [mo.get(m) for m in range(1, 13)]
+    if any(v is None for v in out):
+        missing = ", ".join(MONTHS12[i] for i, v in enumerate(out) if v is None)
+        sys.exit("Warehouse is missing %s %d observations for: %s" % (mid, year, missing))
+    return out
+
+static = {
+    "constants": {
+        "weekly_budget":     _cfgval("weekly_budget"),
+        "annual_budget":     _cfgval("annual_budget"),
+        "restricted_offset": _cfgval("restricted_offset"),
+    },
+    "loan_terms": {
+        "lender":    _cfg.get("loan_lender") or "First State Bank",
+        "rate":      _rate,
+        "payment":   _cfgval("loan_payment"),
+        "principal": _cfgval("loan_payment_principal"),
+        "interest":  _cfgval("loan_payment_interest"),
+    },
+    "history_income":  {str(y): _year_series("op_income", y)  for y in (2022, 2023, 2024, 2025)},
+    "history_expense": {str(y): _year_series("op_expense", y) for y in (2022, 2023, 2024, 2025)},
+}
+
+# Closed 2026 months from the warehouse. closed_through = latest 2026 month
+# with a give_4100 row (give_4100 is only written once a month's books close;
+# the open month's partial numbers stay in live.json).
+_ACT_MIDS = {"giving4100": "give_4100", "op_income": "op_income",
+             "op_expense": "op_expense", "personnel": "personnel_expense",
+             "facilities": "facilities_expense"}
+_g26 = wh.monthly("give_4100", 2026)
+_closed_n = max(_g26) if _g26 else 0
+_closed = {}
+for _m in range(1, _closed_n + 1):
+    _rec = {}
+    for _field, _mid in _ACT_MIDS.items():
+        _v = wh.monthly(_mid, 2026).get(_m)
+        if _v is None:
+            sys.exit("Warehouse is missing %s for closed month 2026-%02d." % (_mid, _m))
+        _rec[_field] = _v
+    _closed[MONTHS12[_m - 1]] = _rec
+actuals = {"year": 2026,
+           "closed_through": MONTHS12[_closed_n - 1] if _closed_n else None,
+           "closed_months": _closed}
 
 C = static["constants"]
 WEEKLY_BUDGET = C["weekly_budget"]; ANNUAL_BUDGET = C["annual_budget"]; RESTR = C["restricted_offset"]
 LT = static["loan_terms"]
 RUN_DATE = live["run_date"]; RUN_WEEKDAY = live["run_weekday"]; DATA_THROUGH = live["data_through"]
 WEEKS_YTD = live["weeks_ytd"]; RMI = live["reporting_month_index"]  # 1-based count of months Jan..reporting
+# Guard: every month before the reporting month must be closed in the warehouse.
+if _closed_n < RMI - 1:
+    sys.exit("Warehouse closed 2026 months run only through %s, but live.json reports "
+             "month index %d (%s). Promote the missing closed month(s) to the warehouse "
+             "before building." % (MONTHS12[_closed_n - 1] if _closed_n else "(none)",
+                                   RMI, live.get("reporting_month_name", "?")))
 # Last-week giving window = the 7 days ending on the last Sunday (= DATA_THROUGH). Derived, never hardcoded.
 _wk_end = datetime.strptime(DATA_THROUGH, "%B %d, %Y"); _wk_start = _wk_end - timedelta(days=6)
 if _wk_start.month == _wk_end.month:
