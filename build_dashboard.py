@@ -149,7 +149,21 @@ loan_balance = live["loan_balance"]
 loan_rate = LT["rate"]; loan_pay = LT["payment"]; loan_prin = LT["principal"]; loan_int = LT["interest"]
 
 gh = live["giving_health"]
+# `committed` is HOUSEHOLD-based (household_giving.py). Before 2026-08-12 it was
+# individual donor records, which made this participation ratio divide individuals
+# by households -- not a like-for-like comparison. Household basis fixes that.
 committed = gh["committed"]; households = gh["households"]; participation = committed/households*100
+committed_basis = gh.get("committed_basis", "individual")
+committed_individuals = gh.get("committed_individuals")
+if committed_basis == "household":
+    basis_note = ("Committed households counts each giving household once, not each individual donor "
+                  "record. Readings before August 12, 2026 were on an individual basis and ran higher "
+                  "(currently %s individuals) &mdash; the step down is the change in definition, not a "
+                  "drop in giving. Participation now compares households to households."
+                  % (committed_individuals if committed_individuals else "~10% more"))
+else:
+    basis_note = ("Committed giving units count individual donor records; a couple who both give "
+                  "counts twice. Participation therefore compares individuals to households.")
 new_donors_year = gh["new_donors_year"]; new_donors_week = gh["new_donors_week"]
 # Previous-month participation: distinct donors to 4100 last complete month / active households
 prev_month_participants = gh.get("prev_month_participants")
@@ -160,7 +174,7 @@ if prev_month_participants:
     part_s = "%d of %d households gave in %s" % (prev_month_participants, households, prev_month_name)
 else:
     part_n = "%.0f%%" % participation
-    part_s = "%d of %d active households" % (committed, households)
+    part_s = "%d of %d committed households" % (committed, households)
 rt = live["retention"]
 retained = rt["retained"]; lapsed = rt["lapsed"]; newly = rt["new"]; retention = rt["rate"]; prior_committed = rt["prior"]
 
@@ -304,29 +318,29 @@ else:
 # --- Donor retention & committed base ---  [home: retention]
 if retention >= 80 and net_committed >= 0:
     add("green","Strength","Committed base holding",
-        "Retention is %.1f%% (%d of %d prior committed units), with %d newly committed vs %d lapsed &mdash; a net change of %+d."
+        "Retention is %.1f%% (%d of %d prior committed households), with %d newly committed vs %d lapsed &mdash; a net change of %+d."
         % (retention, retained, prior_committed, newly, lapsed, net_committed), "retention")
 elif retention >= 65:
     add("amber","Watch","Committed base eased",
-        "Retention is %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed &mdash; a net change of %+d, moving the base from %d to %d."
+        "Retention is %.1f%% (%d of %d prior committed households); %d lapsed vs %d newly committed &mdash; a net change of %+d, moving the base from %d to %d."
         % (retention, retained, prior_committed, lapsed, newly, net_committed, prior_committed, committed), "retention")
 else:
     add("red","Concern","Committed base declining",
-        "Retention has slipped to %.1f%% (%d of %d prior committed units); %d lapsed vs %d newly committed (net %+d)."
+        "Retention has slipped to %.1f%% (%d of %d prior committed households); %d lapsed vs %d newly committed (net %+d)."
         % (retention, retained, prior_committed, lapsed, newly, net_committed), "retention")
 
 # --- Healthy retention benchmark for a church ---  [home: retention]
 if retention >= 70:
     add("green","Benchmark","Retention in the healthy range",
-        "For a church our size, a healthy band for committed-giver retention runs about 70&ndash;80%%+. The broader nonprofit sector averages ~69%% repeat-donor retention, and congregations typically run higher given recurring, rhythm-based giving. MCC's %.1f%% sits inside that healthy range; sustained readings below ~65%% would be the line to watch."
+        "For a church our size, a healthy band for committed-household retention runs about 70&ndash;80%%+. The broader nonprofit sector averages ~69%% repeat-donor retention, and congregations typically run higher given recurring, rhythm-based giving. MCC's %.1f%% sits inside that healthy range; sustained readings below ~65%% would be the line to watch."
         % retention, "retention")
 elif retention >= 65:
     add("amber","Benchmark","Retention near the low end of healthy",
-        "A healthy band for a church's committed-giver retention is roughly 70&ndash;80%%+ (the nonprofit sector averages ~69%% repeat-donor retention, and congregations usually run higher). MCC's %.1f%% is at the low end of healthy &mdash; still workable, but worth watching that it doesn't drift below ~65%%."
+        "A healthy band for a church's committed-household retention is roughly 70&ndash;80%%+ (the nonprofit sector averages ~69%% repeat-donor retention, and congregations usually run higher). MCC's %.1f%% is at the low end of healthy &mdash; still workable, but worth watching that it doesn't drift below ~65%%."
         % retention, "retention")
 else:
     add("red","Benchmark","Retention below the healthy range",
-        "A healthy band for a church's committed-giver retention is roughly 70&ndash;80%%+ (the nonprofit sector averages ~69%% repeat-donor retention). MCC's %.1f%% is below that range, which points to committed households lapsing faster than a healthy base should &mdash; worth a focused re-engagement effort."
+        "A healthy band for a church's committed-household retention is roughly 70&ndash;80%%+ (the nonprofit sector averages ~69%% repeat-donor retention). MCC's %.1f%% is below that range, which points to committed households lapsing faster than a healthy base should &mdash; worth a focused re-engagement effort."
         % retention, "retention")
 
 # --- New givers (positive signal, only when there is activity) ---  [home: giving_health]
@@ -529,24 +543,25 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 <section>
   <h2>Giving Health</h2>
   <div class="grid g4">
-    <div class="card"><div class="kpi-l">Committed Giving Units</div><div class="kpi-n">{committed}</div><div class="kpi-s">Gave &gt;$200 to 4100 &middot; trailing 12 mo</div></div>
+    <div class="card"><div class="kpi-l">Committed Households</div><div class="kpi-n">{committed}</div><div class="kpi-s">Gave &gt;$200 to 4100 &middot; trailing 12 mo</div></div>
     <div class="card"><div class="kpi-l">Participation</div><div class="kpi-n">{part_n}</div><div class="kpi-s">{part_s}</div></div>
     <div class="card"><div class="kpi-l">New Donors to 4100</div><div class="kpi-n">{new_donors_year}</div><div class="kpi-s">This year</div></div>
     <div class="card"><div class="kpi-l">New Donors This Week</div><div class="kpi-n">{new_donors_week}</div><div class="kpi-s">First-time givers, last 7 days</div></div>
   </div>
   {section_insights('giving_health')}
+  <div class="cap">{basis_note}</div>
 </section>
 
 <section>
   <h2>Donor Retention</h2>
   <div class="grid g4">
-    <div class="card"><div class="kpi-l">Retained</div><div class="kpi-n" style="color:var(--green)">{retained}</div><div class="kpi-s">Committed both 12-mo windows</div></div>
+    <div class="card"><div class="kpi-l">Retained</div><div class="kpi-n" style="color:var(--green)">{retained}</div><div class="kpi-s">Committed households, both 12-mo windows</div></div>
     <div class="card"><div class="kpi-l">Lapsed</div><div class="kpi-n" style="color:var(--red)">{lapsed}</div><div class="kpi-s">Committed prior, not now</div></div>
-    <div class="card"><div class="kpi-l">Newly Committed</div><div class="kpi-n">{newly}</div><div class="kpi-s">New committed this window</div></div>
-    <div class="card"><div class="kpi-l">Retention Rate</div><div class="kpi-n" style="color:var(--green)">{retention:.1f}%</div><div class="kpi-s">of {prior_committed} prior committed units</div></div>
+    <div class="card"><div class="kpi-l">Newly Committed</div><div class="kpi-n">{newly}</div><div class="kpi-s">New committed households this window</div></div>
+    <div class="card"><div class="kpi-l">Retention Rate</div><div class="kpi-n" style="color:var(--green)">{retention:.1f}%</div><div class="kpi-s">of {prior_committed} prior committed households</div></div>
   </div>
   {section_insights('retention')}
-  <div class="cap">Committed giving unit = gave &gt;$200 cumulatively to Tithe/Offering (trailing 12 mo). Rolling 12 months vs. the prior 12; net committed change {newly-lapsed}. Live from Planning Center Giving.</div>
+  <div class="cap">Committed household = a household that gave &gt;$200 cumulatively to Tithe/Offering (trailing 12 mo). Rolling 12 months vs. the prior 12; net committed change {newly-lapsed}. Live from Planning Center Giving.</div>
 </section>
 
 <section>

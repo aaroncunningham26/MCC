@@ -1,37 +1,139 @@
 {
-  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
-  "run_date": "August 5, 2026",
-  "run_weekday": "Wednesday",
-  "data_through": "August 2, 2026",
-  "weeks_ytd": 31,
-  "reporting_month_index": 8,
-  "reporting_month_name": "August",
-  "current_month": {"giving4100": 26304.70, "op_income": 26469.20, "op_expense": -99.14, "personnel": 0, "facilities": 0, "partial": true},
-  "last_week_giving": 43664.69,
-  "bank": 769739.33,
-  "loan_balance": 1452737.44,
-  "giving_health": {"committed": 314, "households": 479, "new_donors_year": 46, "new_donors_week": 0},
-  "retention": {"retained": 243, "lapsed": 74, "new": 71, "rate": 76.7, "prior": 317},
-  "ramp": {
-    "card_mtd": 6060.15, "card_mtd_n": 37, "card_7d": 8567.36, "card_7d_n": 60,
-    "ap_paid_mtd": 4060.51, "ap_paid_n": 6, "ap_out": 2660.55, "ap_open_n": 9,
-    "card_over": [
-      ["08/01", "Church Finance", "Aaron Cunningham", "AC - Outsourced accounting subscription", 1780.00],
-      ["08/04", "Grass Guru", "Aaron Cunningham", "", 1670.00],
-      ["07/29", "Global Leadership Network", "Ryan Graham", "RG - GLS tickets for Lead Team", 567.00],
-      ["07/29", "Subsplash", "Aaron Cunningham", "AC - Subsplash subscription", 505.39]
-    ],
-    "bills_paid": [
-      ["08/04", "Missionary Ventures", "Josh & Jennifer Hire", 1100.00],
-      ["08/04", "Glendon and Lorna Bender", "Missionary Support", 800.00],
-      ["08/04", "Mission Aviation Fellowship", "Dan and Stephanie Kramer Support", 800.00],
-      ["08/04", "Heart & Hand International", "Pauline Yoder", 750.00],
-      ["08/03", "KSS Enterprises", "cleaning and janitorial supplies including paper towels and disinfectant wipes", 557.10],
-      ["08/03", "Economy Offset Print and Digital Services", "Printing services for 4x6 Happy Birthday Cards", 53.41],
-      ["07/31", "Clayton Nisly", "Clayton Nisly Support", 800.00],
-      ["07/30", "Students International", "Eric Miller Missionary Support", 800.00],
-      ["07/29", "Economy Offset Print and Digital Services", "printing services for Profile Cards", 361.03],
-      ["07/29", "Economy Offset Print and Digital Services", "printing services for student connect cards", 120.23]
-    ]
-  }
+ "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
+ "run_date": "August 12, 2026",
+ "run_weekday": "Wednesday",
+ "data_through": "August 9, 2026",
+ "weeks_ytd": 32,
+ "reporting_month_index": 8,
+ "reporting_month_name": "August",
+ "current_month": {
+  "giving4100": 52883.55,
+  "op_income": 53415.6,
+  "op_expense": 48824.32,
+  "personnel": 45652.59,
+  "facilities": 2301.55,
+  "partial": true
+ },
+ "last_week_giving": 26578.85,
+ "bank": 749216.84,
+ "loan_balance": 1451413.81,
+ "giving_health": {
+  "committed": 287,
+  "households": 479,
+  "new_donors_year": 46,
+  "new_donors_week": 0,
+  "committed_individuals": 318,
+  "committed_basis": "household"
+ },
+ "retention": {
+  "retained": 226,
+  "lapsed": 54,
+  "new": 61,
+  "rate": 80.7,
+  "prior": 280,
+  "basis": "household"
+ },
+ "ramp": {
+  "card_mtd": 6060.15,
+  "card_mtd_n": 37,
+  "card_7d": 8567.36,
+  "card_7d_n": 60,
+  "ap_paid_mtd": 4060.51,
+  "ap_paid_n": 6,
+  "ap_out": 2660.55,
+  "ap_open_n": 9,
+  "card_over": [
+   [
+    "08/01",
+    "Church Finance",
+    "Aaron Cunningham",
+    "AC - Outsourced accounting subscription",
+    1780.0
+   ],
+   [
+    "08/04",
+    "Grass Guru",
+    "Aaron Cunningham",
+    "",
+    1670.0
+   ],
+   [
+    "07/29",
+    "Global Leadership Network",
+    "Ryan Graham",
+    "RG - GLS tickets for Lead Team",
+    567.0
+   ],
+   [
+    "07/29",
+    "Subsplash",
+    "Aaron Cunningham",
+    "AC - Subsplash subscription",
+    505.39
+   ]
+  ],
+  "bills_paid": [
+   [
+    "08/04",
+    "Missionary Ventures",
+    "Josh & Jennifer Hire",
+    1100.0
+   ],
+   [
+    "08/04",
+    "Glendon and Lorna Bender",
+    "Missionary Support",
+    800.0
+   ],
+   [
+    "08/04",
+    "Mission Aviation Fellowship",
+    "Dan and Stephanie Kramer Support",
+    800.0
+   ],
+   [
+    "08/04",
+    "Heart & Hand International",
+    "Pauline Yoder",
+    750.0
+   ],
+   [
+    "08/03",
+    "KSS Enterprises",
+    "cleaning and janitorial supplies including paper towels and disinfectant wipes",
+    557.1
+   ],
+   [
+    "08/03",
+    "Economy Offset Print and Digital Services",
+    "Printing services for 4x6 Happy Birthday Cards",
+    53.41
+   ],
+   [
+    "07/31",
+    "Clayton Nisly",
+    "Clayton Nisly Support",
+    800.0
+   ],
+   [
+    "07/30",
+    "Students International",
+    "Eric Miller Missionary Support",
+    800.0
+   ],
+   [
+    "07/29",
+    "Economy Offset Print and Digital Services",
+    "printing services for Profile Cards",
+    361.03
+   ],
+   [
+    "07/29",
+    "Economy Offset Print and Digital Services",
+    "printing services for student connect cards",
+    120.23
+   ]
+  ]
+ },
+ "_ramp_note": "STALE 2026-08-12: the Ramp MCP connector was not available in this run's tool set (no ramp_* tools surfaced; no Ramp credentials in ~/.mcc). The ramp block is carried forward unchanged from the 2026-08-05 run and reflects card/AP activity through 2026-08-05, NOT through data_through."
 }
