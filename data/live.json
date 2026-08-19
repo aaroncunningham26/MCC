@@ -1,36 +1,36 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "August 12, 2026",
+ "run_date": "August 19, 2026",
  "run_weekday": "Wednesday",
- "data_through": "August 9, 2026",
- "weeks_ytd": 32,
+ "data_through": "August 16, 2026",
+ "weeks_ytd": 33,
  "reporting_month_index": 8,
  "reporting_month_name": "August",
  "current_month": {
-  "giving4100": 52883.55,
-  "op_income": 53415.6,
-  "op_expense": 48824.32,
+  "giving4100": 79333.62,
+  "op_income": 80603.67,
+  "op_expense": 51167.32,
   "personnel": 45652.59,
-  "facilities": 2301.55,
+  "facilities": 4415.67,
   "partial": true
  },
- "last_week_giving": 26578.85,
- "bank": 749216.84,
- "loan_balance": 1451413.81,
+ "last_week_giving": 26450.07,
+ "bank": 762030.36,
+ "loan_balance": 1450088.47,
  "giving_health": {
   "committed": 287,
   "households": 479,
-  "new_donors_year": 46,
+  "new_donors_year": 50,
   "new_donors_week": 0,
   "committed_individuals": 318,
   "committed_basis": "household"
  },
  "retention": {
   "retained": 226,
-  "lapsed": 54,
+  "lapsed": 52,
   "new": 61,
-  "rate": 80.7,
-  "prior": 280,
+  "rate": 81.3,
+  "prior": 278,
   "basis": "household"
  },
  "ramp": {
@@ -135,5 +135,5 @@
    ]
   ]
  },
- "_ramp_note": "STALE 2026-08-12: the Ramp MCP connector was not available in this run's tool set (no ramp_* tools surfaced; no Ramp credentials in ~/.mcc). The ramp block is carried forward unchanged from the 2026-08-05 run and reflects card/AP activity through 2026-08-05, NOT through data_through."
+ "_ramp_note": "STALE 2026-08-19: the Ramp MCP connector was again unavailable in this run's tool set (no ramp_* tools surfaced). The ramp block is carried forward unchanged from the 2026-08-05 pull and reflects card/AP activity through 2026-08-05, NOT through data_through. Second consecutive week stale."
 }
