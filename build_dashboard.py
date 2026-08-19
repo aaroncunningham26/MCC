@@ -188,6 +188,21 @@ opinc_bar = ytd_opinc/ANNUAL_BUDGET*100
 op_net = round(ytd_opinc - ytd_opexp, 2)          # >0 surplus, <0 deficit
 op_ratio = ytd_opexp/ytd_opinc*100 if ytd_opinc else 0
 pace = WEEKS_YTD/52*100
+
+# ---- YTD Operating Expense vs Budget ----
+# Basis: the approved ANNUAL spending plan prorated straight-line by weeks elapsed
+# (same pace marker the bars already use). Both sides of the comparison stop at
+# DATA_THROUGH, so a partial reporting month is matched by a partial budget.
+# NOTE sign convention is the OPPOSITE of the giving section: for expense,
+# actual < budget is FAVOURABLE. Never reuse the giving 'neg' styling here.
+opexp_budget      = ANNUAL_BUDGET*WEEKS_YTD/52
+opexp_budget_var  = round(ytd_opexp - opexp_budget, 2)   # <0 under budget (good), >0 over (bad)
+opexp_budget_pct  = ytd_opexp/opexp_budget*100 if opexp_budget else 0
+opexp_under       = opexp_budget_var <= 0
+opexp_var_color   = "var(--green)" if opexp_under else "var(--red)"
+opexp_var_word    = "under budget" if opexp_under else "over budget"
+opexp_bar_color   = "var(--green)" if opexp_under else "var(--amber)"
+opexp_pace_bar    = min(opexp_budget_pct, 100)           # cap fill width at the track
 pers_ann = ytd_pers*52/WEEKS_YTD; pers_pct = pers_ann/ANNUAL_BUDGET*100
 fac_ann  = ytd_fac*52/WEEKS_YTD;  fac_pct  = fac_ann/ANNUAL_BUDGET*100
 
@@ -579,6 +594,24 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
     </div>
     {section_insights('opex')}
     <div class="cap">Operating income = total operating revenue (4000s); operating expense = total expenditures (5000&ndash;6000s). Excludes designated/restricted funds and loan service. Year pace marker shows {WEEKS_YTD} of 52 weeks elapsed.</div>
+  </div>
+</section>
+
+<section>
+  <h2>YTD Operating Expense vs Budget</h2>
+  <div class="panel">
+    <div class="stat4">
+      <div><div class="stat-l">YTD Actual Expense</div><div class="stat-n">{d(ytd_opexp)}</div></div>
+      <div><div class="stat-l">YTD Budget ({WEEKS_YTD} wks)</div><div class="stat-n">{d(opexp_budget)}</div></div>
+      <div><div class="stat-l">Variance</div><div class="stat-n" style="color:{opexp_var_color}">{d(opexp_budget_var)}</div></div>
+      <div><div class="stat-l">% of YTD Budget</div><div class="stat-n" style="color:{opexp_var_color}">{opexp_budget_pct:.0f}%</div></div>
+    </div>
+    <div class="bar-wrap">
+      <div class="bar-row"><div class="bar-lab">Expense vs YTD Budget</div><div class="bar-track"><div class="bar-fill" style="width:{opexp_pace_bar:.1f}%;background:{opexp_bar_color}"></div><div class="bar-pace" style="left:100%"></div></div><div class="bar-val">{d(ytd_opexp)} &middot; {opexp_budget_pct:.0f}%</div></div>
+      <div class="bar-row"><div class="bar-lab">Expense vs Annual</div><div class="bar-track"><div class="bar-fill" style="width:{exp_bar:.1f}%;background:var(--chart)"></div><div class="bar-pace" style="left:{pace:.1f}%"></div></div><div class="bar-val">{d(ytd_opexp)} &middot; {exp_bar:.0f}%</div></div>
+    </div>
+    {section_insights('opex_budget')}
+    <div class="cap">Spending is running {d(abs(opexp_budget_var))} {opexp_var_word} at week {WEEKS_YTD}. YTD budget prorates the {d(ANNUAL_BUDGET)} annual plan straight-line across {WEEKS_YTD} of 52 weeks; the marker on the first bar is that 100% YTD target. Unlike the giving section, spending <em>below</em> budget is favourable. Straight-line proration assumes an even spend pace &mdash; irregular items (insurance, capital work, seasonal ministry) can shift a month without signalling a trend, and {RMONTH} is partial through {DATA_THROUGH}.</div>
   </div>
 </section>
 
