@@ -34,106 +34,49 @@
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 6060.15,
-  "card_mtd_n": 37,
-  "card_7d": 8567.36,
-  "card_7d_n": 60,
-  "ap_paid_mtd": 4060.51,
-  "ap_paid_n": 6,
-  "ap_out": 2660.55,
-  "ap_open_n": 9,
+  "card_mtd": 15186.77,
+  "card_mtd_n": 112,
+  "card_7d": 5250.59,
+  "card_7d_n": 36,
+  "ap_paid_mtd": 5509.23,
+  "ap_paid_n": 11,
+  "ap_out": 8092.83,
+  "ap_open_n": 14,
   "card_over": [
    [
-    "08/01",
-    "Church Finance",
-    "Aaron Cunningham",
-    "AC - Outsourced accounting subscription",
-    1780.0
-   ],
-   [
-    "08/04",
-    "Grass Guru",
-    "Aaron Cunningham",
-    "",
-    1670.0
-   ],
-   [
-    "07/29",
-    "Global Leadership Network",
+    "08/18",
+    "Church Media Squad",
     "Ryan Graham",
-    "RG - GLS tickets for Lead Team",
-    567.0
+    "Communications Outsourcing",
+    1597.0
    ],
    [
-    "07/29",
-    "Subsplash",
+    "08/16",
+    "Planning Center",
     "Aaron Cunningham",
-    "AC - Subsplash subscription",
-    505.39
+    "AC - Planning Center Subscription",
+    682.0
    ]
   ],
   "bills_paid": [
    [
-    "08/04",
-    "Missionary Ventures",
-    "Josh & Jennifer Hire",
-    1100.0
+    "08/17",
+    "Goshen Chamber of Commerce",
+    "Goshen Chamber Membership Investment",
+    180.0
    ],
    [
-    "08/04",
-    "Glendon and Lorna Bender",
-    "Missionary Support",
-    800.0
+    "08/14",
+    "Cintas",
+    "Automatic agreement for ZOLL 3 AED service",
+    133.0
    ],
    [
-    "08/04",
-    "Mission Aviation Fellowship",
-    "Dan and Stephanie Kramer Support",
-    800.0
-   ],
-   [
-    "08/04",
-    "Heart & Hand International",
-    "Pauline Yoder",
-    750.0
-   ],
-   [
-    "08/03",
-    "KSS Enterprises",
-    "cleaning and janitorial supplies including paper towels and disinfectant wipes",
-    557.1
-   ],
-   [
-    "08/03",
-    "Economy Offset Print and Digital Services",
-    "Printing services for 4x6 Happy Birthday Cards",
-    53.41
-   ],
-   [
-    "07/31",
-    "Clayton Nisly",
-    "Clayton Nisly Support",
-    800.0
-   ],
-   [
-    "07/30",
-    "Students International",
-    "Eric Miller Missionary Support",
-    800.0
-   ],
-   [
-    "07/29",
-    "Economy Offset Print and Digital Services",
-    "printing services for Profile Cards",
-    361.03
-   ],
-   [
-    "07/29",
-    "Economy Offset Print and Digital Services",
-    "printing services for student connect cards",
-    120.23
+    "08/13",
+    "Wildman Uniform  Linen",
+    "Mats and facility services including delivery and fuel charges",
+    200.72
    ]
   ]
- },
- "_ramp_note": "STALE 2026-08-19: the Ramp MCP connector was again unavailable in this run's tool set (no ramp_* tools surfaced). The ramp block is carried forward unchanged from the 2026-08-05 pull and reflects card/AP activity through 2026-08-05, NOT through data_through. Second consecutive week stale."
+ }
 }
