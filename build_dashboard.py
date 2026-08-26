@@ -598,6 +598,13 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
 </section>
 
 <section>
+  <h2>Operating Income Comparison</h2>
+  <table class="cmp"><thead><tr><th>Year</th>{th_months()}<th>Total</th></tr></thead>
+  <tbody>{cmp_table(oi26, inc)}</tbody></table>
+  <div class="cap">2022&ndash;2025 from PowerChurch; 2026 from QuickBooks Online. {RMONTH} 2026 is partial (through {DATA_THROUGH}).</div>
+</section>
+
+<section>
   <h2>YTD Operating Expense vs Budget</h2>
   <div class="panel">
     <div class="stat4">
@@ -613,13 +620,6 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
     {section_insights('opex_budget')}
     <div class="cap">Spending is running {d(abs(opexp_budget_var))} {opexp_var_word} at week {WEEKS_YTD}. YTD budget prorates the {d(ANNUAL_BUDGET)} annual plan straight-line across {WEEKS_YTD} of 52 weeks; the marker on the first bar is that 100% YTD target. Unlike the giving section, spending <em>below</em> budget is favourable. Straight-line proration assumes an even spend pace &mdash; irregular items (insurance, capital work, seasonal ministry) can shift a month without signalling a trend, and {RMONTH} is partial through {DATA_THROUGH}.</div>
   </div>
-</section>
-
-<section>
-  <h2>Operating Income Comparison</h2>
-  <table class="cmp"><thead><tr><th>Year</th>{th_months()}<th>Total</th></tr></thead>
-  <tbody>{cmp_table(oi26, inc)}</tbody></table>
-  <div class="cap">2022&ndash;2025 from PowerChurch; 2026 from QuickBooks Online. {RMONTH} 2026 is partial (through {DATA_THROUGH}).</div>
 </section>
 
 <section>
