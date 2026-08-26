@@ -1,81 +1,81 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "August 19, 2026",
+ "run_date": "August 26, 2026",
  "run_weekday": "Wednesday",
- "data_through": "August 16, 2026",
- "weeks_ytd": 33,
+ "data_through": "August 23, 2026",
+ "weeks_ytd": 34,
  "reporting_month_index": 8,
  "reporting_month_name": "August",
  "current_month": {
-  "giving4100": 79333.62,
-  "op_income": 80603.67,
-  "op_expense": 51167.32,
-  "personnel": 45652.59,
-  "facilities": 4415.67,
+  "giving4100": 101678.95,
+  "op_income": 104009.5,
+  "op_expense": 101155.92,
+  "personnel": 84416.76,
+  "facilities": 14238.97,
   "partial": true
  },
- "last_week_giving": 26450.07,
- "bank": 762030.36,
- "loan_balance": 1450088.47,
+ "last_week_giving": 22345.33,
+ "bank": 708148.14,
+ "loan_balance": 1448761.4,
  "giving_health": {
-  "committed": 287,
+  "committed": 288,
   "households": 479,
-  "new_donors_year": 50,
-  "new_donors_week": 0,
-  "committed_individuals": 318,
+  "new_donors_year": 51,
+  "new_donors_week": 1,
+  "committed_individuals": 320,
   "committed_basis": "household"
  },
  "retention": {
-  "retained": 226,
-  "lapsed": 52,
-  "new": 61,
-  "rate": 81.3,
-  "prior": 278,
+  "retained": 229,
+  "lapsed": 51,
+  "new": 59,
+  "rate": 81.8,
+  "prior": 280,
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 15186.77,
-  "card_mtd_n": 112,
-  "card_7d": 5250.59,
-  "card_7d_n": 36,
-  "ap_paid_mtd": 5509.23,
-  "ap_paid_n": 11,
-  "ap_out": 8092.83,
-  "ap_open_n": 14,
+  "card_mtd": 18792.78,
+  "card_mtd_n": 154,
+  "card_7d": 3819.35,
+  "card_7d_n": 43,
+  "ap_paid_mtd": 6376.23,
+  "ap_paid_n": 14,
+  "ap_out": 8345.83,
+  "ap_open_n": 13,
   "card_over": [
    [
-    "08/18",
-    "Church Media Squad",
-    "Ryan Graham",
-    "Communications Outsourcing",
-    1597.0
+    "08/25",
+    "TechKnowledgey Inc",
+    "Wrennie Howard",
+    "",
+    715.68
    ],
    [
-    "08/16",
-    "Planning Center",
-    "Aaron Cunningham",
-    "AC - Planning Center Subscription",
-    682.0
+    "08/25",
+    "Coffee Bean Direct",
+    "Kris Miller",
+    "",
+    540.6
    ]
   ],
   "bills_paid": [
    [
-    "08/17",
-    "Goshen Chamber of Commerce",
-    "Goshen Chamber Membership Investment",
-    180.0
+    "08/25",
+    "Tanya Wieland",
+    "Counseling services",
+    300.0
    ],
    [
-    "08/14",
-    "Cintas",
-    "Automatic agreement for ZOLL 3 AED service",
-    133.0
+    "08/19",
+    "Cripes Septic Cleaning Service Inc",
+    "Grease trap pumping disposal fee and fuel charge",
+    485.0
    ],
    [
-    "08/13",
-    "Wildman Uniform  Linen",
-    "Mats and facility services including delivery and fuel charges",
-    200.72
+    "08/19",
+    "RS Pest Inc",
+    "commercial pest control service including exterior spray and bait stations",
+    82.0
    ]
   ]
  }
