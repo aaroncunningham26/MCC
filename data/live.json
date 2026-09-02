@@ -1,81 +1,87 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "August 26, 2026",
+ "run_date": "September 2, 2026",
  "run_weekday": "Wednesday",
- "data_through": "August 23, 2026",
- "weeks_ytd": 34,
+ "data_through": "August 30, 2026",
+ "weeks_ytd": 35,
  "reporting_month_index": 8,
  "reporting_month_name": "August",
  "current_month": {
-  "giving4100": 101678.95,
-  "op_income": 104009.5,
-  "op_expense": 101155.92,
+  "giving4100": 127524.96,
+  "op_income": 129947.09,
+  "op_expense": 110250.16,
   "personnel": 84416.76,
-  "facilities": 14238.97,
+  "facilities": 16119.65,
   "partial": true
  },
- "last_week_giving": 22345.33,
- "bank": 708148.14,
- "loan_balance": 1448761.4,
+ "last_week_giving": 25846.01,
+ "bank": 730942.78,
+ "loan_balance": 1447432.61,
  "giving_health": {
-  "committed": 288,
-  "households": 479,
-  "new_donors_year": 51,
+  "committed": 286,
+  "households": 485,
+  "new_donors_year": 52,
   "new_donors_week": 1,
-  "committed_individuals": 320,
+  "committed_individuals": 318,
   "committed_basis": "household"
  },
  "retention": {
-  "retained": 229,
-  "lapsed": 51,
+  "retained": 227,
+  "lapsed": 52,
   "new": 59,
-  "rate": 81.8,
-  "prior": 280,
+  "rate": 81.4,
+  "prior": 279,
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 18792.78,
-  "card_mtd_n": 154,
-  "card_7d": 3819.35,
-  "card_7d_n": 43,
-  "ap_paid_mtd": 6376.23,
-  "ap_paid_n": 14,
-  "ap_out": 8345.83,
-  "ap_open_n": 13,
+  "card_mtd": 20954.28,
+  "card_mtd_n": 183,
+  "card_7d": 6113.58,
+  "card_7d_n": 45,
+  "ap_paid_mtd": 8222.23,
+  "ap_paid_n": 17,
+  "ap_out": 6760.76,
+  "ap_open_n": 14,
   "card_over": [
    [
-    "08/25",
-    "TechKnowledgey Inc",
-    "Wrennie Howard",
-    "",
-    715.68
+    "09/01",
+    "Church Finance",
+    "Aaron Cunningham",
+    "AC - Outsourced accounting subscription",
+    1780.0
    ],
    [
-    "08/25",
-    "Coffee Bean Direct",
-    "Kris Miller",
-    "",
-    540.6
+    "08/29",
+    "Subsplash",
+    "Aaron Cunningham",
+    "AC - Subsplash subscription",
+    561.39
    ]
   ],
   "bills_paid": [
    [
-    "08/25",
-    "Tanya Wieland",
-    "Counseling services",
-    300.0
+    "09/01",
+    "Missionary Ventures",
+    "Josh & Jennifer Hire",
+    1100.0
    ],
    [
-    "08/19",
-    "Cripes Septic Cleaning Service Inc",
-    "Grease trap pumping disposal fee and fuel charge",
-    485.0
+    "08/31",
+    "Clayton Nisly",
+    "Clayton Nisly Support",
+    800.0
    ],
    [
-    "08/19",
-    "RS Pest Inc",
-    "commercial pest control service including exterior spray and bait stations",
-    82.0
+    "08/28",
+    "Global Gates",
+    "Jayne Delegrange Missionary Support",
+    750.0
+   ],
+   [
+    "08/26",
+    "Best Sweeping Specialist",
+    "Full and fire lane sweeping services for facilities maintenance",
+    296.0
    ]
   ]
  }
