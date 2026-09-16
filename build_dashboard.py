@@ -198,26 +198,50 @@ def _att_yearly_mean(year):
     vals = [v for v in wh.monthly("att_avg_weekly", year).values() if v is not None]
     return (sum(vals)/len(vals)) if vals else None
 
-_donors_annual = wh.annual("donors_unique")
-part_rows = []          # (year, avg_attendance, unique_donors, pct_of_attendance)
+# donors_unique is a COUNT over a window, so a year whose latest observation is
+# not dated Dec 31 is a partial (YTD) count and is NOT comparable to a closed
+# full year -- a half-year donor count divided by a full-year attendance average
+# understates participation badly. Detect that from the observation date and
+# label it rather than charting it as a peer of the closed years.
+# (Durable fix: have household_giving.py emit a rolling-12-month donor count.)
+_don_obs = {}
+for _r in wh.observations():
+    if _r["metric_id"] == "donors_unique" and _r["value"] is not None:
+        _don_obs[int(_r["date"][:4])] = (_r["value"], _r["date"])   # date-sorted: last wins
+
+part_rows = []          # (year, avg_attendance, unique_donors, pct, partial?)
 for _y in PART_YEARS:
-    _a = _att_yearly_mean(_y); _dn = _donors_annual.get(_y)
-    if _a and _dn:
-        part_rows.append((_y, round(_a), int(round(_dn)), _dn/_a*100))
-if part_rows:
-    att_part_cur  = part_rows[-1][3]          # current-year % of attendance
-    att_part_first= part_rows[0][3]           # 2022 baseline %
-    att_donors    = part_rows[-1][2]
-    att_avg       = part_rows[-1][1]
-    att_part_yr   = part_rows[-1][0]
-    att_part_n    = "%.0f%%" % att_part_cur
-    att_part_s    = "%s unique donors / %s avg attendance" % (f"{att_donors:,}", f"{att_avg:,}")
-    att_part_col  = ("var(--green)" if att_part_cur >= PART_GOAL_MIN else "var(--red)")
+    _a = _att_yearly_mean(_y); _rec = _don_obs.get(_y)
+    if _a and _rec:
+        _dn, _d = _rec
+        part_rows.append((_y, round(_a), int(round(_dn)), _dn/_a*100,
+                          not _d.endswith("-12-31"), _d))
+
+closed_rows = [r for r in part_rows if not r[4]]
+if closed_rows:
+    # Headline on the last CLOSED year -- the only figure that can be judged
+    # against the goal band. Partial current year is shown as context only.
+    att_part_yr, att_avg, att_donors, att_part_cur = closed_rows[-1][:4]
+    att_part_first = closed_rows[0][3]
+    att_part_first_yr = closed_rows[0][0]
+    att_part_n   = "%.0f%%" % att_part_cur
+    att_part_col = "var(--green)" if att_part_cur >= PART_GOAL_MIN else "var(--red)"
+    _pr = [r for r in part_rows if r[4]]
+    att_part_s = ("%s donors / %s attendance &middot; %d closed"
+                  % (f"{att_donors:,}", f"{att_avg:,}", att_part_yr))
+    if _pr:
+        att_part_s += " &middot; %d YTD %.0f%% (partial)" % (_pr[-1][0], _pr[-1][3])
+    att_partial_note = (
+        "%d shows %s distinct donors through %s &mdash; a year-to-date count, not a full year, so it "
+        "cannot be compared to the closed years above or judged against the goal band. It is already "
+        "%.0f%% of all of %d's %s donors, so full-year %d is on track to land near or above last year."
+        % (_pr[-1][0], f"{_pr[-1][2]:,}", _pr[-1][5], _pr[-1][2]/att_donors*100, att_part_yr,
+           f"{att_donors:,}", _pr[-1][0]) if _pr else "")
 else:
     att_part_cur = att_part_first = att_donors = att_avg = None
-    att_part_yr = RYEAR if "RYEAR" in dir() else 2026
-    att_part_n = "n/a"; att_part_s = "attendance data unavailable"
-    att_part_col = "var(--slate)"
+    att_part_yr = att_part_first_yr = PART_YEARS[0]
+    att_part_n = "n/a"; att_part_s = "attendance/donor data unavailable"
+    att_part_col = "var(--slate)"; att_partial_note = ""
 
 rt = live["retention"]
 retained = rt["retained"]; lapsed = rt["lapsed"]; newly = rt["new"]; retention = rt["rate"]; prior_committed = rt["prior"]
@@ -403,21 +427,24 @@ else:
         % retention, "retention")
 
 # --- Attendance-based participation vs peer benchmark ---  [home: giving_health]
-if part_rows:
-    _delta = att_part_cur - att_part_first
+# Judged on CLOSED years only. The current year's donor count is year-to-date and
+# a part-year count over a full-year attendance average understates the ratio.
+if closed_rows:
     if att_part_cur >= PART_GOAL_MIN:
         add("green","Strength","Giving participation inside the benchmark",
-            "%d of %s average weekly attenders gave in %d &mdash; <strong>%.0f%%</strong>, inside the %d&ndash;%d%% goal. "
-            "Published peer research puts consistent givers near 20&ndash;27%% of attenders, so MCC sits well above peer median."
-            % (att_donors, f"{att_avg:,}", att_part_yr, att_part_cur, PART_GOAL_MIN, PART_GOAL_MAX), "giving_health")
+            "%s of %s average weekly attenders gave in %d &mdash; <strong>%.0f%%</strong>, inside the %d&ndash;%d%% goal. "
+            "Published peer research puts consistent givers near 20&ndash;27%% of attenders, so MCC sits well above peer median. %s"
+            % (f"{att_donors:,}", f"{att_avg:,}", att_part_yr, att_part_cur, PART_GOAL_MIN, PART_GOAL_MAX,
+               att_partial_note), "giving_health")
     else:
         add("amber" if att_part_cur >= PART_GOAL_MIN-8 else "risk","Watch","Giving participation below benchmark",
-            "Only %d of %s average weekly attenders gave in %d &mdash; <strong>%.0f%%</strong>, %.0f pts under the %d%% floor "
-            "and down from %.0f%% in %d. Attendance grew while the donor count did not, so the ratio is diluting: this is an "
-            "assimilation-to-generosity gap, not a drop in generosity among existing givers. Peer research puts consistent "
-            "givers near 20&ndash;27%% of attenders, so MCC remains above peer median &mdash; but the five-year trend is the concern."
-            % (att_donors, f"{att_avg:,}", att_part_yr, att_part_cur, PART_GOAL_MIN-att_part_cur,
-               PART_GOAL_MIN, att_part_first, part_rows[0][0]), "giving_health")
+            "In %d &mdash; the last closed year &mdash; %s of %s average weekly attenders gave: <strong>%.0f%%</strong>, "
+            "%.0f pts under the %d%% floor and down from %.0f%% in %d. Attendance grew across those years while the donor "
+            "count did not, so the ratio diluted: that points to an assimilation-to-generosity gap rather than a drop in "
+            "generosity among existing givers. Peer research puts consistent givers near 20&ndash;27%% of attenders, so MCC "
+            "remains above peer median. %s"
+            % (att_part_yr, f"{att_donors:,}", f"{att_avg:,}", att_part_cur, PART_GOAL_MIN-att_part_cur,
+               PART_GOAL_MIN, att_part_first, att_part_first_yr, att_partial_note), "giving_health")
 
 # --- New givers (positive signal, only when there is activity) ---  [home: giving_health]
 if new_donors_week > 0:
@@ -449,18 +476,23 @@ def th_months():
     return "".join("<th>%s</th>"%MONTHS12[i] for i in range(RMI))
 
 def part_table():
-    """5-year attendance-based giving participation. Last row (current year) is
-    highlighted and is a YTD average, not a closed full year."""
+    """5-year attendance-based giving participation. Partial (YTD) years are
+    greyed and excluded from the goal comparison -- a part-year donor count over
+    a full-year attendance average is not comparable to a closed year."""
     rows = ""
-    for i,(yr,att,dn,pct) in enumerate(part_rows):
-        cur_row = (i == len(part_rows)-1)
-        col = "var(--green)" if pct >= PART_GOAL_MIN else "var(--red)"
-        vs  = pct - PART_GOAL_MIN
-        vs_s = ("%+.0f pts" % vs) if abs(vs) >= 0.5 else "at floor"
-        rows += ("<tr%s><th>%d</th><td>%s</td><td>%s</td>"
-                 "<td style='color:%s;font-weight:900'>%.0f%%</td><td>%s</td></tr>"
-                 % (" class='cur'" if cur_row else "", yr, f"{att:,}", f"{dn:,}",
-                    col, pct, vs_s))
+    for yr,att,dn,pct,partial,obs_date in part_rows:
+        if partial:
+            rows += ("<tr class='cur'><th>%d &dagger;</th><td>%s</td><td>%s</td>"
+                     "<td style='color:var(--muted);font-weight:900'>%.0f%%</td>"
+                     "<td style='color:var(--muted)'>partial year &mdash; not comparable</td></tr>"
+                     % (yr, f"{att:,}", f"{dn:,}", pct))
+        else:
+            col  = "var(--green)" if pct >= PART_GOAL_MIN else "var(--red)"
+            vs   = pct - PART_GOAL_MIN
+            vs_s = ("%+.0f pts" % vs) if abs(vs) >= 0.5 else "at floor"
+            rows += ("<tr><th>%d</th><td>%s</td><td>%s</td>"
+                     "<td style='color:%s;font-weight:900'>%.0f%%</td><td>%s</td></tr>"
+                     % (yr, f"{att:,}", f"{dn:,}", col, pct, vs_s))
     return rows
 
 def insight_items(items):
@@ -646,7 +678,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h3 style="margin:22px 0 10px;font-size:14px;color:var(--slate);text-transform:uppercase;letter-spacing:.05em">Giving Participation vs Attendance &mdash; 5-Year Trend</h3>
   <table class="cmp"><thead><tr><th>Year</th><th>Avg Attendance</th><th>Unique Donors</th><th>% of Attendance</th><th>vs {PART_GOAL_MIN}% Floor</th></tr></thead>
   <tbody>{part_table()}</tbody></table>
-  <div class="cap">Unique donors as a share of average weekly in-person attendance &mdash; the participation measure published peer research uses, so it is externally benchmarkable (the committed-household figure above is not). Goal band <strong>{PART_GOAL_MIN}&ndash;{PART_GOAL_MAX}%</strong>, recalibrated September 2026 from the former 40&ndash;60%: peer studies put consistent givers near 20&ndash;27% of attenders, and MCC's own 2022&ndash;2024 range was 38&ndash;44%, so 35% recovers recent history while staying above peer median and 45% beats MCC's best year. 2022&ndash;2025 are closed full years; {att_part_yr} is year-to-date. Source: MCC Data Warehouse (attendance &amp; unique donors), same series as the vitals dashboard.</div>
+  <div class="cap">Unique donors as a share of average weekly in-person attendance &mdash; the participation measure published peer research uses, so it is externally benchmarkable (the committed-household figure above is not). Goal band <strong>{PART_GOAL_MIN}&ndash;{PART_GOAL_MAX}%</strong>, recalibrated September 2026 from the former 40&ndash;60%: peer studies put consistent givers near 20&ndash;27% of attenders, and MCC's own 2022&ndash;2024 range was 38&ndash;44%, so 35% recovers recent history while staying above peer median and 45% beats MCC's best year. &dagger; Rows marked with a dagger are <strong>year-to-date counts, not closed years</strong>, and are shown for context only &mdash; a part-year distinct-donor count divided by a full-year attendance average understates the ratio, so it is neither comparable to the closed years nor judgeable against the goal. The KPI card and the goal assessment both use the last closed year ({att_part_yr}). Note this measure counts <em>individual donors giving any amount to the general fund in the calendar year</em>, which is a different population from the committed-household count above (<em>households</em> giving <em>more than $200</em> over the <em>trailing 12 months</em> to 4100) &mdash; the two will never match. Source: MCC Data Warehouse (attendance &amp; unique donors), same series as the vitals dashboard.</div>
 </section>
 
 <section>

@@ -236,7 +236,11 @@ def build_insights(metrics):
     watch = []
     if curpct(att) < 5:  watch.append(f"attendance growth ({curpct(att)}%)")
     if curpct(serv) < serv["goalMin"]: watch.append(f"regular serving ({curpct(serv)}%)")
-    if curpct(don) < don["goalMin"]:   watch.append(f"unique donors ({curpct(don)}%)")
+    # Judge donors on the last CLOSED year: the current-year value is a YTD count
+    # and comparing it to the goal band would flag a miss that may not be real.
+    _don_closed = don["pcts"][-2] if len(don["pcts"]) > 1 else None
+    if _don_closed is not None and _don_closed < don["goalMin"]:
+        watch.append(f"unique donors ({_don_closed}% in {YEARS[-2]}, last closed year)")
     if watch:
         joined = ", ".join(watch[:-1]) + (f", and {watch[-1]}" if len(watch) > 1 else watch[0])
         if len(watch) == 1: joined = watch[0]
@@ -266,16 +270,22 @@ def build_insights(metrics):
     # 6. Donors
     d22 = don["pcts"][0]
     bullets.append(("amber",
-        f"Unique donors ({cur(don):,}, {curpct(don)}%) sit below the 35–45% goal and have "
-        f"contracted from {d22}% of attendance in 2022 even as attendance grew. The goal was "
-        f"recalibrated from 40–60% in September 2026: peer research puts consistent givers near "
-        f"20–27% of attenders, so 35–45% keeps MCC well above peer median while staying reachable. "
-        f"Track this alongside the finance dashboard as a long-term giving-health signal."))
+        f"Unique donors reads {cur(don):,} ({curpct(don)}%), but that is a <strong>year-to-date "
+        f"count against a full-year attendance average</strong> — it understates participation and "
+        f"is not comparable to the closed years or to the goal band. On closed years the trend is "
+        f"the real signal: {d22}% of attendance in 2022 down to {don['pcts'][3]}% in 2025, as "
+        f"attendance grew while the donor count did not. The goal was recalibrated from 40–60% to "
+        f"35–45% in September 2026: peer research puts consistent givers near 20–27% of attenders, "
+        f"so 35–45% keeps MCC well above peer median while staying reachable. Track alongside the "
+        f"finance dashboard as a long-term giving-health signal."))
     # 7. Methodology note
     bullets.append(("blue",
-        "Count-based metrics (visitors, baptisms, Connect Breakfast, giving) are year-to-date and "
-        "should not be compared directly to prior full-year totals. Averages (attendance, serving, "
-        "circles) are fully comparable."))
+        "Count-based metrics (visitors, baptisms, Connect Breakfast, giving, <strong>unique donors, "
+        "new donors</strong>) are year-to-date and should not be compared directly to prior full-year "
+        "totals. Unique donors is the one most easily misread: a part-year distinct-donor count "
+        "measured against a full-year attendance average understates participation, so the current "
+        "year's percentage is not comparable to the closed years and should not be judged against "
+        "the goal band. Averages (attendance, serving, circles) are fully comparable."))
     return bullets
 
 # ── HTML template ──────────────────────────────────────────────────────────
