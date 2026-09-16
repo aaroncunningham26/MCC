@@ -18,7 +18,7 @@ The template/CSS/chart config below is stable; numbers come entirely from the
 warehouse + live.json.
 """
 import json, os, sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 import warehouse_reader as wh
 
@@ -191,6 +191,11 @@ else:
 PART_GOAL_MIN, PART_GOAL_MAX = 35, 45
 PART_YEARS = [2022, 2023, 2024, 2025, 2026]
 
+def _pts(n, signed=True):
+    """'+9 pts' / '-1 pt' -- singular when the rounded magnitude is exactly 1."""
+    unit = "pt" if abs(round(n)) == 1 else "pts"
+    return ("%+.0f %s" % (n, unit)) if signed else ("%.0f %s" % (abs(n), unit))
+
 def _att_yearly_mean(year):
     """Attendance is stored as month-end monthly averages, so the annual figure
     must be averaged across the year -- never read off the Dec-31 row, which is
@@ -217,6 +222,35 @@ for _y in PART_YEARS:
         part_rows.append((_y, round(_a), int(round(_dn)), _dn/_a*100,
                           not _d.endswith("-12-31"), _d))
 
+# Rolling-12-month donor count from household_giving.py. This is the preferred
+# current reading: always a full 12 months, so it is directly comparable to a
+# closed calendar year and needs no partial-year handling. When present it
+# REPLACES the partial calendar-year row. If household_giving.py failed or is an
+# older version, the key is absent and we fall back to the daggered partial row.
+_ttm = gh.get("donors_ttm")
+_ttm_win = gh.get("donors_ttm_window", "")
+if _ttm and _ttm_win:
+    _ttm_end = datetime.strptime(_ttm_win.split("..")[1], "%Y-%m-%d").date()
+    _ttm_start = datetime.strptime(_ttm_win.split("..")[0], "%Y-%m-%d").date()
+    # Attendance over the SAME trailing window: average the monthly att_avg_weekly
+    # observations that fall inside it, spanning the calendar-year boundary.
+    _av = []
+    for _yy in {_ttm_start.year, _ttm_end.year}:
+        for _m, _v in wh.monthly("att_avg_weekly", _yy).items():
+            if _v is not None and _ttm_start <= date(_yy, _m, 1) <= _ttm_end:
+                _av.append(_v)
+    _att_ttm = (sum(_av)/len(_av)) if _av else None
+    if _att_ttm:
+        # Drop the partial calendar row; the TTM row supersedes it.
+        part_rows = [r for r in part_rows if not r[4]]
+        part_rows.append(("TTM", round(_att_ttm), int(_ttm), _ttm/_att_ttm*100,
+                          False, _ttm_win))
+        ttm_label = "%s &ndash; %s" % (_ttm_start.strftime("%b %Y"), _ttm_end.strftime("%b %Y"))
+    else:
+        ttm_label = None
+else:
+    ttm_label = None
+
 closed_rows = [r for r in part_rows if not r[4]]
 if closed_rows:
     # Headline on the last CLOSED year -- the only figure that can be judged
@@ -227,21 +261,57 @@ if closed_rows:
     att_part_n   = "%.0f%%" % att_part_cur
     att_part_col = "var(--green)" if att_part_cur >= PART_GOAL_MIN else "var(--red)"
     _pr = [r for r in part_rows if r[4]]
-    att_part_s = ("%s donors / %s attendance &middot; %d closed"
-                  % (f"{att_donors:,}", f"{att_avg:,}", att_part_yr))
-    if _pr:
-        att_part_s += " &middot; %d YTD %.0f%% (partial)" % (_pr[-1][0], _pr[-1][3])
-    att_partial_note = (
-        "%d shows %s distinct donors through %s &mdash; a year-to-date count, not a full year, so it "
-        "cannot be compared to the closed years above or judged against the goal band. It is already "
-        "%.0f%% of all of %d's %s donors, so full-year %d is on track to land near or above last year."
-        % (_pr[-1][0], f"{_pr[-1][2]:,}", _pr[-1][5], _pr[-1][2]/att_donors*100, att_part_yr,
-           f"{att_donors:,}", _pr[-1][0]) if _pr else "")
+    if ttm_label:
+        # Preferred path: the current reading is a full trailing 12 months.
+        _prev = closed_rows[-2] if len(closed_rows) > 1 else None
+        att_part_s = ("%s donors / %s attendance &middot; rolling 12 mo"
+                      % (f"{att_donors:,}", f"{att_avg:,}"))
+        att_partial_note = (
+            "This is a <strong>rolling 12-month</strong> reading (%s), so it is a full year of giving "
+            "and compares like-for-like with the closed calendar years &mdash; no partial-year caveat. "
+            "It replaces the old calendar-year-to-date donor count, which understated participation "
+            "whenever the dashboard ran mid-year." % ttm_label)
+        if _prev:
+            _mv = att_part_cur - _prev[3]
+            att_partial_note += (" Versus %s (%.0f%%) the ratio is %s."
+                                 % (_prev[0], _prev[3],
+                                    "up " + _pts(_mv, signed=False) if _mv > 0.5 else
+                                    "down " + _pts(_mv, signed=False) if _mv < -0.5 else "flat"))
+    else:
+        att_part_s = ("%s donors / %s attendance &middot; %s closed"
+                      % (f"{att_donors:,}", f"{att_avg:,}", att_part_yr))
+        if _pr:
+            att_part_s += " &middot; %s YTD %.0f%% (partial)" % (_pr[-1][0], _pr[-1][3])
+        att_partial_note = (
+            "%s shows %s distinct donors through %s &mdash; a year-to-date count, not a full year, so it "
+            "cannot be compared to the closed years above or judged against the goal band. It is already "
+            "%.0f%% of all of %s's %s donors, so full-year %s is on track to land near or above last year."
+            % (_pr[-1][0], f"{_pr[-1][2]:,}", _pr[-1][5], _pr[-1][2]/att_donors*100, att_part_yr,
+               f"{att_donors:,}", _pr[-1][0]) if _pr else "")
 else:
     att_part_cur = att_part_first = att_donors = att_avg = None
     att_part_yr = att_part_first_yr = PART_YEARS[0]
     att_part_n = "n/a"; att_part_s = "attendance/donor data unavailable"
     att_part_col = "var(--slate)"; att_partial_note = ""
+
+# Caption basis note. Defined after att_part_yr so the fallback branch can name
+# the closed year it fell back to.
+if ttm_label:
+    part_basis_note = (
+        "The current reading is a <strong>rolling 12-month</strong> window (%s), computed directly "
+        "from Planning Center Giving &mdash; a full year of giving, so it compares like-for-like with "
+        "the closed calendar years and is judged against the goal. It replaces the calendar-year-to-date "
+        "donor count previously shown here, which understated participation on any mid-year run. "
+        "Closed years 2022&ndash;2025 come from the warehouse KPM series, so a small definitional "
+        "difference between the two sources is possible; the rolling figure is the one to trust going forward."
+        % ttm_label)
+else:
+    part_basis_note = (
+        "&dagger; Rows marked with a dagger are <strong>year-to-date counts, not closed years</strong>, shown "
+        "for context only &mdash; a part-year distinct-donor count over a full-year attendance average "
+        "understates the ratio, so it is neither comparable to the closed years nor judgeable against the "
+        "goal. The KPI card and the goal assessment both use the last closed year (%s). "
+        "Rolling-12-month figures were unavailable on this run." % att_part_yr)
 
 rt = live["retention"]
 retained = rt["retained"]; lapsed = rt["lapsed"]; newly = rt["new"]; retention = rt["rate"]; prior_committed = rt["prior"]
@@ -430,20 +500,22 @@ else:
 # Judged on CLOSED years only. The current year's donor count is year-to-date and
 # a part-year count over a full-year attendance average understates the ratio.
 if closed_rows:
+    _period = ("the rolling 12 months to %s" % DATA_THROUGH) if ttm_label else ("%s" % att_part_yr)
     if att_part_cur >= PART_GOAL_MIN:
         add("green","Strength","Giving participation inside the benchmark",
-            "%s of %s average weekly attenders gave in %d &mdash; <strong>%.0f%%</strong>, inside the %d&ndash;%d%% goal. "
+            "%s of %s average weekly attenders gave over %s &mdash; <strong>%.0f%%</strong>, inside the %d&ndash;%d%% goal. "
             "Published peer research puts consistent givers near 20&ndash;27%% of attenders, so MCC sits well above peer median. %s"
-            % (f"{att_donors:,}", f"{att_avg:,}", att_part_yr, att_part_cur, PART_GOAL_MIN, PART_GOAL_MAX,
+            % (f"{att_donors:,}", f"{att_avg:,}", _period, att_part_cur, PART_GOAL_MIN, PART_GOAL_MAX,
                att_partial_note), "giving_health")
     else:
         add("amber" if att_part_cur >= PART_GOAL_MIN-8 else "risk","Watch","Giving participation below benchmark",
-            "In %d &mdash; the last closed year &mdash; %s of %s average weekly attenders gave: <strong>%.0f%%</strong>, "
-            "%.0f pts under the %d%% floor and down from %.0f%% in %d. Attendance grew across those years while the donor "
+            "Over %s, %s of %s average weekly attenders gave: <strong>%.0f%%</strong>, "
+            "%s under the %d%% floor and down from %.0f%% in %s. Attendance grew across those years while the donor "
             "count did not, so the ratio diluted: that points to an assimilation-to-generosity gap rather than a drop in "
             "generosity among existing givers. Peer research puts consistent givers near 20&ndash;27%% of attenders, so MCC "
             "remains above peer median. %s"
-            % (att_part_yr, f"{att_donors:,}", f"{att_avg:,}", att_part_cur, PART_GOAL_MIN-att_part_cur,
+            % (_period, f"{att_donors:,}", f"{att_avg:,}", att_part_cur,
+               _pts(PART_GOAL_MIN-att_part_cur, signed=False),
                PART_GOAL_MIN, att_part_first, att_part_first_yr, att_partial_note), "giving_health")
 
 # --- New givers (positive signal, only when there is activity) ---  [home: giving_health]
@@ -482,17 +554,21 @@ def part_table():
     rows = ""
     for yr,att,dn,pct,partial,obs_date in part_rows:
         if partial:
-            rows += ("<tr class='cur'><th>%d &dagger;</th><td>%s</td><td>%s</td>"
+            rows += ("<tr class='cur'><th>%s &dagger;</th><td>%s</td><td>%s</td>"
                      "<td style='color:var(--muted);font-weight:900'>%.0f%%</td>"
                      "<td style='color:var(--muted)'>partial year &mdash; not comparable</td></tr>"
                      % (yr, f"{att:,}", f"{dn:,}", pct))
         else:
             col  = "var(--green)" if pct >= PART_GOAL_MIN else "var(--red)"
             vs   = pct - PART_GOAL_MIN
-            vs_s = ("%+.0f pts" % vs) if abs(vs) >= 0.5 else "at floor"
-            rows += ("<tr><th>%d</th><td>%s</td><td>%s</td>"
+            vs_s = _pts(vs) if abs(vs) >= 0.5 else "at floor"
+            is_ttm = (yr == "TTM")
+            label  = ("Rolling 12 mo<div style='font-weight:400;color:var(--muted);font-size:11px'>%s</div>"
+                      % ttm_label) if is_ttm else str(yr)
+            rows += ("<tr%s><th>%s</th><td>%s</td><td>%s</td>"
                      "<td style='color:%s;font-weight:900'>%.0f%%</td><td>%s</td></tr>"
-                     % (yr, f"{att:,}", f"{dn:,}", col, pct, vs_s))
+                     % (" class='cur'" if is_ttm else "", label, f"{att:,}", f"{dn:,}",
+                        col, pct, vs_s))
     return rows
 
 def insight_items(items):
@@ -678,7 +754,7 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h3 style="margin:22px 0 10px;font-size:14px;color:var(--slate);text-transform:uppercase;letter-spacing:.05em">Giving Participation vs Attendance &mdash; 5-Year Trend</h3>
   <table class="cmp"><thead><tr><th>Year</th><th>Avg Attendance</th><th>Unique Donors</th><th>% of Attendance</th><th>vs {PART_GOAL_MIN}% Floor</th></tr></thead>
   <tbody>{part_table()}</tbody></table>
-  <div class="cap">Unique donors as a share of average weekly in-person attendance &mdash; the participation measure published peer research uses, so it is externally benchmarkable (the committed-household figure above is not). Goal band <strong>{PART_GOAL_MIN}&ndash;{PART_GOAL_MAX}%</strong>, recalibrated September 2026 from the former 40&ndash;60%: peer studies put consistent givers near 20&ndash;27% of attenders, and MCC's own 2022&ndash;2024 range was 38&ndash;44%, so 35% recovers recent history while staying above peer median and 45% beats MCC's best year. &dagger; Rows marked with a dagger are <strong>year-to-date counts, not closed years</strong>, and are shown for context only &mdash; a part-year distinct-donor count divided by a full-year attendance average understates the ratio, so it is neither comparable to the closed years nor judgeable against the goal. The KPI card and the goal assessment both use the last closed year ({att_part_yr}). Note this measure counts <em>individual donors giving any amount to the general fund in the calendar year</em>, which is a different population from the committed-household count above (<em>households</em> giving <em>more than $200</em> over the <em>trailing 12 months</em> to 4100) &mdash; the two will never match. Source: MCC Data Warehouse (attendance &amp; unique donors), same series as the vitals dashboard.</div>
+  <div class="cap">Unique donors as a share of average weekly in-person attendance &mdash; the participation measure published peer research uses, so it is externally benchmarkable (the committed-household figure above is not). Goal band <strong>{PART_GOAL_MIN}&ndash;{PART_GOAL_MAX}%</strong>, recalibrated September 2026 from the former 40&ndash;60%: peer studies put consistent givers near 20&ndash;27% of attenders, and MCC's own 2022&ndash;2024 range was 38&ndash;44%, so 35% recovers recent history while staying above peer median and 45% beats MCC's best year. {part_basis_note} Note this measure counts <em>individual donors giving any amount</em>, which is a different population from the committed-household count above (<em>households</em> giving <em>more than $200</em>) &mdash; the two will never match. Attendance from the MCC Data Warehouse (same series as the vitals dashboard).</div>
 </section>
 
 <section>

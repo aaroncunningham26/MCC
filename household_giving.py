@@ -16,6 +16,18 @@ PCO Giving API, and merges the results into data/live.json under:
     retention.{retained,lapsed,new,rate,prior}   (household basis)
     retention.basis = "household"
 
+It also emits ROLLING-12-MONTH unique donor counts (any amount), which the finance
+dashboard uses for the attendance-participation metric:
+    giving_health.donors_ttm / donors_ttm_prior / donor_households_ttm / donors_ttm_window
+
+Why those exist: the warehouse metric `donors_unique` is a CALENDAR-year-to-date
+count. Read mid-year it covers ~6 months, and dividing it by a full-year attendance
+average understated participation badly -- in September 2026 it showed 29% against a
+35% floor when the last closed year was 33%. A trailing-12-month count is always a
+full 12 months, so it stays comparable to a closed year on any run date and needs no
+partial-year special-casing. Computing it here is free: the per-window totals this
+script already builds for the committed math are exactly the distinct-donor sets.
+
 Run this BEFORE build_dashboard.py in the weekly job:
     python3 household_giving.py && python3 build_dashboard.py
 
@@ -121,6 +133,32 @@ def main():
 
     ind_now = len([p for p, v in ci.items() if v > THRESHOLD])
 
+    # ---- rolling-12-month unique donors (ANY amount) -----------------------
+    # The warehouse's `donors_unique` is a CALENDAR-YEAR-TO-DATE count, so mid-year
+    # it measures a 6-month window. Dividing that by a full-year attendance average
+    # understated participation and made the current year look like a collapse.
+    # These trailing-12-month counts are always a full 12 months, so they stay
+    # comparable to a closed year no matter when the job runs. Free to compute:
+    # `ci` / `cur` already hold per-donor and per-household totals for the current
+    # window, so their lengths ARE the distinct any-amount counts.
+    donors_ttm      = len(ci)     # distinct individuals, any Tithe/Offering amount
+    donors_hh_ttm   = len(cur)    # distinct households, any amount
+    donors_ttm_pri  = len(pi)     # same window one year earlier, for YoY
+
+    # Invariants. Each must hold by construction; a violation means the windowing
+    # or household mapping broke, and publishing a wrong participation number is
+    # worse than publishing last week's. Same posture as the empty-gifts guard.
+    if donors_ttm < ind_now:
+        raise RuntimeError(f"invariant failed: any-amount donors ({donors_ttm}) < "
+                           f">${THRESHOLD} donors ({ind_now}); the >${THRESHOLD} set "
+                           f"must be a subset of the any-amount set")
+    if donors_hh_ttm < len(committed_now):
+        raise RuntimeError(f"invariant failed: any-amount households ({donors_hh_ttm}) < "
+                           f"committed households ({len(committed_now)})")
+    if donors_ttm < donors_hh_ttm:
+        raise RuntimeError(f"invariant failed: individuals ({donors_ttm}) < households "
+                           f"({donors_hh_ttm}); households cannot outnumber their members")
+
     # ---- merge into live.json ---------------------------------------------
     # RE-READ before writing. live.json sits in a Google Drive-synced tree and the
     # weekly job writes it too; the PCO pull above takes ~3 minutes, which is plenty
@@ -137,6 +175,12 @@ def main():
     gh["committed_individuals"] = ind_now          # what the old tool reported
     gh["committed"] = len(committed_now)           # household basis (what renders)
     gh["committed_basis"] = "household"
+    # Rolling-12-month unique donors. Always a full 12 months, so the dashboard can
+    # compare this to a closed calendar year without any partial-year handling.
+    gh["donors_ttm"]            = donors_ttm
+    gh["donors_ttm_prior"]      = donors_ttm_pri
+    gh["donor_households_ttm"]  = donors_hh_ttm
+    gh["donors_ttm_window"]     = f"{cur_start.isoformat()}..{data_through.isoformat()}"
 
     fresh["retention"] = {
         "retained": len(retained),
@@ -155,6 +199,10 @@ def main():
           f"retained {len(retained)} lapsed {len(lapsed)} new {len(newly)} "
           f"| retention {rate:.1f}% | individual basis would be {ind_now} "
           f"| {len(gifts)} gifts / {pages} pages")
+    _yoy = (donors_ttm - donors_ttm_pri) / donors_ttm_pri * 100 if donors_ttm_pri else 0.0
+    print(f"TTM unique donors (any amount, {cur_start}..{data_through}): {donors_ttm} "
+          f"individuals / {donors_hh_ttm} households | prior TTM {donors_ttm_pri} "
+          f"({_yoy:+.1f}%)")
 
 if __name__ == "__main__":
     try:

@@ -23,7 +23,11 @@
   "new_donors_year": 56,
   "new_donors_week": 0,
   "committed_individuals": 316,
-  "committed_basis": "household"
+  "committed_basis": "household",
+  "donors_ttm": 354,
+  "donors_ttm_prior": 371,
+  "donor_households_ttm": 318,
+  "donors_ttm_window": "2025-09-14..2026-09-13"
  },
  "retention": {
   "retained": 228,
