@@ -6,9 +6,9 @@
     2025,
     2026
   ],
-  "through_week": 26,
-  "month": "June",
-  "generated": "2026-07-16",
+  "through_week": 30,
+  "month": "July",
+  "generated": "2026-09-16",
   "metrics": [
     {
       "name": "Avg. attendance (in-person)",
@@ -22,14 +22,14 @@
         927,
         978,
         1025,
-        1037
+        1013
       ],
       "pcts": [
         16,
         19,
         5,
         5,
-        2
+        1
       ]
     },
     {
@@ -157,14 +157,14 @@
         645,
         671,
         586,
-        255
+        331
       ],
       "pcts": [
         65,
         70,
         69,
         57,
-        25
+        33
       ]
     },
     {
@@ -179,14 +179,14 @@
         86,
         119,
         111,
-        45
+        84
       ],
       "pcts": [
         3,
         9,
         12,
         11,
-        4
+        8
       ]
     },
     {
@@ -235,10 +235,10 @@
     },
     {
       "name": "Unique donors",
-      "goal": "40%\u201360% of attendance",
+      "goal": "35%\u201345% of attendance",
       "group": "discipleship",
       "type": "range",
-      "goalMin": 40,
+      "goalMin": 35,
       "isAvg": true,
       "values": [
         342,
@@ -254,7 +254,7 @@
         33,
         29
       ],
-      "goalMax": 60
+      "goalMax": 45
     },
     {
       "name": "New donors",
@@ -322,7 +322,7 @@
         4,
         4,
         3,
-        6
+        5
       ]
     }
   ],
@@ -391,7 +391,7 @@
         1151,
         1074,
         956,
-        null,
+        871,
         null,
         null,
         null,
@@ -400,7 +400,7 @@
       ]
     },
     "cur_year": 2026,
-    "ytd_month_index": 6,
-    "ytd_label": "Jan\u2013June"
+    "ytd_month_index": 7,
+    "ytd_label": "Jan\u2013July"
   }
 }

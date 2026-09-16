@@ -70,8 +70,14 @@ METRICS = [
          type="min",   goalMin=70, isAvg=True,  mid="adults_in_circles_avg", agg="annual", denom="adults"),
     dict(group="discipleship", name="Regular serving",        goal="50% of attendance",
          type="min",   goalMin=50, isAvg=True,  mid="serving_regular_avg", agg="annual", denom="adults"),
-    dict(group="discipleship", name="Unique donors",          goal="40%–60% of attendance",
-         type="range", goalMin=40, goalMax=60, isAvg=True,  mid="donors_unique", agg="annual", denom="attendance"),
+    # Benchmark recalibrated 2026-09-16 (was 40%–60%). Published peer research
+    # puts consistent givers at roughly 20%–27% of attenders; MCC's own 2022–2024
+    # range was 38%–44%. The 35%–45% band therefore sits well above peer median
+    # while staying achievable: 35% = recover recent history, 45% = beat 2022's
+    # best-ever 44%. The old 60% ceiling was not grounded in any observed data
+    # and had been missed five years running.
+    dict(group="discipleship", name="Unique donors",          goal="35%–45% of attendance",
+         type="range", goalMin=35, goalMax=45, isAvg=True,  mid="donors_unique", agg="annual", denom="attendance"),
     dict(group="discipleship", name="New donors",             goal="5%–10% of unique donors",
          type="range", goalMin=5, goalMax=10, isAvg=False, mid="donors_new",   agg="annual", denom="unique"),
     dict(group="discipleship", name="Giving / person / week",  goal="$25–$35 per person/week",
@@ -260,9 +266,11 @@ def build_insights(metrics):
     # 6. Donors
     d22 = don["pcts"][0]
     bullets.append(("amber",
-        f"Unique donors ({cur(don):,}, {curpct(don)}%) remain well below the 40–60% goal and have "
-        f"contracted from {d22}% of attendance in 2022. Track this alongside the finance dashboard "
-        f"as a long-term giving-health signal."))
+        f"Unique donors ({cur(don):,}, {curpct(don)}%) sit below the 35–45% goal and have "
+        f"contracted from {d22}% of attendance in 2022 even as attendance grew. The goal was "
+        f"recalibrated from 40–60% in September 2026: peer research puts consistent givers near "
+        f"20–27% of attenders, so 35–45% keeps MCC well above peer median while staying reachable. "
+        f"Track this alongside the finance dashboard as a long-term giving-health signal."))
     # 7. Methodology note
     bullets.append(("blue",
         "Count-based metrics (visitors, baptisms, Connect Breakfast, giving) are year-to-date and "
