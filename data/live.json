@@ -1,98 +1,72 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "September 9, 2026",
+ "run_date": "September 16, 2026",
  "run_weekday": "Wednesday",
- "data_through": "September 6, 2026",
- "weeks_ytd": 36,
+ "data_through": "September 13, 2026",
+ "weeks_ytd": 37,
  "reporting_month_index": 9,
  "reporting_month_name": "September",
  "current_month": {
-  "giving4100": 23314.06,
-  "op_income": 23370.06,
-  "op_expense": 50580.51,
-  "personnel": 47392.13,
-  "facilities": 774.33,
+  "giving4100": 49729.58,
+  "op_income": 50583.38,
+  "op_expense": 51749.36,
+  "personnel": 45397.13,
+  "facilities": 3345.39,
   "partial": true
  },
- "last_week_giving": 23764.06,
- "bank": 707105.79,
- "loan_balance": 1447432.61,
+ "last_week_giving": 26415.52,
+ "bank": 728098.39,
+ "loan_balance": 1444770.41,
  "giving_health": {
-  "committed": 286,
+  "committed": 284,
   "households": 485,
-  "new_donors_year": 53,
+  "new_donors_year": 56,
   "new_donors_week": 0,
-  "committed_individuals": 318,
+  "committed_individuals": 316,
   "committed_basis": "household"
  },
  "retention": {
   "retained": 228,
-  "lapsed": 52,
-  "new": 58,
-  "rate": 81.4,
-  "prior": 280,
+  "lapsed": 53,
+  "new": 56,
+  "rate": 81.1,
+  "prior": 281,
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 6339.86,
-  "card_mtd_n": 43,
-  "card_7d": 2846.39,
-  "card_7d_n": 30,
-  "ap_paid_mtd": 5305.37,
-  "ap_paid_n": 8,
-  "ap_out": 2981.03,
-  "ap_open_n": 8,
-  "card_over": [
-   [
-    "09/06",
-    "Grass Guru",
-    "Aaron Cunningham",
-    "",
-    740.0
-   ]
-  ],
+  "card_mtd": 8506.87,
+  "card_mtd_n": 75,
+  "card_7d": 2288.03,
+  "card_7d_n": 33,
+  "ap_paid_mtd": 6733.92,
+  "ap_paid_n": 12,
+  "ap_out": 7853.23,
+  "ap_open_n": 13,
+  "card_over": [],
   "bills_paid": [
    [
-    "09/08",
-    "KSS Enterprises",
-    "Facility and janitorial supplies including liners towels and toilet paper",
-    448.77
+    "09/15",
+    "Tanya Wieland",
+    "Psychotherapy 60 min sessions for Jenn and Chase Borden",
+    300.0
    ],
    [
-    "09/03",
-    "Wycliffe Bible Translators",
-    "Rick & Susan Nivens Support",
+    "09/14",
+    "Glendon and Lorna Bender",
+    "Missionary Support",
     800.0
    ],
    [
-    "09/03",
-    "Students International",
-    "Eric Miller Missionary Support",
-    800.0
+    "09/11",
+    "Wildman Uniform  Linen",
+    "Rental and cleaning of mats plus service and delivery fees",
+    198.05
    ],
    [
-    "09/03",
-    "Heart  Hand International",
-    "Pauline Yoder",
-    750.0
-   ],
-   [
-    "09/02",
-    "Mission Aviation Fellowship",
-    "Dan and Stephanie Kramer Support",
-    800.0
-   ],
-   [
-    "09/02",
-    "Cripes Septic Cleaning Service Inc",
-    "Portable toilet rental service for two standard units with sanitizer",
-    320.0
-   ],
-   [
-    "09/02",
-    "Digistitch Custom Apparel",
-    "Custom screen printed Comfort Colors t-shirts for Mom's Group",
-    286.6
+    "09/10",
+    "Hawkins Water Tech Inc",
+    "10 bags of 50# Pro's Pick Salt",
+    130.5
    ]
   ]
  }
