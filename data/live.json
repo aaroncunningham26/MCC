@@ -1,59 +1,52 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "September 23, 2026",
+ "run_date": "September 30, 2026",
  "run_weekday": "Wednesday",
- "data_through": "September 20, 2026",
- "weeks_ytd": 38,
+ "data_through": "September 27, 2026",
+ "weeks_ytd": 39,
  "reporting_month_index": 9,
  "reporting_month_name": "September",
  "current_month": {
-  "giving4100": 82092.11,
-  "op_income": 83515.41,
-  "op_expense": 100202.45,
+  "giving4100": 117354.9,
+  "op_income": 124075.13,
+  "op_expense": 109725.3,
   "personnel": 84207.62,
-  "facilities": 12115.42,
+  "facilities": 14612.62,
   "partial": true
  },
- "last_week_giving": 32362.53,
- "bank": 697886.49,
- "loan_balance": 1443436.45,
+ "last_week_giving": 35262.79,
+ "bank": 731011.23,
+ "loan_balance": 1442100.76,
  "giving_health": {
-  "committed": 285,
+  "committed": 288,
   "households": 485,
   "new_donors_year": 57,
   "new_donors_week": 0,
-  "committed_individuals": 317,
+  "committed_individuals": 321,
   "committed_basis": "household",
-  "donors_ttm": 355,
-  "donors_ttm_prior": 370,
-  "donor_households_ttm": 319,
-  "donors_ttm_window": "2025-09-21..2026-09-20"
+  "donors_ttm": 363,
+  "donors_ttm_prior": 366,
+  "donor_households_ttm": 326,
+  "donors_ttm_window": "2025-09-28..2026-09-27"
  },
  "retention": {
-  "retained": 228,
+  "retained": 227,
   "lapsed": 53,
-  "new": 57,
+  "new": 61,
   "rate": 81.1,
-  "prior": 281,
+  "prior": 280,
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 12988.7,
-  "card_mtd_n": 105,
-  "card_7d": 4493.99,
-  "card_7d_n": 31,
-  "ap_paid_mtd": 7361.3,
-  "ap_paid_n": 14,
-  "ap_out": 8878.34,
-  "ap_open_n": 15,
+  "card_mtd": 15263.23,
+  "card_mtd_n": 144,
+  "card_7d": 3080.44,
+  "card_7d_n": 42,
+  "ap_paid_mtd": 9557.26,
+  "ap_paid_n": 18,
+  "ap_out": 7649.4,
+  "ap_open_n": 13,
   "card_over": [
-   [
-    "09/21",
-    "Church Media Squad",
-    "Kyla Whetstone",
-    "Avery's Church Circle sub",
-    1597.0
-   ],
    [
     "09/23",
     "TechKnowledgey Inc",
@@ -62,25 +55,37 @@
     755.66
    ],
    [
-    "09/16",
-    "Planning Center",
+    "09/29",
+    "Subsplash",
     "Aaron Cunningham",
-    "AC - Planning Center Subscription",
-    682.0
+    "AC - Subsplash subscription",
+    561.39
    ]
   ],
   "bills_paid": [
    [
-    "09/18",
-    "Cintas",
-    "First aid supplies, service charges, and AED equipment agreements",
-    427.63
+    "09/30",
+    "Wycliffe Bible Translators",
+    "Rick & Susan Nivens Support",
+    801.99
    ],
    [
-    "09/18",
-    "Economy Offset Print and Digital Services",
-    "Printing of green and blue Happy Birthday cards",
-    199.75
+    "09/28",
+    "Global Gates",
+    "Jayne Delegrange Missionary Support",
+    751.99
+   ],
+   [
+    "09/25",
+    "Best Sweeping Specialist",
+    "Full and fire lane sweeping services",
+    339.99
+   ],
+   [
+    "09/25",
+    "Clinton Christian School",
+    "Church share of Rightnowmedia split fifty-fifty",
+    301.99
    ]
   ]
  }
