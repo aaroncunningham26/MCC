@@ -143,8 +143,45 @@ avg_monthly_opexp = sum(oe26[:n_closed])/n_closed if n_closed else oe26[0]
 # ---- KPIs ----
 last_week_giving = live["last_week_giving"]
 current_giving   = live["current_month"]["giving4100"]
-bank = live["bank"]; unrestricted = round(bank - RESTR, 2)
-months_cash = unrestricted/avg_monthly_opexp
+bank = live["bank"]
+# Unrestricted = UNRESTRICTED NET ASSETS = 3900 Net Unrestricted Funds + Net Revenue
+# (YTD), read live from the QBO balance sheet each run (changed 2026-10-05).
+# Equivalent identity: total equity - temporarily restricted - self-restricted.
+# This nets out loan proceeds the capital-campaign fund deficit doesn't absorb;
+# the old "bank - restricted_offset" (static Apr-2026 SOFP figure) counted them
+# as free cash. Reserve months divide by the MONTHLY BUDGET (annual / 12), not
+# trailing actual expense.
+MONTHLY_BUDGET = ANNUAL_BUDGET / 12.0
+_na = live.get("net_assets") or {}
+if _na.get("unrestricted") is not None:
+    UNR_BASIS = "net_assets"
+    unrestricted = round(_na["unrestricted"], 2)
+    unr_3900 = _na.get("unrestricted_funds_3900"); net_rev_ytd = _na.get("net_revenue_ytd")
+    restricted_held = _na.get("designated_positive", RESTR)
+else:
+    UNR_BASIS = "cash_fallback"
+    print("WARNING: live.json has no net_assets block -- falling back to bank - "
+          "restricted_offset (stale config value). Refresh Step 2.", file=sys.stderr)
+    unrestricted = round(bank - RESTR, 2); unr_3900 = net_rev_ytd = None
+    restricted_held = RESTR
+cash_less_funds = round(bank - restricted_held, 2)
+loan_gap = round(cash_less_funds - unrestricted, 2)  # borrowed cash not offset by fund deficits
+months_cash = unrestricted / MONTHLY_BUDGET
+def _d0(x): return ("-$%s" % format(round(abs(x)), ",")) if x < 0 else ("$%s" % format(round(x), ","))
+if UNR_BASIS == "net_assets":
+    UNR_SUB = "Net assets: 3900 Unrestricted %s + YTD net revenue %s" % (_d0(unr_3900), _d0(net_rev_ytd))
+    BANK_CAP = ("Total bank and fund balances live from the QuickBooks balance sheet. "
+                "<strong>Unrestricted</strong> is unrestricted net assets &mdash; 3900 Net Unrestricted Funds plus year-to-date Net Revenue, "
+                "i.e. total equity less every designated and self-restricted fund. "
+                "It is lower than bank less designated balances (%s) because ~%s of First State loan proceeds sit in the bank "
+                "without a matching capital-campaign fund deficit; those dollars are borrowed, not reserve. "
+                "Reserve months = unrestricted &divide; monthly budget (%s annual &divide; 12)."
+                % (_d0(cash_less_funds), _d0(loan_gap), _d0(ANNUAL_BUDGET)))
+else:
+    UNR_SUB = "Bank less restricted (fallback &mdash; net assets not pulled)"
+    BANK_CAP = ("Total bank live from QuickBooks. <strong>Fallback basis this run:</strong> unrestricted = bank less the "
+                "configured restricted offset (%s), because the balance-sheet net-asset figures were not refreshed. "
+                "Reserve months = unrestricted &divide; monthly budget (%s annual &divide; 12)." % (_d0(RESTR), _d0(ANNUAL_BUDGET)))
 loan_balance = live["loan_balance"]
 loan_rate = LT["rate"]; loan_pay = LT["payment"]; loan_prin = LT["principal"]; loan_int = LT["interest"]
 
@@ -455,18 +492,20 @@ else:
         "Facilities annualize to ~%.0f%% of budget &mdash; below the 15&ndash;25%% guideline." % fac_pct, "expense")
 
 # --- Cash runway (months of unrestricted operating cash; 3-mo target) ---  [home: bank]
+_gap_note = (" Bank less designated balances is %s; the ~%s difference is loan money in the bank that the capital-campaign deficit doesn&rsquo;t absorb, so it isn&rsquo;t counted as reserve."
+             % (d(cash_less_funds), d(loan_gap))) if loan_gap > 1000 else ""
 if months_cash >= 3:
-    add("green","Strength","Healthy cash runway",
-        "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, at or above the 3-month target. Total bank %s includes ~%s designated/restricted."
-        % (d(unrestricted), months_cash, d(bank), d(RESTR)), "bank")
+    add("green","Strength","Healthy operating reserve",
+        "Unrestricted net assets are %s &mdash; about %.1f months of the %s monthly budget, at or above the 3-month target.%s"
+        % (d(unrestricted), months_cash, d(MONTHLY_BUDGET), _gap_note), "bank")
 elif months_cash >= 1:
-    add("amber","Watch","Lean cash runway",
-        "Unrestricted cash is about %s &mdash; roughly %.1f months of operating expense, under the 3-month target. Total bank %s includes ~%s designated/restricted."
-        % (d(unrestricted), months_cash, d(bank), d(RESTR)), "bank")
+    add("amber","Watch","Lean operating reserve",
+        "Unrestricted net assets are %s &mdash; about %.1f months of the %s monthly budget, under the 3-month target.%s"
+        % (d(unrestricted), months_cash, d(MONTHLY_BUDGET), _gap_note), "bank")
 else:
-    add("red","Concern","Critically low cash runway",
-        "Unrestricted cash is about %s &mdash; under one month of operating expense (%.1f mo). Total bank %s is mostly designated/restricted (~%s)."
-        % (d(unrestricted), months_cash, d(bank), d(RESTR)), "bank")
+    add("red","Concern","Operating reserve under one month",
+        "Unrestricted net assets are %s &mdash; under one month of the %s monthly budget (%.1f mo).%s"
+        % (d(unrestricted), d(MONTHLY_BUDGET), months_cash, _gap_note), "bank")
 
 # --- Donor retention & committed base ---  [home: retention]
 if retention >= 80 and net_committed >= 0:
@@ -830,12 +869,12 @@ footer a{{color:var(--slate);font-weight:700;text-decoration:none;}}
   <h2>Bank Balance</h2>
   <div class="grid g4">
     <div class="card"><div class="kpi-l">Total Bank Balance</div><div class="kpi-n">{d(bank)}</div><div class="kpi-s">All accounts &middot; as of {DATA_THROUGH}</div></div>
-    <div class="card"><div class="kpi-l">Designated / Restricted</div><div class="kpi-n">{d(RESTR)}</div><div class="kpi-s">Held for designated &amp; capital funds</div></div>
-    <div class="card"><div class="kpi-l">Unrestricted</div><div class="kpi-n">{d(unrestricted)}</div><div class="kpi-s">Available for operating use</div></div>
-    <div class="card"><div class="kpi-l">Operating Reserve</div><div class="kpi-n">{months_cash:.1f} mo</div><div class="kpi-s">Unrestricted &divide; avg monthly expense &middot; 3-mo target</div></div>
+    <div class="card"><div class="kpi-l">Designated / Restricted</div><div class="kpi-n">{d(restricted_held)}</div><div class="kpi-s">Positive fund balances (designated &amp; self-restricted)</div></div>
+    <div class="card"><div class="kpi-l">Unrestricted</div><div class="kpi-n">{d(unrestricted)}</div><div class="kpi-s">{UNR_SUB}</div></div>
+    <div class="card"><div class="kpi-l">Operating Reserve</div><div class="kpi-n">{months_cash:.1f} mo</div><div class="kpi-s">Unrestricted &divide; {d(MONTHLY_BUDGET)} monthly budget &middot; 3-mo target</div></div>
   </div>
   {section_insights('bank')}
-  <div class="cap">Total bank live from QuickBooks (cash across all accounts). Designated/restricted (~{d(RESTR)}) is reserved for capital and designated funds; unrestricted is what remains available for operations. Reserve months = unrestricted cash &divide; average monthly operating expense.</div>
+  <div class="cap">{BANK_CAP}</div>
 </section>
 
 <section>

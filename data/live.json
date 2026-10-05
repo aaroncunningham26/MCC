@@ -88,5 +88,17 @@
     301.99
    ]
   ]
+ },
+ "net_assets": {
+  "unrestricted_funds_3900": 151583.1,
+  "net_revenue_ytd": 18508.85,
+  "unrestricted": 170091.95,
+  "designated_positive": 392097.02,
+  "temporarily_restricted_total": -883176.29,
+  "self_restricted_total": 6595.69,
+  "total_equity": -706488.65,
+  "check_equity_less_funds": 170091.95,
+  "basis": "accrual",
+  "source": "QBO balance sheet THIS_YEAR_TO_DATE"
  }
 }
