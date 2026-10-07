@@ -126,8 +126,8 @@
   ]
  },
  "net_assets": {
-  "unrestricted_funds_3900": 146431.79,
-  "net_revenue_ytd": -18084.18,
+  "unrestricted_funds_3900": 457934.63,
+  "net_revenue_ytd": -329587.02,
   "unrestricted": 128347.61,
   "designated_positive": 392881.86,
   "temporarily_restricted_total": -877679.9,
@@ -135,6 +135,7 @@
   "total_equity": -742736.6,
   "check_equity_less_funds": 128347.61,
   "basis": "accrual",
-  "source": "QBO balance sheet THIS_YEAR_TO_DATE"
+  "source": "QBO balance sheet THIS_YEAR_TO_DATE",
+  "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue); 3900 = unrestricted - net revenue"
  }
 }
