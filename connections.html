@@ -114,7 +114,7 @@
   </div>
 
   <div class="section-label">Key takeaways</div>
-  <div class="insights"><h2>What this data is telling us</h2><ul><li><span class="dot dot-green"></span><span>Weekend attendance is healthy &mdash; the YTD weekly average is <strong>1,017</strong> (6-week moving average <strong>982</strong>). Mar 29 was the year's strongest week at 1,421.</span></li><li><span class="dot dot-blue"></span><span>Year over year, the 2026 monthly attendance is tracking <strong>above</strong> 2025 (2025 averaged 1,025/week) and well above 2021&ndash;2023.</span></li><li><span class="dot dot-green"></span><span>Discipleship base is strong &mdash; <strong>631 adults</strong> are in a group (~58% of adults) and <strong>391</strong> serve on Sundays.</span></li><li><span class="dot dot-blue"></span><span>So far in 2026: <strong>16</strong> baptisms, <strong>15</strong> through Starting Point, and <strong>364</strong> new Sunday guests (YTD).</span></li></ul></div>
+  <div class="insights"><h2>What this data is telling us</h2><ul><li><span class="dot dot-green"></span><span>Weekend attendance is healthy &mdash; the YTD weekly average is <strong>1,017</strong> (6-week moving average <strong>982</strong>). Mar 29 was the year's strongest week at 1,421.</span></li><li><span class="dot dot-blue"></span><span>Year over year, the 2026 monthly attendance is tracking <strong>above</strong> 2025 (2025 averaged 1,025/week) and well above 2021&ndash;2023.</span></li><li><span class="dot dot-green"></span><span>Discipleship base is strong &mdash; <strong>631 adults</strong> are in a group (~58% of adults) and <strong>391</strong> serve on Sundays.</span></li><li><span class="dot dot-blue"></span><span>So far in 2026: <strong>21</strong> baptisms, <strong>29</strong> through Starting Point, and <strong>364</strong> new Sunday guests (YTD).</span></li></ul></div>
 
   <div class="section-divider"><h2>Groups &amp; serving</h2><span class="badge">Live &middot; vs September</span></div>
   <div class="cards">
@@ -132,8 +132,8 @@
   <div class="section-divider"><h2>Guests &amp; next steps</h2><span class="badge">2026 year-to-date</span></div>
   <div class="cards">
     <div class="card top-green"><div class="label">New Sunday Guests</div><div class="value">33</div><div class="sub green">This month &middot; 364 YTD</div></div>
-    <div class="card top-blue"><div class="label">Baptisms</div><div class="value">16</div><div class="sub">2026 to date</div></div>
-    <div class="card top-blue"><div class="label">Starting Point</div><div class="value">15</div><div class="sub">2026 to date</div></div>
+    <div class="card top-blue"><div class="label">Baptisms</div><div class="value">21</div><div class="sub">2026 to date</div></div>
+    <div class="card top-blue"><div class="label">Starting Point</div><div class="value">29</div><div class="sub">2026 to date</div></div>
     <div class="card top-blue"><div class="label">Connect Breakfast</div><div class="value">101</div><div class="sub">2026 to date</div></div>
   </div>
 
@@ -192,7 +192,7 @@
   </div>
 
   <div class="mcc-footer">
-    <p>Maple City Chapel &nbsp;&middot;&nbsp; MCC Connections Dashboard &nbsp;&middot;&nbsp; Prepared October 6, 2026</p>
+    <p>Maple City Chapel &nbsp;&middot;&nbsp; MCC Connections Dashboard &nbsp;&middot;&nbsp; Prepared October 13, 2026</p>
     <p style="margin-top:2px;">Attendance: weekly tracking sheet. Live roster/groups/serving/check-ins: Planning Center. Trends &amp; history: MCC Connection KPMs sheet. Refreshed weekly.</p>
   </div>
 </div>
@@ -255,8 +255,8 @@ const byrs = ["2022", "2023", "2024", "2025", "2026"];
 new Chart(document.getElementById('nextStepsChart'), {
   type:'bar',
   data: { labels: byrs, datasets: [
-    { label:'Baptisms', data:byrs.map(y=>({"2022": 17, "2023": 29, "2024": 43, "2025": 34, "2026": 16})[y]), backgroundColor:'#343A44', borderRadius:4 },
-    { label:'Starting Point', data:byrs.map(y=>({"2022": 35, "2023": 28, "2024": 30, "2025": 19, "2026": 15})[y]), backgroundColor:'#C8842A', borderRadius:4 }
+    { label:'Baptisms', data:byrs.map(y=>({"2022": 17, "2023": 29, "2024": 43, "2025": 34, "2026": 21})[y]), backgroundColor:'#343A44', borderRadius:4 },
+    { label:'Starting Point', data:byrs.map(y=>({"2022": 35, "2023": 28, "2024": 30, "2025": 19, "2026": 29})[y]), backgroundColor:'#C8842A', borderRadius:4 }
   ] },
   options: { responsive:true, maintainAspectRatio:false,
     plugins:{legend:{display:false}, tooltip:{mode:'index'}},
