@@ -1,6 +1,6 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "October 7, 2026",
+ "run_date": "October 14, 2026",
  "run_weekday": "Wednesday",
  "data_through": "October 4, 2026",
  "weeks_ytd": 40,
@@ -15,16 +15,16 @@
   "partial": true
  },
  "last_week_giving": 23716.89,
- "bank": 710159.51,
+ "bank": 709664.83,
  "loan_balance": 1440763.33,
  "giving_health": {
   "committed": 288,
   "households": 491,
-  "new_donors_year": 65,
+  "new_donors_year": 66,
   "new_donors_week": 0,
-  "committed_individuals": 323,
+  "committed_individuals": 324,
   "committed_basis": "household",
-  "donors_ttm": 365,
+  "donors_ttm": 366,
   "donors_ttm_prior": 362,
   "donor_households_ttm": 326,
   "donors_ttm_window": "2025-10-05..2026-10-04"
@@ -38,102 +38,54 @@
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 8504.39,
-  "card_mtd_n": 49,
-  "card_7d": 9139.02,
-  "card_7d_n": 59,
-  "ap_paid_mtd": 3582.68,
-  "ap_paid_n": 6,
-  "ap_out": 3333.57,
-  "ap_open_n": 7,
+  "card_mtd": 13731.74,
+  "card_mtd_n": 78,
+  "card_7d": 6699.55,
+  "card_7d_n": 35,
+  "ap_paid_mtd": 3888.23,
+  "ap_paid_n": 8,
+  "ap_out": 3137.51,
+  "ap_open_n": 6,
   "card_over": [
    [
-    "10/01",
-    "Church Finance",
-    "Aaron Cunningham",
-    "AC - Outsourced accounting subscription",
-    1780.0
+    "10/13",
+    "MultitracksCom",
+    "Jesse Maurer",
+    "",
+    3284.88
    ],
    [
     "10/07",
     "Grass Guru",
     "Aaron Cunningham",
-    "",
+    "Landscaping service",
     1420.0
    ]
   ],
   "bills_paid": [
    [
-    "10/05",
-    "Glendon and Lorna Bender",
-    "Missionary Support",
-    801.99
+    "10/09",
+    "Wildman Uniform  Linen",
+    "Mat rental, delivery, green services, and discount",
+    198.05
    ],
    [
-    "10/01",
-    "Missionary Ventures",
-    "Josh & Jennifer Hire",
-    1101.99
-   ],
-   [
-    "10/01",
-    "Students International",
-    "Eric Miller Missionary Support",
-    801.99
-   ],
-   [
-    "10/01",
-    "XEROX BUSINESS SOLUTIONS",
-    "Magenta and yellow toner cartridges for copier model XALC8070",
-    387.99
-   ],
-   [
-    "10/01",
+    "10/08",
     "Digistitch Custom Apparel",
-    "Custom t-shirts and processing fee for retreat",
-    365.12
-   ],
-   [
-    "10/01",
-    "Digistitch Custom Apparel",
-    "Custom t-shirts and processing fee for Moms Group",
-    123.6
-   ],
-   [
-    "09/30",
-    "Mission Aviation Fellowship",
-    "Dan and Stephanie Kramer Support",
-    801.99
-   ],
-   [
-    "09/30",
-    "Wycliffe Bible Translators",
-    "Rick & Susan Nivens Support",
-    801.99
-   ],
-   [
-    "09/30",
-    "Clayton Nisly",
-    "Clayton Nisly Support",
-    800.59
-   ],
-   [
-    "09/30",
-    "Economy Offset Print and Digital Services",
-    "Connect at MCC and Staying Sharp Cards printed card stock",
-    126.5
+    "T-shirts for Jr High Retreat, screen printed",
+    107.5
    ]
   ]
  },
  "net_assets": {
   "unrestricted_funds_3900": 457934.63,
-  "net_revenue_ytd": -329587.02,
-  "unrestricted": 128347.61,
+  "net_revenue_ytd": -329694.52,
+  "unrestricted": 128240.11,
   "designated_positive": 392881.86,
   "temporarily_restricted_total": -877679.9,
   "self_restricted_total": 6595.69,
-  "total_equity": -742736.6,
-  "check_equity_less_funds": 128347.61,
+  "total_equity": -742844.1,
+  "check_equity_less_funds": 128240.11,
   "basis": "accrual",
   "source": "QBO balance sheet THIS_YEAR_TO_DATE",
   "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue); 3900 = unrestricted - net revenue"
