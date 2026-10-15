@@ -147,6 +147,7 @@ def extract():
     # Cash on hand = live bank balance minus restricted offset (both still live
     # values per the runbook; restricted_offset lives in config).
     cash = None
+    cash_as_of = None
     loan = dict(LOAN_TERMS); loan["balance"] = None; loan["as_of"] = None
     try:
         with open(os.path.join(BASE, "data", "live.json")) as f:
@@ -163,11 +164,13 @@ def extract():
             with open(os.path.join(BASE, "data", "month_end_net_assets.json")) as f:
                 me = json.load(f).get("%04d-%02d" % (CUR_YEAR, rm)) or {}
             unres = me.get("unrestricted")
+            cash_as_of = me.get("as_of")
         except (OSError, ValueError):
             pass
         if unres is None:
             unres = (live.get("net_assets") or {}).get("unrestricted")
             if unres is not None:
+                cash_as_of = live.get("data_through")
                 _warnings.append("WARNING: no month-end entry for %04d-%02d in "
                                  "data/month_end_net_assets.json -- using the weekly "
                                  "live.json unrestricted figure instead." % (CUR_YEAR, rm))
@@ -213,7 +216,7 @@ def extract():
         annual_income=annual_income, annual_expense=annual_expense,
         jan_income=jan_income, jan_expense=jan_expense,
         ytd_income=ytd_income, ytd_expense=ytd_expense, ytd_giving=ytd_giving,
-        budget_income=budget_income, cash_on_hand=cash, loan=loan,
+        budget_income=budget_income, cash_on_hand=cash, cash_as_of=cash_as_of, loan=loan,
         monthly=monthly, payroll_note=payroll_note,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
@@ -507,6 +510,10 @@ const cards = [
 ];
 if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', value:fmt(YTD_GIVING), sub:Math.round(YTD_GIVING/ytdInc*100)+'% of operating income · 4100 tithes & offerings', cls:'neutral', accent:'accent-blue' });
 if (budget2026) cards.push({ label:'2026 annual budget', value:fmt(budget2026), sub:'Received '+Math.round(ytdInc/budget2026*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' });
+if (CASH_ON_HAND !== null) {
+  const asOf = CASH_AS_OF ? (/^\d{4}-\d{2}-\d{2}$/.test(CASH_AS_OF) ? new Date(CASH_AS_OF+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : CASH_AS_OF) : null;
+  cards.push({ label:'Unrestricted cash on hand', value:fmt(CASH_ON_HAND), sub:(asOf ? 'As of '+asOf+' · ' : '')+'excludes designated & restricted funds', cls:'neutral', accent:'accent-blue' });
+}
 if (monthsCash !== null) cards.push({ label:'Months of cash on hand', value:monthsCash + ' mo.', sub: monthsCash >= 3 ? 'Healthy — target is 3–6 months' : monthsCash >= 1.5 ? 'Caution — below the 3-month target' : 'Low — under 1.5 months of runway', cls:cashCls, accent:cashAccent });
 document.getElementById('snapshot-cards').innerHTML = cards.map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub ${c.cls}">${c.sub}</div></div>`).join('');
 
@@ -639,6 +646,7 @@ def data_block(d):
         "const LAST_UPDATED = %s;" % json.dumps(d["last_updated"]),
         "const DATA_NOTE    = %s;" % json.dumps(DATA_NOTE),
         "const CASH_ON_HAND = %s;" % _js_num(d["cash_on_hand"]),
+        "const CASH_AS_OF = %s;" % json.dumps(d.get("cash_as_of")),
         "const YTD_GIVING = %s;" % _js_num(d["ytd_giving"]),
         "const LOAN = %s;" % json.dumps(d["loan"]),
         "const MONTHLY = %s;" % json.dumps(d["monthly"]),
