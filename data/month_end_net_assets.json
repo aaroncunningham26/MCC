@@ -1,0 +1,13 @@
+{
+ "_note": "Month-end unrestricted net assets, per 'How We Calculate Unrestricted Cash on Hand' (Oct 15 2026). Unrestricted = Total Equity - Temporarily Restricted Funds - Self-Restricted Funds, from the QBO accrual balance sheet as of the last day of the month. build_financials.py uses the entry for the reporting month; add one row per month.",
+ "2026-09": {
+  "as_of": "2026-09-30",
+  "bank_total": 739530.11,
+  "total_equity": -713522.50,
+  "temporarily_restricted_total": -877679.90,
+  "self_restricted_total": 6595.69,
+  "unrestricted": 157561.71,
+  "basis": "accrual",
+  "source": "QBO Balance Sheet as of 2026-09-30 (pulled 2026-10-15)"
+ }
+}

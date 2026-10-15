@@ -153,7 +153,29 @@ def extract():
             live = json.load(f)
         bank = live.get("bank")
         restr = cfg.get("restricted_offset")
-        if bank is not None and restr is not None:
+        # Preferred: unrestricted net assets from the weekly QBO balance-sheet
+        # method (total net assets - Temporarily Restricted - Self-Restricted),
+        # per "How We Calculate Unrestricted Cash on Hand" (Oct 15 2026).
+        # Month-end figure for the reporting month wins (elders see the closed
+        # month); the weekly live figure is only a fallback.
+        unres = None
+        try:
+            with open(os.path.join(BASE, "data", "month_end_net_assets.json")) as f:
+                me = json.load(f).get("%04d-%02d" % (CUR_YEAR, rm)) or {}
+            unres = me.get("unrestricted")
+        except (OSError, ValueError):
+            pass
+        if unres is None:
+            unres = (live.get("net_assets") or {}).get("unrestricted")
+            if unres is not None:
+                _warnings.append("WARNING: no month-end entry for %04d-%02d in "
+                                 "data/month_end_net_assets.json -- using the weekly "
+                                 "live.json unrestricted figure instead." % (CUR_YEAR, rm))
+        if unres is not None:
+            cash = round(unres, 2)
+        elif bank is not None and restr is not None:
+            _warnings.append("WARNING: live.json net_assets.unrestricted missing -- "
+                             "falling back to bank minus STALE config restricted_offset.")
             cash = round(bank - restr, 2)
         elif bank is not None:
             cash = round(bank, 2)
@@ -470,7 +492,7 @@ document.querySelectorAll('.hdr-month').forEach(el => el.textContent = lastMonth
 const ytdInc = ytd2026Income.reduce((a,b)=>a+b,0);
 const ytdExp = ytd2026Expense.reduce((a,b)=>a+b,0);
 const ytdNet = ytdInc - ytdExp;
-const avgMonthlyExp = ytdExp / ytd2026Months.length;
+const avgMonthlyExp = annualBudgetIncome[2026] ? annualBudgetIncome[2026] / 12 : ytdExp / ytd2026Months.length;  // monthly operating budget, per the Unrestricted Cash method
 const monthsCash = CASH_ON_HAND === null ? null : (CASH_ON_HAND / avgMonthlyExp).toFixed(1);
 const cashCls = monthsCash === null ? 'neutral' : monthsCash >= 3 ? 'up' : monthsCash >= 1.5 ? 'neutral' : 'down';
 const cashAccent = monthsCash === null ? 'accent-blue' : monthsCash >= 3 ? 'accent-green' : monthsCash >= 1.5 ? 'accent-amber' : 'accent-red';
@@ -504,7 +526,7 @@ const insights = [
   { dot:'dot-blue', text: PAYROLL_NOTE }
 ];
 if (budget2026) insights.push({ dot:'dot-blue', text:`We have received <strong>${Math.round(ytdInc/budget2026*100)}%</strong> of our full-year budget of ${fmt(budget2026)} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` });
-if (monthsCash !== null) insights.push({ dot: monthsCash >= 3 ? 'dot-green' : monthsCash >= 1.5 ? 'dot-amber' : 'dot-red', text:`We currently have <strong>${monthsCash} months of cash on hand</strong> (${fmt(CASH_ON_HAND)} in reserves ÷ ${fmt(Math.round(avgMonthlyExp))} avg monthly costs). The healthy target for a church is <strong>3–6 months</strong>. ${monthsCash >= 3 ? 'We are within that range.' : 'Building reserves toward the 3-month floor should be a priority.'}` });
+if (monthsCash !== null) insights.push({ dot: monthsCash >= 3 ? 'dot-green' : monthsCash >= 1.5 ? 'dot-amber' : 'dot-red', text:`We currently have <strong>${monthsCash} months of cash on hand</strong> (${fmt(CASH_ON_HAND)} unrestricted cash ÷ ${fmt(Math.round(avgMonthlyExp))} monthly operating budget). The healthy target for a church is <strong>3–6 months</strong>. ${monthsCash >= 3 ? 'We are within that range.' : 'Building reserves toward the 3-month floor should be a priority.'}` });
 document.getElementById('insights-list').innerHTML = insights.map(i=>`<li><span class="dot ${i.dot}"></span><span>${i.text}</span></li>`).join('');
 
 Chart.defaults.font.family = "'Lato', system-ui, Arial, sans-serif";
