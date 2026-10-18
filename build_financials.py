@@ -60,8 +60,25 @@ LOAN_TERMS = {"lender": "First State Bank", "rate": "6.67%",
               "payment": 12830.83, "principal": 4806.51, "interest": 8024.32}
 
 DATA_NOTE = ("2022–2023 actuals include General Fund + Missions Fund "
-             "(excl. Pit Road). 2024–2026: General Fund only. "
+             "(excl. Pit Road). Year-over-year figures restate 2024–2025 to the "
+             "2026 QuickBooks operating definition (General Fund plus café, church "
+             "rental, bookstore and interest from Funds 13–15); prior-year budget "
+             "comparisons use General Fund only. "
              "Source: PowerChurch (2022–2025), QuickBooks Online (2026).")
+
+
+def _load_comparable():
+    """Prior-year operating income/expense restated to the 2026 QBO operating
+    definition (data/prior_year_comparable.json, built from the Stewardship Team
+    fund reports). Used ONLY for year-over-year comparisons; annual budget-vs-
+    actual keeps the General Fund 11 warehouse figures (budgets were Fund 11)."""
+    try:
+        with open(os.path.join(BASE, "data", "prior_year_comparable.json")) as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        _warnings.append("WARNING: data/prior_year_comparable.json missing -- year-"
+                         "over-year comparisons fall back to General Fund 11 history.")
+        return {}
 
 # ── Safety-net fallback: frozen monthly history for closed years (from the
 #    legacy static.json this warehouse was backfilled from). Used ONLY if the
@@ -108,6 +125,15 @@ def extract():
     exp = {y: _monthly_list(EXPENSE_MID, y, FALLBACK_EXPENSE) for y in YEARS}
     per = {y: _monthly_list(PERSONNEL_MID, y, None) for y in YEARS}
 
+    # Comparable (like-for-like) series for year-over-year views.
+    _cmp = _load_comparable()
+    def _cmpd(key, y, fallback):
+        v = (_cmp.get(key) or {}).get(str(y))
+        return list(v) if v else fallback
+    cinc = {y: _cmpd("op_income", y, inc[y]) for y in YEARS}
+    cexp = {y: _cmpd("op_expense", y, exp[y]) for y in YEARS}
+    cmp_prior = [y for y in YEARS[:-1] if str(y) in (_cmp.get("op_income") or {})] or YEARS[:-1]
+
     # Reporting month = the last month with a current-year income observation.
     present = [i + 1 for i, v in enumerate(inc[CUR_YEAR]) if v is not None]
     if not present:
@@ -123,8 +149,8 @@ def extract():
     annual_expense = {y: _sum(exp[y]) for y in YEARS[:-1]}
 
     # Period-matched Jan..reporting-month totals across all five years.
-    jan_income = {y: _sum(inc[y], upto=rm) for y in YEARS}
-    jan_expense = {y: _sum(exp[y], upto=rm) for y in YEARS}
+    jan_income = {y: _sum(cinc[y], upto=rm) for y in YEARS}
+    jan_expense = {y: _sum(cexp[y], upto=rm) for y in YEARS}
 
     ytd_income = [inc[CUR_YEAR][i] for i in range(rm)]
     ytd_expense = [exp[CUR_YEAR][i] for i in range(rm)]
@@ -210,15 +236,20 @@ def extract():
     # giving line but falls back to operating income for any year lacking a 4100
     # monthly history in the warehouse (prior years were backfilled income-only).
     giv_hist = {y: _monthly_list("give_4100", y, None) for y in YEARS}
+    for y in YEARS[:-1]:
+        if not any(v is not None for v in giv_hist[y]):
+            giv_hist[y] = _cmpd("give_4100", y, giv_hist[y])
+    giving_prior_ytd = _sum(giv_hist[CUR_YEAR - 1], upto=rm)
     def _giv_line(y):
         return giv_hist[y] if any(v is not None for v in giv_hist[y]) else inc[y]
     monthly = dict(
         months12=MONTHS12,
         giving_chart={"y2024": _giv_line(2024), "y2025": _giv_line(2025),
                       "y2026": giv_hist[CUR_YEAR]},
-        expense_chart={"y2024": exp[2024], "y2025": exp[2025], "y2026": exp[CUR_YEAR]},
-        income_table={str(y): inc[y][:rm] for y in YEARS},
-        expense_table={str(y): exp[y][:rm] for y in YEARS},
+        expense_chart={"y2024": cexp[2024], "y2025": cexp[2025], "y2026": exp[CUR_YEAR]},
+        income_table={str(y): cinc[y][:rm] for y in YEARS},
+        expense_table={str(y): cexp[y][:rm] for y in YEARS},
+        narrow_years=[y for y in YEARS[:-1] if y not in cmp_prior],
         giving_prior_is_income=not any(v is not None for v in giv_hist[2025]),
     )
 
@@ -229,6 +260,7 @@ def extract():
         ytd_income=ytd_income, ytd_expense=ytd_expense, ytd_giving=ytd_giving,
         budget_income=budget_income, cash_on_hand=cash, cash_as_of=cash_as_of, loan=loan,
         monthly=monthly, payroll_note=payroll_note,
+        cmp_prior=cmp_prior, giving_prior_ytd=giving_prior_ytd,
         weekly_budget=weekly_budget, budget_weeks=budget_weeks,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
@@ -520,7 +552,7 @@ const cards = [
   { label:'Operating costs (Jan–'+lastMonth+')', value:fmt(ytdExp), sub:(expChg>=0?'▲ ':'▼ ')+Math.abs(expChg)+'% vs same period last year', cls:Number(expChg)<=3?'up':'down', accent:'accent-amber' },
   { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — income is covering costs':'Deficit — costs exceeding income', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' }
 ];
-if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', value:fmt(YTD_GIVING), sub:Math.round(YTD_GIVING/ytdInc*100)+'% of operating income · 4100 tithes & offerings', cls:'neutral', accent:'accent-blue' });
+if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', value:fmt(YTD_GIVING), sub:(GIVING_PRIOR_YTD ? ((YTD_GIVING>=GIVING_PRIOR_YTD?'▲ ':'▼ ')+Math.abs((YTD_GIVING-GIVING_PRIOR_YTD)/GIVING_PRIOR_YTD*100).toFixed(1)+'% vs same period last year · ') : '')+'4100 tithes & offerings', cls:(GIVING_PRIOR_YTD && YTD_GIVING<GIVING_PRIOR_YTD)?'down':'up', accent:'accent-blue' });
 if (YTD_GIVING !== null && WEEKLY_BUDGET && BUDGET_WEEKS) {
   const gBud = WEEKLY_BUDGET * BUDGET_WEEKS, gVar = YTD_GIVING - gBud;
   cards.push({ label:'YTD Giving Budget (Jan–'+lastMonth+')', value:fmt(gBud), sub:(gVar>=0?'▲ ':'▼ ')+fmt(Math.abs(Math.round(gVar)))+(gVar>=0?' ahead':' behind')+' · '+Math.round(YTD_GIVING/gBud*100)+'% of pace ('+BUDGET_WEEKS+' wks × '+fmt(WEEKLY_BUDGET)+')', cls:gVar>=0?'up':'down', accent:gVar>=0?'accent-green':'accent-red' });
@@ -534,18 +566,19 @@ if (monthsCash !== null) cards.push({ label:'Months of cash on hand', value:mont
 document.getElementById('snapshot-cards').innerHTML = cards.map(c=>`<div class="card ${c.accent}"><div class="label">${c.label}</div><div class="value">${c.value}</div><div class="sub ${c.cls}">${c.sub}</div></div>`).join('');
 
 const netVsLastYear = fmt(janAprIncome[2025]-janAprExpense[2025]);
-const priorNets = [2022,2023,2024,2025].map(y=>janAprIncome[y]-janAprExpense[y]);
+const lastYearCmp = CMP_PRIOR[CMP_PRIOR.length-1];
+const priorNets = CMP_PRIOR.map(y=>janAprIncome[y]-janAprExpense[y]);
 const worstPrior = Math.min(...priorNets);
 const deficitLead = ytdNet <= worstPrior
-  ? `The January–${lastMonth} deficit of <strong>${fmt(ytdNet)}</strong> is the largest in five years`
-  : `The January–${lastMonth} net of <strong>${fmt(ytdNet)}</strong> sits within the five-year range`;
+  ? `The January–${lastMonth} deficit of <strong>${fmt(ytdNet)}</strong> is the largest of the comparable years (${CMP_PRIOR[0]}–${lastYearCmp})`
+  : `The January–${lastMonth} net of <strong>${fmt(ytdNet)}</strong> sits within the range of recent years`;
 const insights = [
-  { dot: ytdInc >= Math.max(...[2022,2023,2024,2025].map(y=>janAprIncome[y])) ? 'dot-green' : 'dot-blue',
-    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025. ${ytdInc >= Math.max(...[2022,2023,2024,2025].map(y=>janAprIncome[y])) ? 'That is the strongest start on record.' : 'Momentum is tracking with recent years.'}` },
+  { dot: ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? 'dot-green' : 'dot-blue',
+    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025 on a like-for-like basis${GIVING_PRIOR_YTD && YTD_GIVING ? ` (tithes &amp; offerings alone are ${YTD_GIVING>=GIVING_PRIOR_YTD?'up':'down'} <strong>${Math.abs((YTD_GIVING-GIVING_PRIOR_YTD)/GIVING_PRIOR_YTD*100).toFixed(1)}%</strong>)` : ''}. ${ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? `That is ahead of the same period in ${CMP_PRIOR.join(' and ')}.` : 'Momentum is tracking with recent years.'}` },
   { dot: Number(expChg) > Number(incChg) ? 'dot-red' : 'dot-green',
     text:`Operating costs are ${expChg>=0?'up':'down'} <strong>${Math.abs(expChg)}%</strong> year-over-year vs ${incChg}% income growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>.${Number(expChg) > Number(incChg) ? ' Costs outpacing income is the key financial challenge right now.' : ''}` },
   { dot: ytdNet >= 0 ? 'dot-green' : 'dot-amber',
-    text:`${deficitLead}${ytdNet < 0 && ytdNet <= worstPrior ? `, more than the deficit in the same period of 2025 (${netVsLastYear})` : ''}. This warrants monitoring as seasonal giving patterns play out.` }
+    text:`${deficitLead}${ytdNet < 0 && ytdNet <= worstPrior ? `, more than the same period of 2025, which was ${netVsLastYear}` : ''}. This warrants monitoring as seasonal giving patterns play out.` }
 ];
 if (budget2026) insights.push({ dot:'dot-blue', text:`We have received <strong>${Math.round(ytdInc/budget2026*100)}%</strong> of our full-year budget of ${fmt(budget2026)} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` });
 if (monthsCash !== null) insights.push({ dot: monthsCash >= 3 ? 'dot-green' : monthsCash >= 1.5 ? 'dot-amber' : 'dot-red', text:`We currently have <strong>${monthsCash} months of cash on hand</strong> (${fmt(CASH_ON_HAND)} unrestricted cash ÷ ${fmt(Math.round(avgMonthlyExp))} monthly operating budget). The healthy target for a church is <strong>3–6 months</strong>. ${monthsCash >= 3 ? 'We are within that range.' : 'Building reserves toward the 3-month floor should be a priority.'}` });
@@ -565,8 +598,9 @@ new Chart(document.getElementById('incExpChart'),{type:'bar',data:{labels:[...pr
 
 new Chart(document.getElementById('monthlyChart'),{type:'bar',data:{labels:ytd2026Months,datasets:[{label:'Giving',data:ytd2026Income,backgroundColor:'#343A44',borderRadius:4},{label:'Costs',data:ytd2026Expense,backgroundColor:'#C8842A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
-const nv=[2022,2023,2024,2025,2026].map(y=>janAprIncome[y]-janAprExpense[y]);
-new Chart(document.getElementById('netChart'),{type:'bar',data:{labels:['2022','2023','2024','2025','2026'],datasets:[{data:nv,backgroundColor:nv.map(v=>v>=0?'#2F8F5B':'#DC2626'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' Net: '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yN}}}});
+const nvYears=[...CMP_PRIOR,2026];
+const nv=nvYears.map(y=>janAprIncome[y]-janAprExpense[y]);
+new Chart(document.getElementById('netChart'),{type:'bar',data:{labels:nvYears.map(String),datasets:[{data:nv,backgroundColor:nv.map(v=>v>=0?'#2F8F5B':'#DC2626'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' Net: '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yN}}}});
 
 let bh=`<thead><tr><th>Year</th><th>Giving goal</th><th>Giving received</th><th>Variance</th><th>vs goal</th></tr></thead><tbody>`;
 priorYears.forEach(y=>{const b=annualBudgetIncome[y],a=annualIncome[y];if(b==null||a==null){bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td>—</td><td>—</td></tr>`;return;}const d=a-b,c=d>=0?'pos':'neg';bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td class="${c}">${d>=0?'+':''}${fmt(d)}</td><td class="${c}">${d>=0?'+':''}${(d/b*100).toFixed(1)}%</td></tr>`;});
@@ -605,8 +639,10 @@ document.getElementById('summaryTable').innerHTML=sh;
     ['2022','2023','2024','2025','2026'].forEach(y=>{const a=data[y]||[];
       const cells=ytd2026Months.map((mm,i)=>`<td>${m0(a[i])}</td>`).join('');
       const tot=a.reduce((s,v)=>s+(v||0),0);
-      h+=`<tr><td>${y}</td>${cells}<td class="ytd-col">${m0(tot)}</td></tr>`;});
-    el.innerHTML=h+'</tbody>';
+      const nar=(M.narrow_years||[]).map(String).includes(y);
+      h+=`<tr><td>${y}${nar?'*':''}</td>${cells}<td class="ytd-col">${m0(tot)}</td></tr>`;});
+    const nn=(M.narrow_years||[]);
+    el.innerHTML=h+'</tbody>'+(nn.length?`<caption style="caption-side:bottom;text-align:left;font-size:12px;color:#6B7280;padding-top:6px">* ${nn.join('–')}: older fund definitions, not directly comparable. 2024–2025 restated to the 2026 operating definition.</caption>`:'');
   }
   tbl('incomeCmpTable', M.income_table);
   tbl('expenseCmpTable', M.expense_table);
@@ -663,6 +699,8 @@ def data_block(d):
         "const CASH_ON_HAND = %s;" % _js_num(d["cash_on_hand"]),
         "const CASH_AS_OF = %s;" % json.dumps(d.get("cash_as_of")),
         "const YTD_GIVING = %s;" % _js_num(d["ytd_giving"]),
+        "const CMP_PRIOR = %s;" % json.dumps(d["cmp_prior"]),
+        "const GIVING_PRIOR_YTD = %s;" % _js_num(d["giving_prior_ytd"]),
         "const WEEKLY_BUDGET = %s;" % _js_num(d.get("weekly_budget")),
         "const BUDGET_WEEKS = %s;" % _js_num(d.get("budget_weeks")),
         "const LOAN = %s;" % json.dumps(d["loan"]),

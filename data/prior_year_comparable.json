@@ -1,0 +1,93 @@
+{
+ "_note": "Prior-year operating income/expense restated to the 2026 QBO operating definition, for year-over-year comparisons only (budget-vs-actual for prior years keeps the General Fund 11 figures in the warehouse). 2026 'operating' = QBO Revenue/Expenditures (accounts 4xxx / 5000-6700). Prior-year equivalent = General Fund 11 total + Fund 13 cafe (4710-290/5710-290), church rental (4710-292/5710-292), bookstore (4710-295/5710-295), merchandise (4710-325) + Fund 14 interest (4310) + Fund 15 youth cafe (4816/5816). Mortgage counted once (Fund 11 transfer 5304). Monthly values = differences of YTD columns; Nov = Dec YTD - Dec current period. Source: Finance/Stewardship Team Archive/2025 MCC Stewardship Team Info (monthly Fund 11/13/14/15 Income & Expense Statements; 2024 from the 'YTD Prior Year' column and the Dec 2024 reports). Built 2026-10-18. give_4100 = Fund 11 General Offering (account 4100) monthly, used for the giving chart where the warehouse has no give_4100 history.",
+ "op_income": {
+  "2025": [
+   70366.22,
+   100695.09,
+   166262.75,
+   135268.5,
+   138360.02,
+   136515.83,
+   102575.21,
+   147423.84,
+   123108.28,
+   127593.24,
+   131611.14,
+   231190.88
+  ],
+  "2024": [
+   82182.98,
+   87794.24,
+   141586.22,
+   121162.13,
+   104281.01,
+   125823.64,
+   114309.24,
+   105928.51,
+   132749.75,
+   101260.98,
+   106293.98,
+   253921.88
+  ]
+ },
+ "op_expense": {
+  "2025": [
+   122005.06,
+   121311.98,
+   123473.52,
+   145988.65,
+   131548.02,
+   153224.81,
+   113319.96,
+   131873.29,
+   122902.92,
+   164978.21,
+   133518.38,
+   149087.46
+  ],
+  "2024": [
+   106159.7,
+   123985.2,
+   99813.16,
+   108224.79,
+   152879.99,
+   129235.84,
+   68390.77,
+   104760.28,
+   104895.6,
+   152294.13,
+   166954.22,
+   120741.35
+  ]
+ },
+ "give_4100": {
+  "2025": [
+   66130.12,
+   97358.92,
+   161382.2,
+   130444.75,
+   132350.5,
+   132969.82,
+   99916.93,
+   145332.06,
+   117016.66,
+   123384.03,
+   123629.73,
+   223564.14
+  ],
+  "2024": [
+   76293.84,
+   86720.05,
+   138862.17,
+   114821.13,
+   97420.04,
+   121972.92,
+   111849.65,
+   101832.46,
+   129040.89,
+   97942.79,
+   99598.74,
+   241906.05
+  ]
+ }
+}
