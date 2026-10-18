@@ -254,7 +254,7 @@ html { scroll-behavior: smooth; }
   <div class="section-label" id="fin-sec-3">Annual giving &mdash; are we growing?</div>
   <div class="chart-card">
     <h2>Total giving received each year</h2>
-    <p class="chart-sub">Full-year totals for 2022&ndash;2025. The 2026 bar shows giving received so far (January through <span class="hdr-month"></span>).</p>
+    <p class="chart-sub">Tithes &amp; offerings (account 4100). Full-year totals for 2022&ndash;2025; the 2026 bar shows giving received so far (January through <span class="hdr-month"></span>). <span id="giving-annual-note"></span></p>
     <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>2026 year-to-date</span></div>
     <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
   </div>
@@ -449,6 +449,8 @@ const CASH_ON_HAND = 157561.71;
 const CASH_AS_OF = "2026-09-30";
 const YTD_GIVING = 1124317.27;
 const CMP_PRIOR = [2024, 2025];
+const annualGiving = {2022:1406184,2023:1515712,2024:1418260.73,2025:1553479.86};
+const GIVING_INCOME_YEARS = [2022, 2023];
 const GIVING_PRIOR_YTD = 1082901.96;
 const WEEKLY_BUDGET = 34900;
 const BUDGET_WEEKS = 39;
@@ -526,7 +528,8 @@ const yT = { callback: v => '$' + Math.round(Math.abs(v)/1000) + 'K', color: '#9
 const yN = { callback: v => (v<0?'-$':'$') + Math.round(Math.abs(v)/1000) + 'K', color: '#9CA3AF' };
 const priorYears = [2022,2023,2024,2025];
 
-new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:[...priorYears.map(()=>'#343A44'),'#8899AA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+(function(){const n=document.getElementById('giving-annual-note'); if(n&&GIVING_INCOME_YEARS.length) n.textContent='* '+GIVING_INCOME_YEARS.join(' & ')+': total General + Missions fund income (no separate 4100 history).';})();
+new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(y=>String(y)+(GIVING_INCOME_YEARS.includes(y)?'*':'')),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualGiving[y]),(YTD_GIVING!==null?YTD_GIVING:ytdInc)],backgroundColor:[...priorYears.map(()=>'#343A44'),'#8899AA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
 new Chart(document.getElementById('incExpChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{label:'Giving received',data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:'#343A44',borderRadius:4},{label:'Operating costs',data:[...priorYears.map(y=>annualExpense[y]),ytdExp],backgroundColor:'#C8842A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 

@@ -240,6 +240,16 @@ def extract():
         if not any(v is not None for v in giv_hist[y]):
             giv_hist[y] = _cmpd("give_4100", y, giv_hist[y])
     giving_prior_ytd = _sum(giv_hist[CUR_YEAR - 1], upto=rm)
+    # Annual giving (4100) for the "Total giving received each year" chart.
+    # Years without a full 4100 monthly history fall back to that year's
+    # operating income (2022-2023: General + Missions fund income) and are flagged.
+    annual_giving, giving_income_years = {}, []
+    for y in YEARS[:-1]:
+        if all(v is not None for v in giv_hist[y]):
+            annual_giving[y] = _sum(giv_hist[y])
+        else:
+            annual_giving[y] = annual_income.get(y)
+            giving_income_years.append(y)
     def _giv_line(y):
         return giv_hist[y] if any(v is not None for v in giv_hist[y]) else inc[y]
     monthly = dict(
@@ -261,6 +271,7 @@ def extract():
         budget_income=budget_income, cash_on_hand=cash, cash_as_of=cash_as_of, loan=loan,
         monthly=monthly, payroll_note=payroll_note,
         cmp_prior=cmp_prior, giving_prior_ytd=giving_prior_ytd,
+        annual_giving=annual_giving, giving_income_years=giving_income_years,
         weekly_budget=weekly_budget, budget_weeks=budget_weeks,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
@@ -435,7 +446,7 @@ __DATA_BLOCK__
   <div class="section-label">Annual giving &mdash; are we growing?</div>
   <div class="chart-card">
     <h2>Total giving received each year</h2>
-    <p class="chart-sub">Full-year totals for 2022&ndash;2025. The 2026 bar shows giving received so far (January through <span class="hdr-month"></span>).</p>
+    <p class="chart-sub">Tithes &amp; offerings (account 4100). Full-year totals for 2022&ndash;2025; the 2026 bar shows giving received so far (January through <span class="hdr-month"></span>). <span id="giving-annual-note"></span></p>
     <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>2026 year-to-date</span></div>
     <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
   </div>
@@ -592,7 +603,8 @@ const yT = { callback: v => '$' + Math.round(Math.abs(v)/1000) + 'K', color: '#9
 const yN = { callback: v => (v<0?'-$':'$') + Math.round(Math.abs(v)/1000) + 'K', color: '#9CA3AF' };
 const priorYears = [2022,2023,2024,2025];
 
-new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:[...priorYears.map(()=>'#343A44'),'#8899AA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
+(function(){const n=document.getElementById('giving-annual-note'); if(n&&GIVING_INCOME_YEARS.length) n.textContent='* '+GIVING_INCOME_YEARS.join(' & ')+': total General + Missions fund income (no separate 4100 history).';})();
+new Chart(document.getElementById('givingChart'),{type:'bar',data:{labels:[...priorYears.map(y=>String(y)+(GIVING_INCOME_YEARS.includes(y)?'*':'')),'2026 YTD'],datasets:[{data:[...priorYears.map(y=>annualGiving[y]),(YTD_GIVING!==null?YTD_GIVING:ytdInc)],backgroundColor:[...priorYears.map(()=>'#343A44'),'#8899AA'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
 new Chart(document.getElementById('incExpChart'),{type:'bar',data:{labels:[...priorYears.map(String),'2026 YTD'],datasets:[{label:'Giving received',data:[...priorYears.map(y=>annualIncome[y]),ytdInc],backgroundColor:'#343A44',borderRadius:4},{label:'Operating costs',data:[...priorYears.map(y=>annualExpense[y]),ytdExp],backgroundColor:'#C8842A',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yT,min:0}}}});
 
@@ -700,6 +712,8 @@ def data_block(d):
         "const CASH_AS_OF = %s;" % json.dumps(d.get("cash_as_of")),
         "const YTD_GIVING = %s;" % _js_num(d["ytd_giving"]),
         "const CMP_PRIOR = %s;" % json.dumps(d["cmp_prior"]),
+        "const annualGiving = %s;" % _js_obj(d["annual_giving"]),
+        "const GIVING_INCOME_YEARS = %s;" % json.dumps(d["giving_income_years"]),
         "const GIVING_PRIOR_YTD = %s;" % _js_num(d["giving_prior_ytd"]),
         "const WEEKLY_BUDGET = %s;" % _js_num(d.get("weekly_budget")),
         "const BUDGET_WEEKS = %s;" % _js_num(d.get("budget_weeks")),
