@@ -254,7 +254,7 @@ html { scroll-behavior: smooth; }
   <div class="section-label" id="fin-sec-3">Annual giving &mdash; are we growing?</div>
   <div class="chart-card">
     <h2>Total giving received each year</h2>
-    <p class="chart-sub">Tithes &amp; offerings (account 4100). Full-year totals for 2022&ndash;2025; the 2026 bar shows giving received so far (January through <span class="hdr-month"></span>). <span id="giving-annual-note"></span></p>
+    <p class="chart-sub">Tithes &amp; offerings (account 4100; 2022&ndash;2023 include missions offerings, which moved into 4100 in 2024). Full-year totals for 2022&ndash;2025; the 2026 bar shows giving received so far (January through <span class="hdr-month"></span>). <span id="giving-annual-note"></span></p>
     <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>2026 year-to-date</span></div>
     <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
   </div>
@@ -262,7 +262,7 @@ html { scroll-behavior: smooth; }
   <div class="section-label" id="fin-sec-4">Is income covering our costs?</div>
   <div class="chart-card">
     <h2>Annual operating income vs operating costs</h2>
-    <p class="chart-sub">When the slate bar is taller, we finished the year with a surplus. When amber is taller, we ran a deficit. 2024&ndash;2026 use the 2026 QuickBooks operating definition (General Fund plus café, church rental, bookstore and interest). <span id="incexp-note"></span></p>
+    <p class="chart-sub">When the slate bar is taller, we finished the year with a surplus. When amber is taller, we ran a deficit. All years use the 2026 QuickBooks operating definition (General Fund plus café, church rental, bookstore and interest; 2022&ndash;2023 also include the Missions Fund, excluding Pit Road). <span id="incexp-note"></span></p>
     <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Operating income</span><span class="legend-item"><span class="legend-dot" style="background:#C8842A;"></span>Operating costs</span></div>
     <div class="chart-wrap" style="height:230px;"><canvas id="incExpChart" role="img" aria-label="Operating income vs operating costs 2022 through 2026 YTD"></canvas></div>
   </div>
@@ -441,23 +441,23 @@ const annualBudgetIncome  = {2022:1203775,2023:1220300,2024:1482025,2025:1604875
 const ytd2026Income  = [107451.1,108714.84,129496.25,178529.59,124018.04,144174.37,128883.87,132268.7,136113.65];
 const ytd2026Expense = [147212.47,152827.55,153449.52,189917.69,147390.06,142459.9,170444.41,131662.62,128359.64];
 const ytd2026Months  = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
-const janAprIncome  = {2022:968633,2023:1031392,2024:1015817.72,2025:1120575.74,2026:1189650.41};
-const janAprExpense = {2022:1033757,2023:1002895,2024:998345.33,2025:1165648.21,2026:1363723.86};
+const janAprIncome  = {2022:992427.21,2023:1057003.48,2024:1015817.72,2025:1120575.74,2026:1189650.41};
+const janAprExpense = {2022:1014849.03,2023:1004954.7,2024:998345.33,2025:1165648.21,2026:1363723.86};
 const LAST_UPDATED = "September 2026";
-const DATA_NOTE    = "2022\u20132023 actuals include General Fund + Missions Fund (excl. Pit Road). Year-over-year figures restate 2024\u20132025 to the 2026 QuickBooks operating definition (General Fund plus caf\u00e9, church rental, bookstore and interest from Funds 13\u201315); prior-year budget comparisons use General Fund only. Source: PowerChurch (2022\u20132025), QuickBooks Online (2026).";
+const DATA_NOTE    = "Year-over-year figures restate 2022\u20132025 to the 2026 QuickBooks operating definition (General Fund plus caf\u00e9, church rental, bookstore and interest from Funds 13\u201315; 2022\u20132023 also include the Missions Fund, excl. Pit Road). Prior-year budget comparisons use the original fund figures. Source: PowerChurch (2022\u20132025), QuickBooks Online (2026).";
 const CASH_ON_HAND = 157561.71;
 const CASH_AS_OF = "2026-09-30";
 const YTD_GIVING = 1124317.27;
-const CMP_PRIOR = [2024, 2025];
-const annualGiving = {2022:1406184,2023:1515712,2024:1418260.73,2025:1553479.86};
-const annualIncomeCmp = {2022:1406184,2023:1515712,2024:1477294.56,2025:1610971};
-const annualExpenseCmp = {2022:1374577,2023:1349295,2024:1438335.03,2025:1613232.26};
-const GIVING_INCOME_YEARS = [2022, 2023];
+const CMP_PRIOR = [2022, 2023, 2024, 2025];
+const annualGiving = {2022:1406128.68,2023:1515686.32,2024:1418260.73,2025:1553479.86};
+const annualIncomeCmp = {2022:1437514.92,2023:1556291.72,2024:1477294.56,2025:1610971};
+const annualExpenseCmp = {2022:1351715,2023:1349179.28,2024:1438335.03,2025:1613232.26};
+const GIVING_INCOME_YEARS = [];
 const GIVING_PRIOR_YTD = 1082901.96;
 const WEEKLY_BUDGET = 34900;
 const BUDGET_WEEKS = 39;
 const LOAN = {"lender": "First State Bank", "rate": "6.67%", "payment": 12830.83, "principal": 4806.51, "interest": 8024.32, "balance": 1440763.33, "as_of": "October 4, 2026"};
-const MONTHLY = {"months12": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "giving_chart": {"y2024": [76293.84, 86720.05, 138862.17, 114821.13, 97420.04, 121972.92, 111849.65, 101832.46, 129040.89, 97942.79, 99598.74, 241906.05], "y2025": [66130.12, 97358.92, 161382.2, 130444.75, 132350.5, 132969.82, 99916.93, 145332.06, 117016.66, 123384.03, 123629.73, 223564.14], "y2026": [96872.49, 101828.06, 121537.32, 171822.96, 107732.8, 137147.08, 125714.37, 128492.96, 133169.23, null, null, null]}, "expense_chart": {"y2024": [106159.7, 123985.2, 99813.16, 108224.79, 152879.99, 129235.84, 68390.77, 104760.28, 104895.6, 152294.13, 166954.22, 120741.35], "y2025": [122005.06, 121311.98, 123473.52, 145988.65, 131548.02, 153224.81, 113319.96, 131873.29, 122902.92, 164978.21, 133518.38, 149087.46], "y2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, 170444.41, 131662.62, 128359.64, null, null, null]}, "income_table": {"2022": [87163.0, 95988.0, 109900.0, 150004.0, 113555.0, 110814.0, 95557.0, 87095.0, 118557.0], "2023": [64824.0, 89895.0, 119128.0, 130114.0, 90236.0, 125297.0, 138285.0, 105685.0, 167928.0], "2024": [82182.98, 87794.24, 141586.22, 121162.13, 104281.01, 125823.64, 114309.24, 105928.51, 132749.75], "2025": [70366.22, 100695.09, 166262.75, 135268.5, 138360.02, 136515.83, 102575.21, 147423.84, 123108.28], "2026": [107451.1, 108714.84, 129496.25, 178529.59, 124018.04, 144174.37, 128883.87, 132268.7, 136113.65]}, "expense_table": {"2022": [94382.0, 100727.0, 141604.0, 97031.0, 111113.0, 157223.0, 94621.0, 108767.0, 128289.0], "2023": [100898.0, 112560.0, 110885.0, 112667.0, 145223.0, 94965.0, 122961.0, 99505.0, 103231.0], "2024": [106159.7, 123985.2, 99813.16, 108224.79, 152879.99, 129235.84, 68390.77, 104760.28, 104895.6], "2025": [122005.06, 121311.98, 123473.52, 145988.65, 131548.02, 153224.81, 113319.96, 131873.29, 122902.92], "2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, 170444.41, 131662.62, 128359.64]}, "narrow_years": [2022, 2023], "giving_prior_is_income": false};
+const MONTHLY = {"months12": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "giving_chart": {"y2024": [76293.84, 86720.05, 138862.17, 114821.13, 97420.04, 121972.92, 111849.65, 101832.46, 129040.89, 97942.79, 99598.74, 241906.05], "y2025": [66130.12, 97358.92, 161382.2, 130444.75, 132350.5, 132969.82, 99916.93, 145332.06, 117016.66, 123384.03, 123629.73, 223564.14], "y2026": [96872.49, 101828.06, 121537.32, 171822.96, 107732.8, 137147.08, 125714.37, 128492.96, 133169.23, null, null, null]}, "expense_chart": {"y2024": [106159.7, 123985.2, 99813.16, 108224.79, 152879.99, 129235.84, 68390.77, 104760.28, 104895.6, 152294.13, 166954.22, 120741.35], "y2025": [122005.06, 121311.98, 123473.52, 145988.65, 131548.02, 153224.81, 113319.96, 131873.29, 122902.92, 164978.21, 133518.38, 149087.46], "y2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, 170444.41, 131662.62, 128359.64, null, null, null]}, "income_table": {"2022": [89776.46, 97840.41, 111038.39, 152315.75, 114730.51, 111770.34, 96787.22, 96066.05, 122102.08], "2023": [71877.65, 93872.17, 121469.64, 134580.84, 93017.84, 127615.86, 139438.95, 106562.43, 168568.1], "2024": [82182.98, 87794.24, 141586.22, 121162.13, 104281.01, 125823.64, 114309.24, 105928.51, 132749.75], "2025": [70366.22, 100695.09, 166262.75, 135268.5, 138360.02, 136515.83, 102575.21, 147423.84, 123108.28], "2026": [107451.1, 108714.84, 129496.25, 178529.59, 124018.04, 144174.37, 128883.87, 132268.7, 136113.65]}, "expense_table": {"2022": [91061.13, 98219.37, 140180.49, 95215.35, 109584.05, 155286.3, 92048.75, 107047.74, 126205.85], "2023": [101300.29, 114230.22, 110045.6, 114430.4, 145476.04, 94054.9, 121925.99, 100528.61, 102962.65], "2024": [106159.7, 123985.2, 99813.16, 108224.79, 152879.99, 129235.84, 68390.77, 104760.28, 104895.6], "2025": [122005.06, 121311.98, 123473.52, 145988.65, 131548.02, 153224.81, 113319.96, 131873.29, 122902.92], "2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, 170444.41, 131662.62, 128359.64]}, "narrow_years": [], "giving_prior_is_income": false};
 const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.";
 
 
@@ -512,7 +512,7 @@ const deficitLead = ytdNet <= worstPrior
   : `The January–${lastMonth} net of <strong>${fmt(ytdNet)}</strong> sits within the range of recent years`;
 const insights = [
   { dot: ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? 'dot-green' : 'dot-blue',
-    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025 on a like-for-like basis${GIVING_PRIOR_YTD && YTD_GIVING ? ` (tithes &amp; offerings alone are ${YTD_GIVING>=GIVING_PRIOR_YTD?'up':'down'} <strong>${Math.abs((YTD_GIVING-GIVING_PRIOR_YTD)/GIVING_PRIOR_YTD*100).toFixed(1)}%</strong>)` : ''}. ${ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? `That is ahead of the same period in ${CMP_PRIOR.join(' and ')}.` : 'Momentum is tracking with recent years.'}` },
+    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025 on a like-for-like basis${GIVING_PRIOR_YTD && YTD_GIVING ? ` (tithes &amp; offerings alone are ${YTD_GIVING>=GIVING_PRIOR_YTD?'up':'down'} <strong>${Math.abs((YTD_GIVING-GIVING_PRIOR_YTD)/GIVING_PRIOR_YTD*100).toFixed(1)}%</strong>)` : ''}. ${ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? (CMP_PRIOR.length>2 ? `That is the strongest January–${lastMonth} of any year since ${CMP_PRIOR[0]}.` : `That is ahead of the same period in ${CMP_PRIOR.join(' and ')}.`) : 'Momentum is tracking with recent years.'}` },
   { dot: Number(expChg) > Number(incChg) ? 'dot-red' : 'dot-green',
     text:`Operating costs are ${expChg>=0?'up':'down'} <strong>${Math.abs(expChg)}%</strong> year-over-year vs ${incChg}% income growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>.${Number(expChg) > Number(incChg) ? ' Costs outpacing income is the key financial challenge right now.' : ''}` },
   { dot: ytdNet >= 0 ? 'dot-green' : 'dot-amber',

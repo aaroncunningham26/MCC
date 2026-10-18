@@ -59,11 +59,11 @@ BUDGET_INCOME_HISTORY = {2022: 1203775, 2023: 1220300, 2024: 1482025, 2025: 1604
 LOAN_TERMS = {"lender": "First State Bank", "rate": "6.67%",
               "payment": 12830.83, "principal": 4806.51, "interest": 8024.32}
 
-DATA_NOTE = ("2022–2023 actuals include General Fund + Missions Fund "
-             "(excl. Pit Road). Year-over-year figures restate 2024–2025 to the "
-             "2026 QuickBooks operating definition (General Fund plus café, church "
-             "rental, bookstore and interest from Funds 13–15); prior-year budget "
-             "comparisons use General Fund only. "
+DATA_NOTE = ("Year-over-year figures restate 2022–2025 to the 2026 QuickBooks "
+             "operating definition (General Fund plus café, church rental, bookstore "
+             "and interest from Funds 13–15; 2022–2023 also include the Missions Fund, "
+             "excl. Pit Road). Prior-year budget comparisons use the original "
+             "fund figures. "
              "Source: PowerChurch (2022–2025), QuickBooks Online (2026).")
 
 
@@ -451,7 +451,7 @@ __DATA_BLOCK__
   <div class="section-label">Annual giving &mdash; are we growing?</div>
   <div class="chart-card">
     <h2>Total giving received each year</h2>
-    <p class="chart-sub">Tithes &amp; offerings (account 4100). Full-year totals for 2022&ndash;2025; the 2026 bar shows giving received so far (January through <span class="hdr-month"></span>). <span id="giving-annual-note"></span></p>
+    <p class="chart-sub">Tithes &amp; offerings (account 4100; 2022&ndash;2023 include missions offerings, which moved into 4100 in 2024). Full-year totals for 2022&ndash;2025; the 2026 bar shows giving received so far (January through <span class="hdr-month"></span>). <span id="giving-annual-note"></span></p>
     <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Prior years (full year)</span><span class="legend-item"><span class="legend-dot" style="background:#8899AA;"></span>2026 year-to-date</span></div>
     <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
   </div>
@@ -459,7 +459,7 @@ __DATA_BLOCK__
   <div class="section-label">Is income covering our costs?</div>
   <div class="chart-card">
     <h2>Annual operating income vs operating costs</h2>
-    <p class="chart-sub">When the slate bar is taller, we finished the year with a surplus. When amber is taller, we ran a deficit. 2024&ndash;2026 use the 2026 QuickBooks operating definition (General Fund plus café, church rental, bookstore and interest). <span id="incexp-note"></span></p>
+    <p class="chart-sub">When the slate bar is taller, we finished the year with a surplus. When amber is taller, we ran a deficit. All years use the 2026 QuickBooks operating definition (General Fund plus café, church rental, bookstore and interest; 2022&ndash;2023 also include the Missions Fund, excluding Pit Road). <span id="incexp-note"></span></p>
     <div class="legend"><span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Operating income</span><span class="legend-item"><span class="legend-dot" style="background:#C8842A;"></span>Operating costs</span></div>
     <div class="chart-wrap" style="height:230px;"><canvas id="incExpChart" role="img" aria-label="Operating income vs operating costs 2022 through 2026 YTD"></canvas></div>
   </div>
@@ -590,7 +590,7 @@ const deficitLead = ytdNet <= worstPrior
   : `The January–${lastMonth} net of <strong>${fmt(ytdNet)}</strong> sits within the range of recent years`;
 const insights = [
   { dot: ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? 'dot-green' : 'dot-blue',
-    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025 on a like-for-like basis${GIVING_PRIOR_YTD && YTD_GIVING ? ` (tithes &amp; offerings alone are ${YTD_GIVING>=GIVING_PRIOR_YTD?'up':'down'} <strong>${Math.abs((YTD_GIVING-GIVING_PRIOR_YTD)/GIVING_PRIOR_YTD*100).toFixed(1)}%</strong>)` : ''}. ${ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? `That is ahead of the same period in ${CMP_PRIOR.join(' and ')}.` : 'Momentum is tracking with recent years.'}` },
+    text:`Operating income in the January–${lastMonth} window is <strong>${fmt(ytdInc)}</strong>, ${incChg>=0?'up':'down'} ${Math.abs(incChg)}% from the same period in 2025 on a like-for-like basis${GIVING_PRIOR_YTD && YTD_GIVING ? ` (tithes &amp; offerings alone are ${YTD_GIVING>=GIVING_PRIOR_YTD?'up':'down'} <strong>${Math.abs((YTD_GIVING-GIVING_PRIOR_YTD)/GIVING_PRIOR_YTD*100).toFixed(1)}%</strong>)` : ''}. ${ytdInc >= Math.max(...CMP_PRIOR.map(y=>janAprIncome[y])) ? (CMP_PRIOR.length>2 ? `That is the strongest January–${lastMonth} of any year since ${CMP_PRIOR[0]}.` : `That is ahead of the same period in ${CMP_PRIOR.join(' and ')}.`) : 'Momentum is tracking with recent years.'}` },
   { dot: Number(expChg) > Number(incChg) ? 'dot-red' : 'dot-green',
     text:`Operating costs are ${expChg>=0?'up':'down'} <strong>${Math.abs(expChg)}%</strong> year-over-year vs ${incChg}% income growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>.${Number(expChg) > Number(incChg) ? ' Costs outpacing income is the key financial challenge right now.' : ''}` },
   { dot: ytdNet >= 0 ? 'dot-green' : 'dot-amber',
