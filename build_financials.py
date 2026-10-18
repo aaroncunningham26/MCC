@@ -195,7 +195,7 @@ def extract():
 
     # YTD budget pace, same convention as the Finance Team dashboard:
     # giving budget = config weekly_budget x Sundays elapsed (Jan 1 .. last day
-    # of the reporting month); the annual budget is balanced, so budgeted net = 0.
+    # of the reporting month); 
     weekly_budget = cfg.get("weekly_budget")
     _jan1 = datetime.date(CUR_YEAR, 1, 1)
     _first_sun = _jan1 + datetime.timedelta(days=(6 - _jan1.weekday()) % 7)
@@ -524,10 +524,6 @@ if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', 
 if (YTD_GIVING !== null && WEEKLY_BUDGET && BUDGET_WEEKS) {
   const gBud = WEEKLY_BUDGET * BUDGET_WEEKS, gVar = YTD_GIVING - gBud;
   cards.push({ label:'YTD Giving Budget (Jan–'+lastMonth+')', value:fmt(gBud), sub:(gVar>=0?'▲ ':'▼ ')+fmt(Math.abs(Math.round(gVar)))+(gVar>=0?' ahead':' behind')+' · '+Math.round(YTD_GIVING/gBud*100)+'% of pace ('+BUDGET_WEEKS+' wks × '+fmt(WEEKLY_BUDGET)+')', cls:gVar>=0?'up':'down', accent:gVar>=0?'accent-green':'accent-red' });
-}
-if (budget2026) {
-  const nVar = ytdNet - 0;
-  cards.push({ label:'YTD Net Budget (Jan–'+lastMonth+')', value:fmt(0), sub:'Balanced budget · actual net is '+fmt(Math.abs(Math.round(nVar)))+(nVar>=0?' ahead':' behind'), cls:nVar>=0?'up':'down', accent:nVar>=0?'accent-green':'accent-red' });
 }
 if (budget2026) cards.push({ label:'2026 annual budget', value:fmt(budget2026), sub:'Received '+Math.round(ytdInc/budget2026*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' });
 if (CASH_ON_HAND !== null) {
