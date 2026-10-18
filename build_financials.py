@@ -193,6 +193,17 @@ def extract():
     # detected from personnel_expense instead of hard-coding "April".
     payroll_note = _payroll_note(per[CUR_YEAR], rm)
 
+    # YTD budget pace, same convention as the Finance Team dashboard:
+    # giving budget = config weekly_budget x Sundays elapsed (Jan 1 .. last day
+    # of the reporting month); the annual budget is balanced, so budgeted net = 0.
+    weekly_budget = cfg.get("weekly_budget")
+    _jan1 = datetime.date(CUR_YEAR, 1, 1)
+    _first_sun = _jan1 + datetime.timedelta(days=(6 - _jan1.weekday()) % 7)
+    _mend = (datetime.date(CUR_YEAR + (rm == 12), rm % 12 + 1, 1) - datetime.timedelta(days=1))
+    budget_weeks = (_mend - _first_sun).days // 7 + 1
+    if weekly_budget is None:
+        _warnings.append("WARNING: config key 'weekly_budget' missing -- YTD Giving Budget card omitted.")
+
     # Monthly comparison sections (charts + period-matched tables), ported from
     # the Finance Team Dashboard. Charts show 2024/2025 lines + 2026 bars; tables
     # show 2022-2026, Jan..reporting-month. The giving chart prefers the 4100
@@ -218,6 +229,7 @@ def extract():
         ytd_income=ytd_income, ytd_expense=ytd_expense, ytd_giving=ytd_giving,
         budget_income=budget_income, cash_on_hand=cash, cash_as_of=cash_as_of, loan=loan,
         monthly=monthly, payroll_note=payroll_note,
+        weekly_budget=weekly_budget, budget_weeks=budget_weeks,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
     )
@@ -509,6 +521,14 @@ const cards = [
   { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — income is covering costs':'Deficit — costs exceeding income', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' }
 ];
 if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', value:fmt(YTD_GIVING), sub:Math.round(YTD_GIVING/ytdInc*100)+'% of operating income · 4100 tithes & offerings', cls:'neutral', accent:'accent-blue' });
+if (YTD_GIVING !== null && WEEKLY_BUDGET && BUDGET_WEEKS) {
+  const gBud = WEEKLY_BUDGET * BUDGET_WEEKS, gVar = YTD_GIVING - gBud;
+  cards.push({ label:'YTD Giving Budget (Jan–'+lastMonth+')', value:fmt(gBud), sub:(gVar>=0?'▲ ':'▼ ')+fmt(Math.abs(Math.round(gVar)))+(gVar>=0?' ahead':' behind')+' · '+Math.round(YTD_GIVING/gBud*100)+'% of pace ('+BUDGET_WEEKS+' wks × '+fmt(WEEKLY_BUDGET)+')', cls:gVar>=0?'up':'down', accent:gVar>=0?'accent-green':'accent-red' });
+}
+if (budget2026) {
+  const nVar = ytdNet - 0;
+  cards.push({ label:'YTD Net Budget (Jan–'+lastMonth+')', value:fmt(0), sub:'Balanced budget · actual net is '+fmt(Math.abs(Math.round(nVar)))+(nVar>=0?' ahead':' behind'), cls:nVar>=0?'up':'down', accent:nVar>=0?'accent-green':'accent-red' });
+}
 if (budget2026) cards.push({ label:'2026 annual budget', value:fmt(budget2026), sub:'Received '+Math.round(ytdInc/budget2026*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' });
 if (CASH_ON_HAND !== null) {
   const asOf = CASH_AS_OF ? (/^\d{4}-\d{2}-\d{2}$/.test(CASH_AS_OF) ? new Date(CASH_AS_OF+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : CASH_AS_OF) : null;
@@ -647,6 +667,8 @@ def data_block(d):
         "const CASH_ON_HAND = %s;" % _js_num(d["cash_on_hand"]),
         "const CASH_AS_OF = %s;" % json.dumps(d.get("cash_as_of")),
         "const YTD_GIVING = %s;" % _js_num(d["ytd_giving"]),
+        "const WEEKLY_BUDGET = %s;" % _js_num(d.get("weekly_budget")),
+        "const BUDGET_WEEKS = %s;" % _js_num(d.get("budget_weeks")),
         "const LOAN = %s;" % json.dumps(d["loan"]),
         "const MONTHLY = %s;" % json.dumps(d["monthly"]),
         "const PAYROLL_NOTE = %s;" % json.dumps(d["payroll_note"]),

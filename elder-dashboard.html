@@ -448,6 +448,8 @@ const DATA_NOTE    = "2022\u20132023 actuals include General Fund + Missions Fun
 const CASH_ON_HAND = 157561.71;
 const CASH_AS_OF = "2026-09-30";
 const YTD_GIVING = 1124317.27;
+const WEEKLY_BUDGET = 34900;
+const BUDGET_WEEKS = 39;
 const LOAN = {"lender": "First State Bank", "rate": "6.67%", "payment": 12830.83, "principal": 4806.51, "interest": 8024.32, "balance": 1440763.33, "as_of": "October 4, 2026"};
 const MONTHLY = {"months12": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], "giving_chart": {"y2024": [76299.0, 86725.0, 138867.0, 114826.0, 97422.0, 121975.0, 111852.0, 101834.0, 129043.0, 97945.0, 99601.0, 242301.0], "y2025": [65693.0, 97362.0, 161385.0, 130448.0, 132355.0, 132973.0, 100146.0, 145551.0, 117019.0, 123389.0, 123635.0, 223569.0], "y2026": [96872.49, 101828.06, 121537.32, 171822.96, 107732.8, 137147.08, 125714.37, 128492.96, 133169.23, null, null, null]}, "expense_chart": {"y2024": [102264.0, 118014.0, 91828.0, 96847.0, 134588.0, 121862.0, 96511.0, 100754.0, 102729.0, 147714.0, 104708.0, 171347.0], "y2025": [121234.0, 119485.0, 120650.0, 142802.0, 124219.0, 149949.0, 112898.0, 128108.0, 120214.0, 160439.0, 129052.0, 145528.0], "y2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, 170444.41, 131662.62, 128359.64, null, null, null]}, "income_table": {"2022": [87163.0, 95988.0, 109900.0, 150004.0, 113555.0, 110814.0, 95557.0, 87095.0, 118557.0], "2023": [64824.0, 89895.0, 119128.0, 130114.0, 90236.0, 125297.0, 138285.0, 105685.0, 167928.0], "2024": [76299.0, 86725.0, 138867.0, 114826.0, 97422.0, 121975.0, 111852.0, 101834.0, 129043.0], "2025": [65693.0, 97362.0, 161385.0, 130448.0, 132355.0, 132973.0, 100146.0, 145551.0, 117019.0], "2026": [107451.1, 108714.84, 129496.25, 178529.59, 124018.04, 144174.37, 128883.87, 132268.7, 136113.65]}, "expense_table": {"2022": [94382.0, 100727.0, 141604.0, 97031.0, 111113.0, 157223.0, 94621.0, 108767.0, 128289.0], "2023": [100898.0, 112560.0, 110885.0, 112667.0, 145223.0, 94965.0, 122961.0, 99505.0, 103231.0], "2024": [102264.0, 118014.0, 91828.0, 96847.0, 134588.0, 121862.0, 96511.0, 100754.0, 102729.0], "2025": [121234.0, 119485.0, 120650.0, 142802.0, 124219.0, 149949.0, 112898.0, 128108.0, 120214.0], "2026": [147212.47, 152827.55, 153449.52, 189917.69, 147390.06, 142459.9, 170444.41, 131662.62, 128359.64]}, "giving_prior_is_income": true};
 const PAYROLL_NOTE = "April's higher cost total was driven by a <strong>third payroll in the month</strong> \u2014 a calendar artifact that occurs 2\u20133 times a year on a bi-weekly pay schedule, not a new permanent cost level. The normal monthly personnel run rate is about <strong>$83,000\u2013$89,000 per month</strong>.";
@@ -483,6 +485,14 @@ const cards = [
   { label:'Net (surplus or deficit)', value:fmt(ytdNet), sub:ytdNet>=0?'Surplus — income is covering costs':'Deficit — costs exceeding income', cls:ytdNet>=0?'up':'down', accent:ytdNet>=0?'accent-green':'accent-red' }
 ];
 if (YTD_GIVING !== null) cards.push({ label:'YTD Giving (Jan–'+lastMonth+')', value:fmt(YTD_GIVING), sub:Math.round(YTD_GIVING/ytdInc*100)+'% of operating income · 4100 tithes & offerings', cls:'neutral', accent:'accent-blue' });
+if (YTD_GIVING !== null && WEEKLY_BUDGET && BUDGET_WEEKS) {
+  const gBud = WEEKLY_BUDGET * BUDGET_WEEKS, gVar = YTD_GIVING - gBud;
+  cards.push({ label:'YTD Giving Budget (Jan–'+lastMonth+')', value:fmt(gBud), sub:(gVar>=0?'▲ ':'▼ ')+fmt(Math.abs(Math.round(gVar)))+(gVar>=0?' ahead':' behind')+' · '+Math.round(YTD_GIVING/gBud*100)+'% of pace ('+BUDGET_WEEKS+' wks × '+fmt(WEEKLY_BUDGET)+')', cls:gVar>=0?'up':'down', accent:gVar>=0?'accent-green':'accent-red' });
+}
+if (budget2026) {
+  const nVar = ytdNet - 0;
+  cards.push({ label:'YTD Net Budget (Jan–'+lastMonth+')', value:fmt(0), sub:'Balanced budget · actual net is '+fmt(Math.abs(Math.round(nVar)))+(nVar>=0?' ahead':' behind'), cls:nVar>=0?'up':'down', accent:nVar>=0?'accent-green':'accent-red' });
+}
 if (budget2026) cards.push({ label:'2026 annual budget', value:fmt(budget2026), sub:'Received '+Math.round(ytdInc/budget2026*100)+'% of full-year goal so far', cls:'neutral', accent:'accent-blue' });
 if (CASH_ON_HAND !== null) {
   const asOf = CASH_AS_OF ? (/^\d{4}-\d{2}-\d{2}$/.test(CASH_AS_OF) ? new Date(CASH_AS_OF+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : CASH_AS_OF) : null;
