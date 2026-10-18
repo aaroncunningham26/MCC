@@ -267,25 +267,6 @@ def build_insights(metrics):
         f"Kids attendance is holding steady{edge_note}. <strong>{kv:,} average "
         f"({kp}% of attendance)</strong> in 2026, after peaking at {kpeak}; the trend has "
         f"leveled off, giving children's ministry a stable base to build on."))
-    # 6. Donors
-    d22 = don["pcts"][0]
-    bullets.append(("amber",
-        f"Unique donors reads {cur(don):,} ({curpct(don)}%), but that is a <strong>year-to-date "
-        f"count against a full-year attendance average</strong> — it understates participation and "
-        f"is not comparable to the closed years or to the goal band. On closed years the trend is "
-        f"the real signal: {d22}% of attendance in 2022 down to {don['pcts'][3]}% in 2025, as "
-        f"attendance grew while the donor count did not. The goal was recalibrated from 40–60% to "
-        f"35–45% in September 2026: peer research puts consistent givers near 20–27% of attenders, "
-        f"so 35–45% keeps MCC well above peer median while staying reachable. Track alongside the "
-        f"finance dashboard as a long-term giving-health signal."))
-    # 7. Methodology note
-    bullets.append(("blue",
-        "Count-based metrics (visitors, baptisms, Connect Breakfast, giving, <strong>unique donors, "
-        "new donors</strong>) are year-to-date and should not be compared directly to prior full-year "
-        "totals. Unique donors is the one most easily misread: a part-year distinct-donor count "
-        "measured against a full-year attendance average understates participation, so the current "
-        "year's percentage is not comparable to the closed years and should not be judged against "
-        "the goal band. Averages (attendance, serving, circles) are fully comparable."))
     return bullets
 
 # ── HTML template ──────────────────────────────────────────────────────────
