@@ -225,10 +225,9 @@ html { scroll-behavior: smooth; }
 <a class="nav-link" href="#fin-sec-6">Is income covering our costs?</a>
 <a class="nav-link" href="#fin-sec-7">How are we tracking against our budgets?</a>
 <a class="nav-link" href="#fin-sec-8">Operating Income Comparison</a>
-<a class="nav-link" href="#fin-sec-9">Operating Expense — 2026 vs Prior Years</a>
-<a class="nav-link" href="#fin-sec-10">Operating Expense Comparison</a>
-<a class="nav-link" href="#fin-sec-11">Full summary</a>
-<a class="nav-link" href="#fin-sec-12">Campaign loan — First State Bank</a>
+<a class="nav-link" href="#fin-sec-9">Operating Expense Comparison</a>
+<a class="nav-link" href="#fin-sec-10">Full summary</a>
+<a class="nav-link" href="#fin-sec-11">Campaign loan — First State Bank</a>
 </div>
 <div class="nav-group"><a class="nav-link nav-head" href="#grp-vitals">Vitals</a>
 <a class="nav-link" href="#vit-sec-1">2026 at a glance</a>
@@ -304,21 +303,14 @@ html { scroll-behavior: smooth; }
     <table class="data-table" id="incomeCmpTable"></table>
   </div>
 
-  <div class="section-label" id="fin-sec-9">Operating Expense &mdash; 2026 vs Prior Years</div>
-  <div class="chart-card">
-    <h2>Monthly operating expense &mdash; 2026 vs 2024&ndash;2025</h2>
-    <p class="chart-sub">2026 bars against prior-year lines.</p>
-    <div class="chart-wrap" style="height:230px;"><canvas id="expenseMonthlyChart" role="img" aria-label="Monthly operating expense 2026 vs prior years"></canvas></div>
-  </div>
-
-  <div class="section-label" id="fin-sec-10">Operating Expense Comparison</div>
+  <div class="section-label" id="fin-sec-9">Operating Expense Comparison</div>
   <div class="chart-card">
     <h2>Operating expense by month &mdash; year over year</h2>
     <p class="chart-sub">Total operating expenditures each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
     <table class="data-table" id="expenseCmpTable"></table>
   </div>
 
-  <div class="section-label" id="fin-sec-11">Full summary</div>
+  <div class="section-label" id="fin-sec-10">Full summary</div>
   <div class="chart-card">
     <h2>Operating totals &mdash; year by year</h2>
     <p class="chart-sub">All figures are full-year actuals on the 2026 operating definition, except 2026, which reflects January through <span class="hdr-month"></span> only.</p>
@@ -326,7 +318,7 @@ html { scroll-behavior: smooth; }
   </div>
 
   <div id="loan-section">
-    <div class="section-label" id="fin-sec-12">Campaign loan &mdash; First State Bank</div>
+    <div class="section-label" id="fin-sec-11">Campaign loan &mdash; First State Bank</div>
     <div class="chart-card">
       <div class="cards" id="loan-cards" style="margin-bottom:0;"></div>
       <p class="chart-sub" style="margin:16px 0 0;">Balance is live from QuickBooks (2100 First State Loan); rate, payment, principal &amp; interest are from the ONE Campaign Loan Info sheet. Loan service is a designated / capital obligation, separate from the operating figures above.</p>
@@ -574,7 +566,6 @@ document.getElementById('summaryTable').innerHTML=sh;
     });
   }
   mkChart('givingMonthlyChart', M.giving_chart, 'Giving');
-  mkChart('expenseMonthlyChart', M.expense_chart, 'Expense');
   function tbl(id, data){
     const el=document.getElementById(id); if(!el) return;
     let h='<thead><tr><th>Year</th>'+ytd2026Months.map(m=>`<th>${m}</th>`).join('')+'<th>Total</th></tr></thead><tbody>';

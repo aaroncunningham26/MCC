@@ -506,13 +506,6 @@ __DATA_BLOCK__
     <table class="data-table" id="incomeCmpTable"></table>
   </div>
 
-  <div class="section-label">Operating Expense &mdash; 2026 vs Prior Years</div>
-  <div class="chart-card">
-    <h2>Monthly operating expense &mdash; 2026 vs 2024&ndash;2025</h2>
-    <p class="chart-sub">2026 bars against prior-year lines.</p>
-    <div class="chart-wrap" style="height:230px;"><canvas id="expenseMonthlyChart" role="img" aria-label="Monthly operating expense 2026 vs prior years"></canvas></div>
-  </div>
-
   <div class="section-label">Operating Expense Comparison</div>
   <div class="chart-card">
     <h2>Operating expense by month &mdash; year over year</h2>
@@ -656,7 +649,6 @@ document.getElementById('summaryTable').innerHTML=sh;
     });
   }
   mkChart('givingMonthlyChart', M.giving_chart, 'Giving');
-  mkChart('expenseMonthlyChart', M.expense_chart, 'Expense');
   function tbl(id, data){
     const el=document.getElementById(id); if(!el) return;
     let h='<thead><tr><th>Year</th>'+ytd2026Months.map(m=>`<th>${m}</th>`).join('')+'<th>Total</th></tr></thead><tbody>';
