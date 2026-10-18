@@ -247,6 +247,10 @@ def extract():
     # restated; others fall back to the warehouse figures and are flagged).
     annual_income_cmp = {y: (_sum(cinc[y]) if y in cmp_prior else annual_income.get(y)) for y in YEARS[:-1]}
     annual_expense_cmp = {y: (_sum(cexp[y]) if y in cmp_prior else annual_expense.get(y)) for y in YEARS[:-1]}
+    # Budget-vs-actual for prior years: General Fund 11 actual vs the General
+    # Fund 11 budget (the 2022-2025 budgets were Fund 11 budgets).
+    _f11 = _cmp.get("fund11_income_annual") or {}
+    budget_actual = {y: (_f11.get(str(y)) if _f11.get(str(y)) is not None else annual_income.get(y)) for y in YEARS[:-1]}
     annual_giving, giving_income_years = {}, []
     for y in YEARS[:-1]:
         if all(v is not None for v in giv_hist[y]):
@@ -277,6 +281,7 @@ def extract():
         cmp_prior=cmp_prior, giving_prior_ytd=giving_prior_ytd,
         annual_giving=annual_giving, giving_income_years=giving_income_years,
         annual_income_cmp=annual_income_cmp, annual_expense_cmp=annual_expense_cmp,
+        budget_actual=budget_actual,
         weekly_budget=weekly_budget, budget_weeks=budget_weeks,
         last_updated="%s %d" % (MONTH_FULL[rm - 1], CUR_YEAR),
         generated=datetime.date.today().isoformat(),
@@ -482,8 +487,8 @@ __DATA_BLOCK__
 
   <div class="section-label">How are we tracking against our budgets?</div>
   <div class="chart-card">
-    <h2>Giving budget vs actual &mdash; year by year</h2>
-    <p class="chart-sub">Budget is the target set at the start of each year. Variance shows whether we came in above or below the goal.</p>
+    <h2>Income budget vs actual &mdash; year by year</h2>
+    <p class="chart-sub">Budget is the income target set at the start of each year. Variance shows whether we came in above or below it. 2022&ndash;2025 compare General Fund income to the General Fund budget (that is what those budgets covered); 2026 compares operating income to the 2026 budget.</p>
     <table class="data-table" id="budgetTable"></table>
   </div>
 
@@ -517,8 +522,8 @@ __DATA_BLOCK__
 
   <div class="section-label">Full summary</div>
   <div class="chart-card">
-    <h2>General Fund &mdash; year-by-year totals</h2>
-    <p class="chart-sub">All figures are full-year actuals except 2026, which reflects January through <span class="hdr-month"></span> only.</p>
+    <h2>Operating totals &mdash; year by year</h2>
+    <p class="chart-sub">All figures are full-year actuals on the 2026 operating definition, except 2026, which reflects January through <span class="hdr-month"></span> only.</p>
     <table class="data-table" id="summaryTable"></table>
   </div>
 
@@ -621,14 +626,14 @@ const nvYears=[...CMP_PRIOR,2026];
 const nv=nvYears.map(y=>janAprIncome[y]-janAprExpense[y]);
 new Chart(document.getElementById('netChart'),{type:'bar',data:{labels:nvYears.map(String),datasets:[{data:nv,backgroundColor:nv.map(v=>v>=0?'#2F8F5B':'#DC2626'),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' Net: '+fmt(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#9CA3AF'}},y:{grid:{color:gc},ticks:yN}}}});
 
-let bh=`<thead><tr><th>Year</th><th>Giving goal</th><th>Giving received</th><th>Variance</th><th>vs goal</th></tr></thead><tbody>`;
-priorYears.forEach(y=>{const b=annualBudgetIncome[y],a=annualIncome[y];if(b==null||a==null){bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td>—</td><td>—</td></tr>`;return;}const d=a-b,c=d>=0?'pos':'neg';bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td class="${c}">${d>=0?'+':''}${fmt(d)}</td><td class="${c}">${d>=0?'+':''}${(d/b*100).toFixed(1)}%</td></tr>`;});
+let bh=`<thead><tr><th>Year</th><th>Budgeted income</th><th>Actual income</th><th>Variance</th><th>vs goal</th></tr></thead><tbody>`;
+priorYears.forEach(y=>{const b=annualBudgetIncome[y],a=budgetActual[y];if(b==null||a==null){bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td>—</td><td>—</td></tr>`;return;}const d=a-b,c=d>=0?'pos':'neg';bh+=`<tr><td>${y}</td><td>${fmt(b)}</td><td>${fmt(a)}</td><td class="${c}">${d>=0?'+':''}${fmt(d)}</td><td class="${c}">${d>=0?'+':''}${(d/b*100).toFixed(1)}%</td></tr>`;});
 if(budget2026){bh+=`<tr><td>2026 (Jan–${lastMonth})</td><td>${fmt(budget2026)} annual goal</td><td>${fmt(ytdInc)} received</td><td class="ytd-col">${Math.round(ytdInc/budget2026*100)}% of goal reached</td><td class="ytd-col">YTD only</td></tr>`;}
 bh+=`</tbody>`;
 document.getElementById('budgetTable').innerHTML=bh;
 
-let sh=`<thead><tr><th>Year</th><th>Giving received</th><th>Operating costs</th><th>Net</th><th>Giving YoY</th></tr></thead><tbody>`;
-priorYears.forEach((y,i)=>{const inc=annualIncome[y],exp=annualExpense[y],net=(inc==null||exp==null)?null:inc-exp,prev=i>0?annualIncome[priorYears[i-1]]:null,cs=(prev&&inc!=null)?((inc-prev)/prev*100).toFixed(1)+'%':'—',cc=(prev&&inc!=null)?(inc>=prev?'pos':'neg'):'';sh+=`<tr><td>${y}</td><td>${fmt(inc)}</td><td>${fmt(exp)}</td><td class="${net!=null&&net>=0?'pos':'neg'}">${net!=null&&net>=0?'+':''}${fmt(net)}</td><td class="${cc}">${(prev&&inc!=null)?(inc>=prev?'+':'')+cs:cs}</td></tr>`;});
+let sh=`<thead><tr><th>Year</th><th>Operating income</th><th>Operating costs</th><th>Net</th><th>Income YoY</th></tr></thead><tbody>`;
+priorYears.forEach((y,i)=>{const inc=annualIncomeCmp[y],exp=annualExpenseCmp[y],net=(inc==null||exp==null)?null:inc-exp,prev=i>0?annualIncomeCmp[priorYears[i-1]]:null,cs=(prev&&inc!=null)?((inc-prev)/prev*100).toFixed(1)+'%':'—',cc=(prev&&inc!=null)?(inc>=prev?'pos':'neg'):'';sh+=`<tr><td>${y}</td><td>${fmt(inc)}</td><td>${fmt(exp)}</td><td class="${net!=null&&net>=0?'pos':'neg'}">${net!=null&&net>=0?'+':''}${fmt(net)}</td><td class="${cc}">${(prev&&inc!=null)?(inc>=prev?'+':'')+cs:cs}</td></tr>`;});
 sh+=`<tr><td>2026 (Jan–${lastMonth})</td><td class="ytd-col">${fmt(ytdInc)}</td><td class="ytd-col">${fmt(ytdExp)}</td><td class="${ytdNet>=0?'pos':'neg'}">${fmt(ytdNet)}</td><td class="ytd-col">${incChg>=0?'+':''}${incChg}% vs 2025 same period</td></tr></tbody>`;
 document.getElementById('summaryTable').innerHTML=sh;
 
@@ -721,6 +726,7 @@ def data_block(d):
         "const CMP_PRIOR = %s;" % json.dumps(d["cmp_prior"]),
         "const annualGiving = %s;" % _js_obj(d["annual_giving"]),
         "const annualIncomeCmp = %s;" % _js_obj(d["annual_income_cmp"]),
+        "const budgetActual = %s;" % _js_obj(d["budget_actual"]),
         "const annualExpenseCmp = %s;" % _js_obj(d["annual_expense_cmp"]),
         "const GIVING_INCOME_YEARS = %s;" % json.dumps(d["giving_income_years"]),
         "const GIVING_PRIOR_YTD = %s;" % _js_num(d["giving_prior_ytd"]),

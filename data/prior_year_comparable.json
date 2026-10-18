@@ -1,5 +1,5 @@
 {
- "_note": "Prior-year operating income/expense restated to the 2026 QBO operating definition, for year-over-year comparisons only (budget-vs-actual for prior years keeps the General Fund 11 figures in the warehouse). 2026 'operating' = QBO Revenue/Expenditures (accounts 4xxx / 5000-6700). Prior-year equivalent = General Fund 11 total + Fund 13 cafe (4710-290/5710-290), church rental (4710-292/5710-292), bookstore (4710-295/5710-295), merchandise (4710-325) + Fund 14 interest (4310) + Fund 15 youth cafe (4816/5816). Mortgage counted once (Fund 11 transfer 5304). Monthly values = differences of YTD columns; Nov = Dec YTD - Dec current period. Source: Finance/Stewardship Team Archive/2025 MCC Stewardship Team Info (monthly Fund 11/13/14/15 Income & Expense Statements; 2024 from the 'YTD Prior Year' column and the Dec 2024 reports). Built 2026-10-18. give_4100 = Fund 11 General Offering (account 4100) monthly, used for the giving chart where the warehouse has no give_4100 history. 2022-2023 (added 2026-10-18, from the 2023 monthly and Dec 2022 reports in Stewardship Team Archive): missions ran through Fund 12 then, so they also include Fund 12 Foreign & Local Missions EXCLUDING Pit Road (income 4400-418; expenses 6400-418 and Pit Road Staff 6405) -- matching 2024+, when missions moved into Fund 11 and Pit Road became designated. 2022-2023 give_4100 = Fund 11 General Offering + Fund 12 missions offerings (4345, 4350, 4405, 4406), since from 2024 that giving is booked in 4100.",
+ "_note": "Prior-year operating income/expense restated to the 2026 QBO operating definition, for year-over-year comparisons only (budget-vs-actual for prior years keeps the General Fund 11 figures in the warehouse). 2026 'operating' = QBO Revenue/Expenditures (accounts 4xxx / 5000-6700). Prior-year equivalent = General Fund 11 total + Fund 13 cafe (4710-290/5710-290), church rental (4710-292/5710-292), bookstore (4710-295/5710-295), merchandise (4710-325) + Fund 14 interest (4310) + Fund 15 youth cafe (4816/5816). Mortgage counted once (Fund 11 transfer 5304). Monthly values = differences of YTD columns; Nov = Dec YTD - Dec current period. Source: Finance/Stewardship Team Archive/2025 MCC Stewardship Team Info (monthly Fund 11/13/14/15 Income & Expense Statements; 2024 from the 'YTD Prior Year' column and the Dec 2024 reports). Built 2026-10-18. give_4100 = Fund 11 General Offering (account 4100) monthly, used for the giving chart where the warehouse has no give_4100 history. 2022-2023 (added 2026-10-18, from the 2023 monthly and Dec 2022 reports in Stewardship Team Archive): missions ran through Fund 12 then, so they also include Fund 12 Foreign & Local Missions EXCLUDING Pit Road (income 4400-418; expenses 6400-418 and Pit Road Staff 6405) -- matching 2024+, when missions moved into Fund 11 and Pit Road became designated. 2022-2023 give_4100 = Fund 11 General Offering + Fund 12 missions offerings (4345, 4350, 4405, 4406), since from 2024 that giving is booked in 4100. fund11_income_annual = General Fund 11 TOTAL INCOME per the year-end (or latest restated) Stewardship report; used ONLY for the prior-year budget-vs-actual table, because the 2022-2025 budgets were General Fund 11 budgets.",
  "op_income": {
   "2025": [
    70366.22,
@@ -173,5 +173,11 @@
    107591.82,
    225853.3
   ]
+ },
+ "fund11_income_annual": {
+  "2022": 1192661.05,
+  "2023": 1315488.16,
+  "2024": 1418690.37,
+  "2025": 1553524.15
  }
 }
