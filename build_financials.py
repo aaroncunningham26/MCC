@@ -529,8 +529,7 @@ const insights = [
   { dot: Number(expChg) > Number(incChg) ? 'dot-red' : 'dot-green',
     text:`Operating costs are ${expChg>=0?'up':'down'} <strong>${Math.abs(expChg)}%</strong> year-over-year vs ${incChg}% income growth. For every dollar received in 2026, we are spending <strong>$${(ytdExp/ytdInc).toFixed(2)}</strong>.${Number(expChg) > Number(incChg) ? ' Costs outpacing income is the key financial challenge right now.' : ''}` },
   { dot: ytdNet >= 0 ? 'dot-green' : 'dot-amber',
-    text:`${deficitLead}${ytdNet < 0 && ytdNet <= worstPrior ? `, more than the deficit in the same period of 2025 (${netVsLastYear})` : ''}. This warrants monitoring as seasonal giving patterns play out.` },
-  { dot:'dot-blue', text: PAYROLL_NOTE }
+    text:`${deficitLead}${ytdNet < 0 && ytdNet <= worstPrior ? `, more than the deficit in the same period of 2025 (${netVsLastYear})` : ''}. This warrants monitoring as seasonal giving patterns play out.` }
 ];
 if (budget2026) insights.push({ dot:'dot-blue', text:`We have received <strong>${Math.round(ytdInc/budget2026*100)}%</strong> of our full-year budget of ${fmt(budget2026)} through ${lastMonth}. Historically, strong giving in the fall and December is essential to finishing the year on track.` });
 if (monthsCash !== null) insights.push({ dot: monthsCash >= 3 ? 'dot-green' : monthsCash >= 1.5 ? 'dot-amber' : 'dot-red', text:`We currently have <strong>${monthsCash} months of cash on hand</strong> (${fmt(CASH_ON_HAND)} unrestricted cash ÷ ${fmt(Math.round(avgMonthlyExp))} monthly operating budget). The healthy target for a church is <strong>3–6 months</strong>. ${monthsCash >= 3 ? 'We are within that range.' : 'Building reserves toward the 3-month floor should be a priority.'}` });
