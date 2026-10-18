@@ -413,6 +413,10 @@ TEMPLATE = r"""<!DOCTYPE html>
   .data-table td { padding: 9px 12px; border-bottom: 1px solid #F3F4F6; text-align: right; color: var(--ink); }
   .data-table td:first-child { text-align: left; font-weight: 700; color: var(--slate); }
   .data-table tr:last-child td { border-bottom: none; font-weight: 700; background: #F9FAFB; }
+  .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .data-table.cmp-table { font-size: 12px; font-variant-numeric: tabular-nums; }
+  .data-table.cmp-table th, .data-table.cmp-table td { padding: 8px 6px; white-space: nowrap; }
+  .data-table.cmp-table th { letter-spacing: .03em; }
   .pos { color: var(--green); font-weight: 700; }
   .neg { color: var(--red); font-weight: 700; }
   .ytd-col { color: var(--slate); font-weight: 700; }
@@ -496,28 +500,28 @@ __DATA_BLOCK__
   <div class="chart-card">
     <h2>Income budget vs actual &mdash; year by year</h2>
     <p class="chart-sub">Budget is the income target set at the start of each year. Variance shows whether we came in above or below it. 2022&ndash;2025 compare General Fund income to the General Fund budget (that is what those budgets covered); 2026 compares operating income to the 2026 budget.</p>
-    <table class="data-table" id="budgetTable"></table>
+    <div class="table-scroll"><table class="data-table" id="budgetTable"></table></div>
   </div>
 
   <div class="section-label">Operating Income Comparison</div>
   <div class="chart-card">
     <h2>Operating income by month &mdash; year over year</h2>
     <p class="chart-sub">Total operating revenue each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
-    <table class="data-table" id="incomeCmpTable"></table>
+    <div class="table-scroll"><table class="data-table cmp-table" id="incomeCmpTable"></table></div>
   </div>
 
   <div class="section-label">Operating Expense Comparison</div>
   <div class="chart-card">
     <h2>Operating expense by month &mdash; year over year</h2>
     <p class="chart-sub">Total operating expenditures each January through <span class="hdr-month"></span>, all five years (period-matched).</p>
-    <table class="data-table" id="expenseCmpTable"></table>
+    <div class="table-scroll"><table class="data-table cmp-table" id="expenseCmpTable"></table></div>
   </div>
 
   <div class="section-label">Full summary</div>
   <div class="chart-card">
     <h2>Operating totals &mdash; year by year</h2>
     <p class="chart-sub">All figures are full-year actuals on the 2026 operating definition, except 2026, which reflects January through <span class="hdr-month"></span> only.</p>
-    <table class="data-table" id="summaryTable"></table>
+    <div class="table-scroll"><table class="data-table" id="summaryTable"></table></div>
   </div>
 
   <div id="loan-section">
@@ -635,6 +639,7 @@ document.getElementById('summaryTable').innerHTML=sh;
   if (typeof MONTHLY === 'undefined' || !MONTHLY) return;
   const M = MONTHLY, m12 = M.months12;
   const m0 = v => (v==null ? '—' : fmt(Math.round(v)));
+  const mK = v => (v==null ? '—' : (Math.abs(v)>=1e6 ? '$'+(v/1e6).toFixed(2)+'M' : '$'+Math.round(v/1000)+'K'));
   function mkChart(id, s, lab){
     const el = document.getElementById(id); if(!el) return;
     new Chart(el,{ data:{labels:m12,datasets:[
@@ -653,10 +658,10 @@ document.getElementById('summaryTable').innerHTML=sh;
     const el=document.getElementById(id); if(!el) return;
     let h='<thead><tr><th>Year</th>'+ytd2026Months.map(m=>`<th>${m}</th>`).join('')+'<th>Total</th></tr></thead><tbody>';
     ['2022','2023','2024','2025','2026'].forEach(y=>{const a=data[y]||[];
-      const cells=ytd2026Months.map((mm,i)=>`<td>${m0(a[i])}</td>`).join('');
+      const cells=ytd2026Months.map((mm,i)=>`<td>${mK(a[i])}</td>`).join('');
       const tot=a.reduce((s,v)=>s+(v||0),0);
       const nar=(M.narrow_years||[]).map(String).includes(y);
-      h+=`<tr><td>${y}${nar?'*':''}</td>${cells}<td class="ytd-col">${m0(tot)}</td></tr>`;});
+      h+=`<tr><td>${y}${nar?'*':''}</td>${cells}<td class="ytd-col">${mK(tot)}</td></tr>`;});
     const nn=(M.narrow_years||[]);
     el.innerHTML=h+'</tbody>'+(nn.length?`<caption style="caption-side:bottom;text-align:left;font-size:12px;color:#6B7280;padding-top:6px">* ${nn.join('–')}: older fund definitions, not directly comparable. 2024–2025 restated to the 2026 operating definition.</caption>`:'');
   }
