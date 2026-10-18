@@ -477,6 +477,13 @@ __DATA_BLOCK__
     <div class="chart-wrap" style="height:210px;"><canvas id="givingChart" role="img" aria-label="Annual giving 2022 through 2026 YTD"></canvas></div>
   </div>
 
+  <div class="section-label">Monthly Giving &mdash; 2026 vs Prior Years</div>
+  <div class="chart-card">
+    <h2>Monthly giving &mdash; 2026 vs 2024&ndash;2025</h2>
+    <p class="chart-sub">2026 bars against prior-year lines. <span id="giving-metric-note"></span></p>
+    <div class="chart-wrap" style="height:230px;"><canvas id="givingMonthlyChart" role="img" aria-label="Monthly giving 2026 vs prior years"></canvas></div>
+  </div>
+
   <div class="section-label">Is income covering our costs?</div>
   <div class="chart-card">
     <h2>Annual operating income vs operating costs</h2>
@@ -490,13 +497,6 @@ __DATA_BLOCK__
     <h2>Income budget vs actual &mdash; year by year</h2>
     <p class="chart-sub">Budget is the income target set at the start of each year. Variance shows whether we came in above or below it. 2022&ndash;2025 compare General Fund income to the General Fund budget (that is what those budgets covered); 2026 compares operating income to the 2026 budget.</p>
     <table class="data-table" id="budgetTable"></table>
-  </div>
-
-  <div class="section-label">Monthly Giving &mdash; 2026 vs Prior Years</div>
-  <div class="chart-card">
-    <h2>Monthly giving &mdash; 2026 vs 2024&ndash;2025</h2>
-    <p class="chart-sub">2026 bars against prior-year lines. <span id="giving-metric-note"></span></p>
-    <div class="chart-wrap" style="height:230px;"><canvas id="givingMonthlyChart" role="img" aria-label="Monthly giving 2026 vs prior years"></canvas></div>
   </div>
 
   <div class="section-label">Operating Income Comparison</div>
