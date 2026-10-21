@@ -1,40 +1,40 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "October 14, 2026",
+ "run_date": "October 21, 2026",
  "run_weekday": "Wednesday",
- "data_through": "October 4, 2026",
- "weeks_ytd": 40,
+ "data_through": "October 18, 2026",
+ "weeks_ytd": 42,
  "reporting_month_index": 10,
  "reporting_month_name": "October",
  "current_month": {
-  "giving4100": 10414.56,
-  "op_income": 10555.1,
-  "op_expense": 45685.08,
-  "personnel": 45494.16,
-  "facilities": 0.0,
+  "giving4100": 75921.41,
+  "op_income": 77930.11,
+  "op_expense": 85959.05,
+  "personnel": 80877.81,
+  "facilities": 4500.53,
   "partial": true
  },
- "last_week_giving": 23716.89,
- "bank": 709664.83,
- "loan_balance": 1440763.33,
+ "last_week_giving": 29947.54,
+ "bank": 706041.15,
+ "loan_balance": 1438083.82,
  "giving_health": {
-  "committed": 288,
+  "committed": 284,
   "households": 491,
-  "new_donors_year": 66,
+  "new_donors_year": 67,
   "new_donors_week": 0,
-  "committed_individuals": 324,
+  "committed_individuals": 319,
   "committed_basis": "household",
-  "donors_ttm": 366,
-  "donors_ttm_prior": 362,
-  "donor_households_ttm": 326,
-  "donors_ttm_window": "2025-10-05..2026-10-04"
+  "donors_ttm": 362,
+  "donors_ttm_prior": 364,
+  "donor_households_ttm": 321,
+  "donors_ttm_window": "2025-10-19..2026-10-18"
  },
  "retention": {
   "retained": 227,
-  "lapsed": 50,
-  "new": 61,
-  "rate": 81.9,
-  "prior": 277,
+  "lapsed": 53,
+  "new": 57,
+  "rate": 81.1,
+  "prior": 280,
   "basis": "household"
  },
  "ramp": {
@@ -75,19 +75,20 @@
     "T-shirts for Jr High Retreat, screen printed",
     107.5
    ]
-  ]
+  ],
+  "_ramp_note": "Carried forward from the Oct 14 run (data through Oct 4): Ramp connector needed re-authorization on the Oct 21 run."
  },
  "net_assets": {
-  "unrestricted_funds_3900": 457934.63,
-  "net_revenue_ytd": -329694.52,
-  "unrestricted": 128240.11,
+  "unrestricted_funds_3900": 450588.63,
+  "net_revenue_ytd": -306744.3,
+  "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue); 3900 = unrestricted - net revenue",
+  "unrestricted": 143844.33,
   "designated_positive": 392881.86,
   "temporarily_restricted_total": -877679.9,
   "self_restricted_total": 6595.69,
-  "total_equity": -742844.1,
-  "check_equity_less_funds": 128240.11,
+  "total_equity": -727239.88,
+  "check_equity_less_funds": 143844.33,
   "basis": "accrual",
-  "source": "QBO balance sheet THIS_YEAR_TO_DATE",
-  "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue); 3900 = unrestricted - net revenue"
+  "source": "QBO balance sheet THIS_YEAR_TO_DATE"
  }
 }
