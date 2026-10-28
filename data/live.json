@@ -1,93 +1,103 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "October 21, 2026",
+ "run_date": "October 28, 2026",
  "run_weekday": "Wednesday",
- "data_through": "October 18, 2026",
- "weeks_ytd": 42,
+ "data_through": "October 25, 2026",
+ "weeks_ytd": 43,
  "reporting_month_index": 10,
  "reporting_month_name": "October",
  "current_month": {
-  "giving4100": 75921.41,
-  "op_income": 77930.11,
-  "op_expense": 85959.05,
-  "personnel": 80877.81,
-  "facilities": 4500.53,
+  "giving4100": 110091.41,
+  "op_income": 112421.66,
+  "op_expense": 103001.3,
+  "personnel": 81150.3,
+  "facilities": 13786.32,
   "partial": true
  },
- "last_week_giving": 29947.54,
- "bank": 706041.15,
- "loan_balance": 1438083.82,
+ "last_week_giving": 34270.0,
+ "bank": 730251.66,
+ "loan_balance": 1436741.18,
  "giving_health": {
-  "committed": 284,
+  "committed": 290,
   "households": 491,
-  "new_donors_year": 67,
-  "new_donors_week": 0,
-  "committed_individuals": 319,
+  "new_donors_year": 59,
+  "new_donors_week": 1,
+  "committed_individuals": 326,
   "committed_basis": "household",
-  "donors_ttm": 362,
-  "donors_ttm_prior": 364,
-  "donor_households_ttm": 321,
-  "donors_ttm_window": "2025-10-19..2026-10-18"
+  "donors_ttm": 365,
+  "donors_ttm_prior": 363,
+  "donor_households_ttm": 324,
+  "donors_ttm_window": "2025-10-26..2026-10-25"
  },
  "retention": {
-  "retained": 227,
-  "lapsed": 53,
-  "new": 57,
-  "rate": 81.1,
-  "prior": 280,
+  "retained": 230,
+  "lapsed": 49,
+  "new": 60,
+  "rate": 82.4,
+  "prior": 279,
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 13731.74,
-  "card_mtd_n": 78,
-  "card_7d": 6699.55,
-  "card_7d_n": 35,
-  "ap_paid_mtd": 3888.23,
-  "ap_paid_n": 8,
-  "ap_out": 3137.51,
-  "ap_open_n": 6,
+  "card_mtd": 20311.15,
+  "card_mtd_n": 144,
+  "card_7d": 2652.87,
+  "card_7d_n": 36,
+  "ap_paid_mtd": 10742.94,
+  "ap_paid_n": 15,
+  "ap_out": 12115.89,
+  "ap_open_n": 16,
   "card_over": [
    [
-    "10/13",
-    "MultitracksCom",
-    "Jesse Maurer",
+    "10/23",
+    "TechKnowledgey Inc",
+    "Wrennie Howard",
     "",
-    3284.88
-   ],
-   [
-    "10/07",
-    "Grass Guru",
-    "Aaron Cunningham",
-    "Landscaping service",
-    1420.0
+    757.17
    ]
   ],
   "bills_paid": [
    [
-    "10/09",
-    "Wildman Uniform  Linen",
-    "Mat rental, delivery, green services, and discount",
-    198.05
+    "10/27",
+    "Global Gates",
+    "Jayne Delegrange Missionary Support",
+    751.99
    ],
    [
-    "10/08",
-    "Digistitch Custom Apparel",
-    "T-shirts for Jr High Retreat, screen printed",
-    107.5
+    "10/27",
+    "Imperial Brady",
+    "antimicrobial foam citrus soap and freight charges",
+    225.09
+   ],
+   [
+    "10/23",
+    "Bear Lake Camp",
+    "Retreat lodging, meals, and activities for fall 2026 event",
+    1937.99
+   ],
+   [
+    "10/23",
+    "Bear Lake Camp",
+    "Retreat lodging, meals, gym, and activities charges",
+    1925.99
+   ],
+   [
+    "10/23",
+    "Heart  Hand International",
+    "Pauline Yoder",
+    751.99
    ]
-  ],
-  "_ramp_note": "Carried forward from the Oct 14 run (data through Oct 4): Ramp connector needed re-authorization on the Oct 21 run."
+  ]
  },
  "net_assets": {
-  "unrestricted_funds_3900": 450588.63,
-  "net_revenue_ytd": -306744.3,
+  "unrestricted_funds_3900": 456604.57,
+  "net_revenue_ytd": -281302.81,
   "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue); 3900 = unrestricted - net revenue",
-  "unrestricted": 143844.33,
+  "unrestricted": 175301.76,
   "designated_positive": 392881.86,
   "temporarily_restricted_total": -877679.9,
   "self_restricted_total": 6595.69,
-  "total_equity": -727239.88,
-  "check_equity_less_funds": 143844.33,
+  "total_equity": -695782.45,
+  "check_equity_less_funds": 175301.76,
   "basis": "accrual",
   "source": "QBO balance sheet THIS_YEAR_TO_DATE"
  }
