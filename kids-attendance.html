@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Kids Family Attendance — MCC Metrics</title>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --slate:#343A44; --bg:#F2F2F2; --card:#fff; --ink:#23272e; --muted:#6b7280;
+    --line:#e3e5ea; --red:#DC2626; --green:#2F8F5B; --amber:#C8842A; }
+  *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Lato',system-ui,-apple-system,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:15px; line-height:1.6; }
+  .mcc-header { position:relative; overflow:hidden; background:var(--slate); color:#fff; }
+  .mcc-header-inner { position:relative; max-width:1180px; margin:0 auto; padding:26px 30px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; }
+  .mcc-header::before { content:""; position:absolute; inset:0; background:url('https://storage1.snappages.site/VCFHFT/assets/images/21064405_1024x1024_2500.png'); background-size:620px; opacity:.065; pointer-events:none; }
+  .mcc-header .brand { display:flex; align-items:center; gap:20px; position:relative; }
+  .mcc-header .logo { height:42px; width:auto; display:block; }
+  .mcc-header .back { color:#aeb6c2; font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; text-decoration:none; display:inline-block; margin-bottom:5px; }
+  .mcc-header .back:hover { color:#fff; }
+  .mcc-header h1 { font-size:27px; font-weight:900; text-transform:uppercase; letter-spacing:-.02em; line-height:1; }
+  .mcc-header .sub { font-size:11.5px; font-weight:400; letter-spacing:.05em; text-transform:uppercase; opacity:.72; margin-top:6px; }
+  .mcc-header .right { position:relative; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; opacity:.8; text-align:right; line-height:1.7; }
+  .page { max-width:1180px; margin:0 auto; padding:28px 30px 60px; }
+  .section-label { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; margin-top:32px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .card { background:var(--card); border-radius:10px; padding:18px 20px; border:1px solid var(--line); box-shadow:0 1px 4px rgba(20,30,60,.05); }
+  .card .label { font-size:11px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+  .card .value { font-size:26px; font-weight:900; color:var(--slate); letter-spacing:-0.5px; }
+  .card .sub { font-size:12px; margin-top:4px; color:var(--muted); }
+  .card .sub.green { color:var(--green); }
+  .card.top-green { border-top:4px solid var(--green); } .card.top-blue { border-top:4px solid var(--slate); } .card.top-amber { border-top:4px solid var(--amber); }
+  .insights { background:#F4F5F7; border:1px solid var(--line); border-radius:10px; padding:20px 24px; margin-top:6px; }
+  .insights h2 { font-size:13px; font-weight:900; text-transform:uppercase; letter-spacing:.08em; color:var(--slate); margin-bottom:12px; }
+  .insights ul { list-style:none; }
+  .insights ul li { padding:8px 0; border-bottom:1px solid var(--line); font-size:13px; display:flex; align-items:flex-start; gap:10px; line-height:1.55; }
+  .insights ul li:last-child { border-bottom:none; }
+  .dot { width:8px; height:8px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .dot-green { background:var(--green); } .dot-amber { background:var(--amber); } .dot-blue { background:var(--slate); }
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:820px) { .grid-2 { grid-template-columns:1fr; } }
+  .chart-card { background:var(--card); border-radius:10px; padding:22px 22px 18px; border:1px solid var(--line); margin-bottom:14px; box-shadow:0 1px 4px rgba(20,30,60,.05); min-width:0; }
+  .chart-card h2 { font-size:15px; font-weight:900; text-transform:uppercase; letter-spacing:-.01em; color:var(--slate); margin-bottom:4px; }
+  .chart-card .chart-sub { font-size:13px; color:var(--muted); margin-bottom:16px; }
+  .chart-wrap { position:relative; width:100%; }
+  .legend { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:14px; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); font-weight:700; }
+  .legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+  .tbl-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { text-align:left; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:2px solid var(--line); }
+  td { padding:10px; border-bottom:1px solid var(--line); }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  tr.hl td { font-weight:900; color:var(--slate); background:#F7F8FA; }
+  .method { font-size:12.5px; color:var(--muted); line-height:1.7; }
+  .method p + p { margin-top:8px; }
+  .mcc-footer { color:var(--muted); font-size:11.5px; margin-top:44px; line-height:1.8; text-align:center; }
+  @media (max-width:600px) { .page, .mcc-header-inner { padding-left:16px; padding-right:16px; } .mcc-header .right { text-align:left; } }
+</style>
+</head>
+<body>
+<header class="mcc-header">
+  <div class="mcc-header-inner">
+  <div class="brand">
+    <img class="logo" src="https://storage1.snappages.site/VCFHFT/assets/images/22645050_962x358_500.png" alt="Maple City Chapel">
+    <div>
+      <a class="back" href="care-connections.html">&larr; Care &amp; Connections</a>
+      <h1>Kids Family Attendance</h1>
+      <div class="sub">How often Maple City Kids families are here on Sundays</div>
+    </div>
+  </div>
+  <div class="right">Nov 2025 &ndash; Oct 2026<br>Source: PCO Check-Ins &middot; Maple City Kids</div>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="section-label">Trailing 12 months &mdash; families with kids checked in</div>
+  <div class="cards">
+    <div class="card top-blue"><div class="label">Avg Sundays / Month</div><div class="value">2.3</div><div class="sub">Per family, in months they attended (median 2)</div></div>
+    <div class="card top-green"><div class="label">Regular Families</div><div class="value">2.5</div><div class="sub green">Sundays/month &middot; 146 families active 6+ months</div></div>
+    <div class="card top-amber"><div class="label">Share of Sundays</div><div class="value">55%</div><div class="sub">Of available Sundays attended, in active months</div></div>
+    <div class="card top-blue"><div class="label">Families Reached</div><div class="value">323</div><div class="sub">601 kids &middot; 7,747 check-ins &middot; 49 Sundays</div></div>
+  </div>
+
+  <div class="section-label">Key takeaways</div>
+  <div class="insights"><h2>What this data is telling us</h2><ul>
+    <li><span class="dot dot-blue"></span><span>A typical Maple City Kids family is here <strong>about 2&ndash;3 Sundays a month</strong>. Even the core (families active 9+ of the last 12 months) averages <strong>2.6</strong>, not 4.</span></li>
+    <li><span class="dot dot-green"></span><span>Among the <strong>146 regular families</strong>, nearly 9 in 10 average between 1.5 and 3.5 Sundays a month. Only <strong>9</strong> families average 3.5 or more.</span></li>
+    <li><span class="dot dot-amber"></span><span>Once you account for month length, attendance is steady at <strong>52&ndash;58%</strong> of Sundays most months. The softest month was <strong>July (47%)</strong>. Nov&ndash;Dec ran higher (~65%) because those months had only 3 programmed Sundays, and the five-Sunday months (Mar, May, Aug) post the highest raw averages.</span></li>
+    <li><span class="dot dot-blue"></span><span>Planning implication: a family that is &ldquo;regular&rdquo; will miss roughly half of any given series. Kids&rsquo; curriculum and volunteer rotations work best when each Sunday stands on its own.</span></li>
+  </ul></div>
+
+  <div class="section-label">Monthly trend</div>
+  <div class="chart-card">
+    <h2>Average Sundays attended per family, by month</h2>
+    <p class="chart-sub">Bars: families with at least one kids check-in that month. Line: average Sundays those families attended. Labels show how many Sundays had kids programming.</p>
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot" style="background:#C9D1DB;"></span>Active families</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#343A44;"></span>Avg Sundays / family</span>
+    </div>
+    <div class="chart-wrap" style="height:260px;"><canvas id="monthly"></canvas></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="chart-card">
+      <h2>Sundays per family-month</h2>
+      <p class="chart-sub">Every month a family attended (1,848 family-months), by how many Sundays they came.</p>
+      <div class="chart-wrap" style="height:230px;"><canvas id="dist"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h2>Regular families by frequency</h2>
+      <p class="chart-sub">The 146 families active 6+ months, by their average Sundays per active month.</p>
+      <div class="chart-wrap" style="height:230px;"><canvas id="tiers"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-label">By engagement level</div>
+  <div class="chart-card">
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Families included</th><th class="num">Families</th><th class="num">Avg Sundays / month<br>(months attended)</th><th class="num">Avg Sundays / month<br>(full year, incl. 0s)</th></tr></thead>
+      <tbody>
+        <tr><td>All families</td><td class="num">323</td><td class="num">2.27</td><td class="num">1.08</td></tr>
+        <tr><td>Came in 3+ months</td><td class="num">194</td><td class="num">2.37</td><td class="num">1.72</td></tr>
+        <tr class="hl"><td>Came in 6+ months (regulars)</td><td class="num">146</td><td class="num">2.46</td><td class="num">2.11</td></tr>
+        <tr><td>Came in 9+ months (core)</td><td class="num">115</td><td class="num">2.57</td><td class="num">2.39</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section-label">How this is calculated</div>
+  <div class="chart-card method">
+    <p><strong>Data:</strong> every attendee check-in (regular + guest, volunteers excluded) to the Maple City Kids event in Planning Center Check-Ins, Nov 2, 2025 &ndash; Oct 25, 2026.</p>
+    <p><strong>Family:</strong> a Planning Center household. Siblings on the same Sunday count once. Children listed in two households (e.g., shared custody) link those households into one family. 6 unlinked one-time guest check-ins are excluded.</p>
+    <p><strong>Sundays:</strong> 49 Sundays with kids programming. Nov 9, Nov 30 and Dec 28, 2025 had no kids check-ins and are treated as no-programming Sundays.</p>
+    <p><strong>Averages:</strong> &ldquo;Months attended&rdquo; averages only months where the family came at least once. &ldquo;Full year&rdquo; divides each family&rsquo;s total Sundays by 12.</p>
+  </div>
+
+  <div class="mcc-footer">
+    <p>Maple City Chapel &nbsp;&middot;&nbsp; Kids Family Attendance &nbsp;&middot;&nbsp; Prepared October 28, 2026</p>
+    <p style="margin-top:2px;">Source: Planning Center Check-Ins (Maple City Kids) and People households. Point-in-time analysis.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+Chart.defaults.font.family = "'Lato', system-ui, Arial, sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6b7280';
+const gc = 'rgba(0,0,0,0.06)', tc = '#9CA3AF';
+const D = {"months": ["Nov '25","Dec '25","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct"],
+  "avail": [3,3,4,4,5,4,5,4,4,5,4,4],
+  "fams": [142,127,140,145,166,175,177,151,148,158,158,161],
+  "avg": [1.94,1.91,2.25,2.3,2.64,2.11,2.69,2.15,1.88,2.89,2.09,2.16],
+  "share": [65,64,56,57,53,53,54,54,47,58,52,54]};
+
+new Chart(document.getElementById('monthly'), {
+  data: { labels: D.months.map((m,i)=>[m, D.avail[i]+' Sun']),
+    datasets: [
+      { type:'bar', label:'Active families', data:D.fams, backgroundColor:'#C9D1DB', borderRadius:3, yAxisID:'y1', order:2 },
+      { type:'line', label:'Avg Sundays / family', data:D.avg, borderColor:'#343A44', backgroundColor:'#343A44', borderWidth:3, pointRadius:3, tension:.3, yAxisID:'y', order:1 }
+    ] },
+  options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+    plugins:{ legend:{display:false}, tooltip:{ callbacks:{
+      title:(c)=>D.months[c[0].dataIndex]+' ('+D.avail[c[0].dataIndex]+' Sundays)',
+      label:(c)=>' '+c.dataset.label+': '+c.parsed.y,
+      afterBody:(c)=>'Share of Sundays: '+D.share[c[0].dataIndex]+'%' } } },
+    scales:{ x:{grid:{display:false},ticks:{color:tc,maxRotation:0,autoSkip:false}},
+      y:{position:'left',min:0,max:4,grid:{color:gc},ticks:{color:tc,stepSize:1},title:{display:true,text:'Avg Sundays',color:tc}},
+      y1:{position:'right',min:0,grid:{display:false},ticks:{color:tc},title:{display:true,text:'Families',color:tc}} } }
+});
+
+new Chart(document.getElementById('dist'), {
+  type:'bar',
+  data:{ labels:['1 Sunday','2','3','4','5'], datasets:[{ label:'Family-months', data:[589,514,471,212,62], backgroundColor:'#343A44', borderRadius:4 }] },
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{label:(c)=>' '+c.parsed.y+' family-months ('+Math.round(100*c.parsed.y/1848)+'%)'}} },
+    scales:{ x:{grid:{display:false},ticks:{color:tc}}, y:{grid:{color:gc},ticks:{color:tc},min:0} } }
+});
+
+new Chart(document.getElementById('tiers'), {
+  type:'bar',
+  data:{ labels:['< 1.5','1.5 – 2.5','2.5 – 3.5','3.5+'], datasets:[{ label:'Families', data:[11,70,56,9], backgroundColor:['#C8842A','#8899AA','#343A44','#2F8F5B'], borderRadius:4 }] },
+  options:{ responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{callbacks:{label:(c)=>' '+c.parsed.y+' families'}} },
+    scales:{ x:{grid:{display:false},ticks:{color:tc},title:{display:true,text:'Avg Sundays per month',color:tc}}, y:{grid:{color:gc},ticks:{color:tc},min:0} } }
+});
+</script>
+</body>
+</html>
