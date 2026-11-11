@@ -1,6 +1,6 @@
 {
  "_note": "Dynamic data pulled fresh each weekly run. Everything here is genuinely live: the open month, last-week giving, bank/loan balances, PCO committed/retention (rolling 12mo), and Ramp activity. Overwrite this file each run; the renderer merges it with the warehouse (closed-month actuals, budget, loan terms).",
- "run_date": "November 4, 2026",
+ "run_date": "November 11, 2026",
  "run_weekday": "Wednesday",
  "data_through": "November 1, 2026",
  "weeks_ytd": 44,
@@ -15,19 +15,19 @@
   "partial": true
  },
  "last_week_giving": 33574.13,
- "bank": 727890.77,
+ "bank": 727440.81,
  "loan_balance": 1435396.81,
  "giving_health": {
   "committed": 293,
   "households": 500,
-  "new_donors_year": 62,
-  "new_donors_week": 1,
-  "committed_individuals": 329,
-  "committed_basis": "household",
+  "new_donors_year": 63,
+  "new_donors_week": 0,
   "donors_ttm": 367,
   "donors_ttm_prior": 353,
   "donor_households_ttm": 327,
-  "donors_ttm_window": "2025-11-02..2026-11-01"
+  "donors_ttm_window": "2025-11-02..2026-11-01",
+  "committed_individuals": 329,
+  "committed_basis": "household"
  },
  "retention": {
   "retained": 231,
@@ -38,98 +38,40 @@
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 5673.15,
-  "card_mtd_n": 23,
-  "card_7d": 7642.91,
-  "card_7d_n": 42,
-  "ap_paid_mtd": 2350.0,
-  "ap_paid_n": 3,
-  "ap_out": 6320.3,
-  "ap_open_n": 9,
-  "card_over": [
-   [
-    "11/01",
-    "Church Finance",
-    "Aaron Cunningham",
-    "AC - Outsourced accounting subscription",
-    1780.0
-   ],
-   [
-    "11/03",
-    "Grass Guru",
-    "Aaron Cunningham",
-    "Lawncare",
-    930.0
-   ],
-   [
-    "10/29",
-    "Subsplash",
-    "Aaron Cunningham",
-    "AC - Subsplash subscription",
-    561.39
-   ]
-  ],
+  "card_mtd": 7673.36,
+  "card_mtd_n": 52,
+  "card_7d": 2302.14,
+  "card_7d_n": 31,
+  "ap_paid_mtd": 2880.06,
+  "ap_paid_n": 5,
+  "ap_out": 6240.2,
+  "ap_open_n": 8,
+  "card_over": [],
   "bills_paid": [
    [
-    "11/03",
-    "Tanya Wieland",
-    "Counseling services statement",
-    450.0
+    "11/09",
+    "GET PRINTING INC.",
+    "Printing of 1000 remittance envelopes",
+    334.0
    ],
    [
-    "11/02",
-    "Missionary Ventures",
-    "Josh and Jennifer Hire Support",
-    1100.0
-   ],
-   [
-    "11/02",
-    "Glendon and Lorna Bender",
-    "Missionary support",
-    800.0
-   ],
-   [
-    "10/30",
-    "Clayton Nisly",
-    "",
-    800.0
-   ],
-   [
-    "10/30",
-    "Best Sweeping Specialist",
-    "Sweeping services for full sweep and fire lane",
-    296.0
-   ],
-   [
-    "10/29",
-    "Students International",
-    "Eric Miller missionary support",
-    800.0
-   ],
-   [
-    "10/29",
-    "Wycliffe Bible Translators",
-    "Rick/Susan Nivens Support",
-    800.0
-   ],
-   [
-    "10/28",
-    "Mission Aviation Fellowship",
-    "Dan and Stephanie Kramer support",
-    800.0
+    "11/04",
+    "Wildman Uniform & Linen",
+    "Mats and facility services including delivery and green fees",
+    196.06
    ]
   ]
  },
  "net_assets": {
-  "unrestricted_funds_3900": 446326.66,
-  "net_revenue_ytd": -301018.01,
-  "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue, summed from quarterly P&Ls Q1+Q2+Q3+Oct1-Nov4 because the connector truncates the YTD report at 100 rows); 3900 = unrestricted - net revenue",
-  "unrestricted": 145308.65,
-  "designated_positive": 399348.85,
-  "temporarily_restricted_total": -868486.12,
+  "unrestricted_funds_3900": 445929.83,
+  "net_revenue_ytd": -300871.14,
+  "net_revenue_source": "QBO P&L Jan 1 to run date (Net Revenue, summed from Jan+Feb+Mar monthly, Q2, Q3, Oct1-Nov11 P&Ls because the connector truncates large reports at 100 rows); 3900 = unrestricted - net revenue",
+  "unrestricted": 145058.69,
+  "designated_positive": 399148.85,
+  "temporarily_restricted_total": -868686.12,
   "self_restricted_total": 5345.69,
-  "total_equity": -717831.78,
-  "check_equity_less_funds": 145308.65,
+  "total_equity": -718281.74,
+  "check_equity_less_funds": 145058.69,
   "basis": "accrual",
   "source": "QBO balance sheet THIS_YEAR_TO_DATE"
  }
