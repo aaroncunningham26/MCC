@@ -38,22 +38,13 @@
   "basis": "household"
  },
  "ramp": {
-  "card_mtd": 15092.86,
-  "card_mtd_n": 87,
-  "card_7d": 7432.68,
-  "card_7d_n": 35,
+  "card_mtd": 18638.14,
+  "card_mtd_n": 122,
+  "card_7d": 5747.28,
+  "card_7d_n": 40,
   "ap_paid_mtd": 4130.43,
   "ap_paid_n": 8,
-  "ap_out": 12073.96,
-  "ap_open_n": 16,
   "card_over": [
-   [
-    "11/12",
-    "National Pen",
-    "Kris Miller",
-    "",
-    2186.34
-   ],
    [
     "11/18",
     "Church Media Squad",
@@ -62,41 +53,23 @@
     1597.0
    ],
    [
-    "11/16",
-    "Planning Center",
-    "Aaron Cunningham",
-    "AC - Planning Center Subscription",
-    682.0
+    "11/22",
+    "UPrinting",
+    "Jenn Borden",
+    "JB- green boxes for visitors",
+    699.04
    ],
    [
-    "11/17",
-    "WebstaurantStore",
-    "Kris Miller",
+    "11/21",
+    "C J Dannemiller Co",
+    "Joe Miller",
     "",
-    580.13
+    524.67
    ]
   ],
-  "bills_paid": [
-   [
-    "11/17",
-    "Cintas",
-    "First aid supplies, disinfection services, and AED equipment agreements",
-    449.96
-   ],
-   [
-    "11/13",
-    "Heart & Hand International",
-    "",
-    750.0
-   ],
-   [
-    "11/12",
-    "Economy Offset Print and Digital Services",
-    "Custom printed birthday cards for classroom moving",
-    50.41
-   ]
-  ],
-  "_ramp_note": "Ramp connector sign-in refused on 11/25/2026 run; Ramp block carried forward unchanged from 11/18/2026 run."
+  "bills_paid": [],
+  "ap_out": 13566.62,
+  "ap_open_n": 20
  },
  "net_assets": {
   "unrestricted_funds_3900": 445929.83,
